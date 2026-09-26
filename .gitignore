@@ -1,0 +1,14 @@
+# Dependências do Node.js (React)
+node_modules
+dist
+
+# Compilados do Rust (Tauri)
+src-tauri/target/
+
+# Ficheiros de ambiente e chaves secretas (nunca devem ir para o GitHub)
+.env
+.env.local
+
+# Ficheiros do sistema operativo
+.DS_Store
+Thumbs.db

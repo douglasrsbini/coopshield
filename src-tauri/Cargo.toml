@@ -1,0 +1,23 @@
+[package]
+name = "kopher-shield"
+version = "1.0.0"
+description = "Enterprise Backup & Disaster Recovery"
+authors = ["BINAVER Soluções Tecnológicas"]
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2.0.0", features = [] }
+
+[dependencies]
+tauri = { version = "2.0.0", features = [] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+rusqlite = { version = "0.40.2", features = ["bundled"] }
+lazy_static = "1.5.0"
+parking_lot = "0.12.5"
+sha2 = "0.10"
+aes-gcm = "0.10"
+rand = "0.8"
+walkdir = "2.5"
+tauri-plugin-dialog = "2"
+rfd = "0.14"
