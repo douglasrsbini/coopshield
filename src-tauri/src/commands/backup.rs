@@ -193,28 +193,27 @@ pub fn execute_backup_routine(source_path: String, destination_vault: String) ->
     Ok("Rotina iniciada em background! Acompanhe o progresso no terminal do sistema.".to_string())
 }
 
-#[command]
+#[tauri::command]
 pub fn scan_local_vault(vault_path: String) -> Result<Vec<BackupManifest>, String> {
     let mut manifests = Vec::new();
-    let path = Path::new(&vault_path);
 
-    if !path.exists() {
-        return Err("O caminho do cofre não foi encontrado.".into());
-    }
-
-    if let Ok(entries) = fs::read_dir(path) {
-        for entry in entries.filter_map(|e| e.ok()) {
-            let p = entry.path();
-            if p.is_file() && p.extension().unwrap_or_default() == "kopher" {
-                manifests.push(BackupManifest {
-                    name: entry.file_name().to_string_lossy().to_string(),
-                    path: p.to_string_lossy().to_string(),
-                    status: "Íntegro (AES-256)".to_string(),
-                });
-            }
+    // WalkDir varre a pasta e TODAS as subpastas de forma recursiva
+    for entry in WalkDir::new(&vault_path).into_iter().filter_map(|e| e.ok()) {
+        let path = entry.path();
+        
+        // Verifica se é um ficheiro válido e se termina em ".kopher"
+        if path.is_file() && path.extension().map_or(false, |ext| ext == "kopher") {
+            manifests.push(BackupManifest {
+                name: path.file_name()
+                    .unwrap_or_default()
+                    .to_string_lossy()
+                    .to_string(),
+                path: path.to_string_lossy().to_string(),
+                status: "Íntegro (AES-256)".to_string(),
+            });
         }
     }
-    
+
     Ok(manifests)
 }
 

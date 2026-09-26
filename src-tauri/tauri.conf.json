@@ -13,11 +13,22 @@
       {
         "title": "Kopher Shield",
         "width": 1280,
-        "height": 800,
-        "minWidth": 1024,
-        "minHeight": 768,
+        "height": 720,
+        "maximized": true,
+        "visible": false,
+        "label": "main"
+      },
+      {
+        "title": "Iniciando...",
+        "width": 400,
+        "height": 280,
+        "decorations": false,
+        "transparent": true,
+        "alwaysOnTop": true,
         "center": true,
-        "decorations": true
+        "resizable": false,
+        "label": "splashscreen",
+        "url": "/splash.html"
       }
     ],
     "security": {

@@ -11,7 +11,6 @@ interface Routine {
   schedule: string;
 }
 
-// Tipo para as nossas notificações flutuantes
 interface Toast {
   id: number;
   title: string;
@@ -25,8 +24,6 @@ export default function BackupRoutines() {
   const [isSaving, setIsSaving] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [executingId, setExecutingId] = useState<number | null>(null);
-  
-  // Estado para gerir as notificações ativas
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const [formData, setFormData] = useState({
@@ -41,11 +38,9 @@ export default function BackupRoutines() {
   const [customTime, setCustomTime] = useState('02:00');
   const [repeatEvery, setRepeatEvery] = useState('1');
 
-  // Função para disparar notificações bonitas na tela
   const showToast = (title: string, message: string, type: 'success' | 'error' | 'info' = 'info') => {
     const id = Date.now();
     setToasts(prev => [...prev, { id, title, message, type }]);
-    // Remove a notificação automaticamente após 4 segundos
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id));
     }, 4000);
@@ -105,8 +100,6 @@ export default function BackupRoutines() {
 
   const handleDeleteRoutine = async (id?: number) => {
     if (!id) return;
-    
-    // Mantemos o 'ask' nativo aqui porque a exclusão requer confirmação de segurança a 100%
     const confirmed = await ask("Tem certeza que deseja eliminar esta rotina de backup?", { title: 'Kopher Shield', kind: 'warning' });
     if (!confirmed) return;
 
@@ -148,15 +141,11 @@ export default function BackupRoutines() {
     setExecutingId(routine.id);
     
     try {
-      // Avisa visualmente que o processo arrancou
       showToast('A Iniciar Motor', 'A rotina foi enviada para processamento em background.', 'info');
-      
       const response = await invoke('execute_backup_routine', { 
         sourcePath: routine.source_path,
         destinationVault: routine.destination_vault
       });
-      
-      // O Rust retorna rapidamente dizendo que atirou para a thread
       showToast('Execução em Background', response as string, 'success');
     } catch (error) {
       console.error(error);
@@ -169,7 +158,6 @@ export default function BackupRoutines() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500 max-w-[1600px] mx-auto relative">
       
-      {/* Container de Notificações (Toasts) flutuantes no canto inferior direito */}
       <div className="fixed bottom-6 right-6 z-[100] flex flex-col space-y-3 pointer-events-none">
         {toasts.map(toast => (
           <div key={toast.id} className={`w-80 p-4 rounded-xl shadow-2xl border flex items-start space-x-3 pointer-events-auto animate-in slide-in-from-right-8 fade-in duration-300 ${
@@ -178,17 +166,17 @@ export default function BackupRoutines() {
             'bg-surface/95 border-blue-500/40 backdrop-blur-sm'
           }`}>
             <div className="shrink-0 mt-0.5">
-              {toast.type === 'success' && <CheckCircle2 size={18} className="text-green-400" />}
-              {toast.type === 'error' && <AlertCircle size={18} className="text-red-400" />}
-              {toast.type === 'info' && <Info size={18} className="text-blue-400" />}
+              {toast.type === 'success' && <CheckCircle2 size={18} className="text-green-500" />}
+              {toast.type === 'error' && <AlertCircle size={18} className="text-red-500" />}
+              {toast.type === 'info' && <Info size={18} className="text-blue-500" />}
             </div>
             <div className="flex flex-col">
               <h4 className={`text-sm font-bold ${
-                toast.type === 'success' ? 'text-green-400' :
-                toast.type === 'error' ? 'text-red-400' :
-                'text-blue-400'
+                toast.type === 'success' ? 'text-green-500' :
+                toast.type === 'error' ? 'text-red-500' :
+                'text-blue-500'
               }`}>{toast.title}</h4>
-              <p className="text-xs text-gray-300 mt-1 leading-relaxed">{toast.message}</p>
+              <p className="text-xs text-textMuted mt-1 leading-relaxed">{toast.message}</p>
             </div>
           </div>
         ))}
@@ -196,7 +184,7 @@ export default function BackupRoutines() {
 
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold mb-2 tracking-tight">Rotinas de Backup</h1>
+          <h1 className="text-3xl font-bold mb-2 tracking-tight text-textMain">Rotinas de Backup</h1>
           <p className="text-sm text-textMuted">Gestão de políticas de proteção e agendamentos.</p>
         </div>
         <button 
@@ -222,7 +210,7 @@ export default function BackupRoutines() {
                   <div className="bg-primary/10 p-2 rounded-lg text-primary shrink-0">
                     <Layers size={18} />
                   </div>
-                  <h3 className="text-base font-bold truncate text-white">{routine.name}</h3>
+                  <h3 className="text-base font-bold truncate text-textMain">{routine.name}</h3>
                 </div>
                 <span className="bg-green-500/10 text-green-500 text-[10px] uppercase tracking-wider font-bold px-2.5 py-1 rounded-full flex items-center shrink-0 ml-4">
                   <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5 animate-pulse"></div>
@@ -235,25 +223,25 @@ export default function BackupRoutines() {
                   <span className="text-[11px] text-textMuted uppercase tracking-wider font-semibold mb-1.5 flex items-center">
                     <FolderOpen size={12} className="mr-1.5 text-primary" /> Origem
                   </span>
-                  <span className="text-sm text-gray-200 truncate" title={routine.source_path}>
+                  <span className="text-sm text-textMain truncate" title={routine.source_path}>
                     {routine.source_path}
                   </span>
                 </div>
 
                 <div className="flex flex-col min-w-0">
                   <span className="text-[11px] text-textMuted uppercase tracking-wider font-semibold mb-1.5 flex items-center">
-                    <Cloud size={12} className="mr-1.5 text-blue-400" /> Destino
+                    <Cloud size={12} className="mr-1.5 text-blue-500" /> Destino
                   </span>
-                  <span className="text-sm text-gray-200 truncate" title={routine.destination_vault}>
+                  <span className="text-sm text-textMain truncate" title={routine.destination_vault}>
                     {routine.destination_vault}
                   </span>
                 </div>
 
                 <div className="flex flex-col min-w-0">
                   <span className="text-[11px] text-textMuted uppercase tracking-wider font-semibold mb-1.5 flex items-center">
-                    <Clock size={12} className="mr-1.5 text-amber-400" /> Agendamento
+                    <Clock size={12} className="mr-1.5 text-amber-500" /> Agendamento
                   </span>
-                  <span className="text-sm text-gray-200 truncate" title={routine.schedule}>
+                  <span className="text-sm text-textMain truncate" title={routine.schedule}>
                     {routine.schedule}
                   </span>
                 </div>
@@ -276,7 +264,7 @@ export default function BackupRoutines() {
                 <button 
                   onClick={() => handleOpenEdit(routine)}
                   disabled={executingId === routine.id}
-                  className="bg-background hover:bg-white/5 border border-border text-textMuted hover:text-white p-1.5 rounded-md transition-all cursor-pointer disabled:opacity-50"
+                  className="bg-background hover:bg-surface/5 border border-border text-textMuted hover:text-textMain p-1.5 rounded-md transition-all cursor-pointer disabled:opacity-50"
                   title="Editar Rotina"
                 >
                   <Pencil size={15} />
@@ -284,7 +272,7 @@ export default function BackupRoutines() {
                 <button 
                   onClick={() => handleDeleteRoutine(routine.id)}
                   disabled={executingId === routine.id}
-                  className="bg-background hover:bg-red-500/10 border border-border text-textMuted hover:text-red-400 p-1.5 rounded-md transition-all cursor-pointer disabled:opacity-50"
+                  className="bg-background hover:bg-red-500/10 border border-border text-textMuted hover:text-red-500 p-1.5 rounded-md transition-all cursor-pointer disabled:opacity-50"
                   title="Eliminar Rotina"
                 >
                   <Trash2 size={15} />
@@ -299,8 +287,8 @@ export default function BackupRoutines() {
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 animate-in fade-in duration-200">
           <div className="bg-surface border border-border rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
             <div className="flex justify-between items-center p-6 border-b border-border/50">
-              <h2 className="text-xl font-bold">{editingId !== null ? 'Editar Rotina' : 'Nova Rotina de Backup'}</h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-textMuted hover:text-white transition-colors p-1 rounded-md hover:bg-white/10 cursor-pointer">
+              <h2 className="text-xl font-bold text-textMain">{editingId !== null ? 'Editar Rotina' : 'Nova Rotina de Backup'}</h2>
+              <button onClick={() => setIsModalOpen(false)} className="text-textMuted hover:text-textMain transition-colors p-1 rounded-md hover:bg-surface/10 cursor-pointer">
                 <X size={24} />
               </button>
             </div>
@@ -313,7 +301,7 @@ export default function BackupRoutines() {
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
                   placeholder="Ex: Servidor de Arquivos Sicoob" 
-                  className="w-full bg-background border border-border rounded-lg px-4 py-2 text-sm text-white focus:border-primary outline-none transition-all" 
+                  className="w-full bg-background border border-border rounded-lg px-4 py-2 text-sm text-textMain focus:border-primary outline-none transition-all" 
                 />
               </div>
 
@@ -324,7 +312,7 @@ export default function BackupRoutines() {
                     type="text" 
                     value={formData.source_path}
                     readOnly
-                    className="w-full bg-background border border-border rounded-lg px-4 py-2 text-sm text-white outline-none cursor-pointer truncate" 
+                    className="w-full bg-background border border-border rounded-lg px-4 py-2 text-sm text-textMain outline-none cursor-pointer truncate" 
                     onClick={handleSelectFolder}
                   />
                   <button 
@@ -349,7 +337,7 @@ export default function BackupRoutines() {
                       setFormData({...formData, destination_vault: e.target.value});
                     }
                   }}
-                  className="w-full bg-background border border-border rounded-lg px-4 py-2 text-sm text-white focus:border-primary outline-none appearance-none"
+                  className="w-full bg-background border border-border rounded-lg px-4 py-2 text-sm text-textMain focus:border-primary outline-none appearance-none"
                 >
                   <option value="S3 Brasil (Amazon Web Services)">S3 Brasil (Amazon Web Services)</option>
                   <option value="Azure Blob Storage">Azure Blob Storage</option>
@@ -364,7 +352,7 @@ export default function BackupRoutines() {
                         type="text" 
                         value={formData.destination_vault.replace('Local: ', '')}
                         readOnly
-                        className="w-full bg-background border border-border rounded-md px-3 py-1.5 text-sm text-white outline-none cursor-pointer truncate" 
+                        className="w-full bg-background border border-border rounded-md px-3 py-1.5 text-sm text-textMain outline-none cursor-pointer truncate" 
                         onClick={async () => {
                           const path = await invoke<string>('select_folder_dialog');
                           if (path) setFormData({...formData, destination_vault: `Local: ${path}`});
@@ -391,7 +379,7 @@ export default function BackupRoutines() {
                 <select 
                   value={scheduleType}
                   onChange={(e) => setScheduleType(e.target.value)}
-                  className="w-full bg-background border border-border rounded-lg px-4 py-2 text-sm text-white focus:border-primary outline-none appearance-none"
+                  className="w-full bg-background border border-border rounded-lg px-4 py-2 text-sm text-textMain focus:border-primary outline-none appearance-none"
                 >
                   <option value="Diariamente às 02:00">Diariamente às 02:00</option>
                   <option value="A cada 6 horas">A cada 6 horas</option>
@@ -408,7 +396,7 @@ export default function BackupRoutines() {
                       <select 
                         value={customFrequency}
                         onChange={(e) => setCustomFrequency(e.target.value)}
-                        className="w-full bg-surface border border-border rounded-md px-3 py-1.5 text-sm text-white outline-none"
+                        className="w-full bg-surface border border-border rounded-md px-3 py-1.5 text-sm text-textMain outline-none"
                       >
                         <option value="Diário">Diário</option>
                         <option value="Dias úteis (Seg-Sex)">Dias úteis</option>
@@ -421,7 +409,7 @@ export default function BackupRoutines() {
                       <select 
                         value={repeatEvery}
                         onChange={(e) => setRepeatEvery(e.target.value)}
-                        className="w-full bg-surface border border-border rounded-md px-3 py-1.5 text-sm text-white outline-none"
+                        className="w-full bg-surface border border-border rounded-md px-3 py-1.5 text-sm text-textMain outline-none"
                       >
                         <option value="1">1 hora</option>
                         <option value="3">3 horas</option>
@@ -436,7 +424,7 @@ export default function BackupRoutines() {
                       type="time" 
                       value={customTime}
                       onChange={(e) => setCustomTime(e.target.value)}
-                      className="w-full bg-surface border border-border rounded-md px-3 py-1.5 text-sm text-white outline-none"
+                      className="w-full bg-surface border border-border rounded-md px-3 py-1.5 text-sm text-textMain outline-none"
                     />
                   </div>
                 </div>
@@ -444,7 +432,7 @@ export default function BackupRoutines() {
             </div>
 
             <div className="p-5 border-t border-border/50 bg-background/50 flex justify-end space-x-3">
-              <button onClick={() => setIsModalOpen(false)} className="px-4 py-2 rounded-lg font-medium text-sm text-textMuted hover:text-white hover:bg-surface transition-all cursor-pointer">Cancelar</button>
+              <button onClick={() => setIsModalOpen(false)} className="px-4 py-2 rounded-lg font-medium text-sm text-textMuted hover:text-textMain hover:bg-surface transition-all cursor-pointer">Cancelar</button>
               <button 
                 onClick={handleSaveRoutine}
                 disabled={isSaving}
