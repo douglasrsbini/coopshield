@@ -1,8 +1,8 @@
 [package]
-name = "kopher-shield"
+name = "coopshield"
 version = "1.0.0"
-description = "Enterprise Backup & Disaster Recovery"
-authors = ["BINAVER Soluções Tecnológicas"]
+description = "Enterprise Backup para o Sicoob Primavera"
+authors = ["Douglas Bini - Sicoob Primavera"]
 edition = "2021"
 
 [build-dependencies]
@@ -21,3 +21,15 @@ rand = "0.8"
 walkdir = "2.5"
 tauri-plugin-dialog = "2"
 rfd = "0.14"
+hex = "0.4"
+chrono = "0.4"
+dirs = "5.0"
+base64 = "0.22"
+tauri-plugin-notification = "2.5.0"
+zstd = "0.13"
+aws-config = { version = "1.1.7", features = ["behavior-version-latest"] }
+aws-sdk-s3 = "1.21.0"
+tokio = { version = "1.36", features = ["full"] }
+mac_address = "1.2.0"
+hostname = "0.4.2"
+reqwest = "0.13.5"

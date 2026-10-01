@@ -9,10 +9,10 @@ pub fn get_db_path(app_handle: &AppHandle) -> PathBuf {
         .app_data_dir()
         .unwrap_or_else(|_| PathBuf::from("."));
 
-    path.push("com.binaver.kophershield");
+    path.push("com.binaver.coopshield");
     fs::create_dir_all(&path).unwrap_or(()); 
 
-    path.push("kopher_shield.db");
+    path.push("coopshield.db");
     path
 }
 
@@ -20,6 +20,7 @@ pub fn init_db(app_handle: &AppHandle) -> Result<()> {
     let db_path = get_db_path(app_handle);
     let conn = Connection::open(db_path)?;
 
+    // Criação base (Atualizada com a coluna endpoint_url para novas instalações)
     conn.execute(
         "CREATE TABLE IF NOT EXISTS cloud_vaults (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -28,10 +29,15 @@ pub fn init_db(app_handle: &AppHandle) -> Result<()> {
             access_key TEXT NOT NULL,
             secret_key TEXT NOT NULL,
             bucket_name TEXT NOT NULL,
+            endpoint_url TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )",
         [],
     )?;
+
+    // MIGRAÇÃO DE DADOS (Estratégia Silenciosa)
+    // Tenta adicionar a coluna para clientes antigos. Se já existir, a falha é ignorada em segurança.
+    let _ = conn.execute("ALTER TABLE cloud_vaults ADD COLUMN endpoint_url TEXT", []);
 
     conn.execute(
         "CREATE TABLE IF NOT EXISTS backup_routines (
@@ -46,7 +52,7 @@ pub fn init_db(app_handle: &AppHandle) -> Result<()> {
         [],
     )?;
 
-    // NOVA TABELA: Configurações do Sistema (Modelo Chave-Valor Escalonável)
+    // Tabela de Configurações do Sistema
     conn.execute(
         "CREATE TABLE IF NOT EXISTS system_settings (
             setting_key TEXT PRIMARY KEY,
