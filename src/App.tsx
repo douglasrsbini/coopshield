@@ -50,10 +50,12 @@ export default function App() {
   const [resendTimer, setResendTimer] = useState(0);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
+    
     if (resendTimer > 0) {
       interval = setInterval(() => setResendTimer((prev) => prev - 1), 1000);
     }
+    
     return () => clearInterval(interval);
   }, [resendTimer]);
 
