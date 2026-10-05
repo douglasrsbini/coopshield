@@ -1,252 +1,526 @@
-import { useState, useMemo } from 'react';
-import { ShieldAlert, Search, FolderSearch, FileKey2, RefreshCw, CheckCircle2, AlertCircle, Info, HardDriveDownload, CheckSquare, Filter, Calendar, ChevronDown } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { HardDrive, Cloud, FolderOpen, Play, CheckCircle2, AlertCircle, Info, RefreshCcw, ShieldCheck, Download, Search, Calendar, CheckSquare, Square, ListChecks } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
+import { listen } from '@tauri-apps/api/event';
+import { ask } from '@tauri-apps/plugin-dialog';
 
 interface BackupManifest {
   name: string;
   path: string;
   status: string;
-  date?: string; // Propriedade opcional preparada para receber a data do backend Rust
+  date_formatted: string;
+  original_source: string;
+  total_files: number;
 }
 
-interface Toast { id: number; title: string; message: string; type: 'success' | 'error' | 'info'; }
+interface CloudVault {
+  id?: number;
+  name: string;
+  provider: string;
+}
+
+interface Toast {
+  id: number;
+  title: string;
+  message: string;
+  type: 'success' | 'error' | 'info';
+}
+
+interface RestoreProgressPayload {
+  manifest_path: string;
+  progress: number;
+  status: string;
+}
+
+// TIPAGEM CORRIGIDA PARA RECEBER O PAYLOAD DO RUST
+interface RestoreCompletePayload {
+  manifest_path: string;
+}
 
 export default function Restore() {
-  const [vaultPath, setVaultPath] = useState('');
-  const [manifests, setManifests] = useState<BackupManifest[]>([]);
-  const [isScanning, setIsScanning] = useState(false);
-  const [restoringPath, setRestoringPath] = useState<string | null>(null);
+  const [sourceType, setSourceType] = useState<'local' | 'cloud'>(() => (sessionStorage.getItem('restoreSourceType') as 'local' | 'cloud') || 'local');
+  const [localPath, setLocalPath] = useState(() => sessionStorage.getItem('restoreLocalPath') || '');
+  
+  const [cloudVaults, setCloudVaults] = useState<CloudVault[]>([]);
+  const [selectedCloudVault, setSelectedCloudVault] = useState(() => sessionStorage.getItem('restoreSelectedVault') || '');
+  
+  const [manifests, setManifests] = useState<BackupManifest[]>(() => {
+    try {
+      const saved = sessionStorage.getItem('restoreManifests');
+      if (saved && saved !== 'undefined' && saved !== 'null') {
+        const parsed = JSON.parse(saved);
+        return Array.isArray(parsed) ? parsed : [];
+      }
+    } catch (e) {
+      console.warn("Erro ao restaurar manifestos da sessão", e);
+    }
+    return [];
+  });
+  
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const [restoringPath, setRestoringPath] = useState<string | null>(() => sessionStorage.getItem('restoringPath'));
+  const [progress, setProgress] = useState<number>(() => parseInt(sessionStorage.getItem('restoreProgress') || '0'));
+  const [statusText, setStatusText] = useState<string>(() => sessionStorage.getItem('restoreStatus') || '');
+  
   const [toasts, setToasts] = useState<Toast[]>([]);
-  const [selectedManifests, setSelectedManifests] = useState<string[]>([]);
 
-  // Estados para o Motor de Busca e Filtros
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
-  const [dateStart, setDateStart] = useState('');
-  const [dateEnd, setDateEnd] = useState('');
-  const [statusFilter, setStatusFilter] = useState('Todos');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [selectedManifests, setSelectedManifests] = useState<Set<string>>(new Set());
+  const [isBulkRestoring, setIsBulkRestoring] = useState(false);
 
-  const showToast = (title: string, msg: string, type: 'success' | 'error' | 'info' = 'info') => {
-    const id = Date.now();
-    setToasts(prev => [...prev, { id, title, message: msg, type }]);
-    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4500);
+  const showToast = (title: string, message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    const id = Date.now() + Math.random();
+    setToasts(prev => [...prev, { id, title, message, type }]);
+    setTimeout(() => { setToasts(p => p.filter(t => t.id !== id)); }, 5000);
   };
 
-  const handleSelectVault = async () => {
+  useEffect(() => {
+    async function loadVaults() {
+      try {
+        const vaults = await invoke<CloudVault[]>('get_cloud_vaults');
+        setCloudVaults(vaults);
+        if (vaults.length > 0 && !selectedCloudVault) {
+          setSelectedCloudVault(vaults[0].name);
+        }
+      } catch (err) {
+        console.error("Erro ao carregar cofres cloud:", err);
+      }
+    }
+    loadVaults();
+  }, [selectedCloudVault]);
+
+  useEffect(() => {
+    sessionStorage.setItem('restoreSourceType', sourceType);
+    sessionStorage.setItem('restoreLocalPath', localPath);
+    sessionStorage.setItem('restoreSelectedVault', selectedCloudVault);
+    sessionStorage.setItem('restoreManifests', JSON.stringify(manifests));
+  }, [sourceType, localPath, selectedCloudVault, manifests]);
+
+  useEffect(() => {
+    let unlistenProgress: (() => void) | undefined;
+    let unlistenComplete: (() => void) | undefined;
+    let unlistenError: (() => void) | undefined;
+
+    const setupListeners = async () => {
+      unlistenProgress = await listen<RestoreProgressPayload>('restore-progress', (event) => {
+        const payload = event.payload;
+        setRestoringPath(payload.manifest_path);
+        setProgress(payload.progress);
+        setStatusText(payload.status);
+
+        sessionStorage.setItem('restoringPath', payload.manifest_path);
+        sessionStorage.setItem('restoreProgress', payload.progress.toString());
+        sessionStorage.setItem('restoreStatus', payload.status);
+      });
+
+      // OUVINTE ATUALIZADO COM O TIPO DE DADOS CORRETO (RestoreCompletePayload)
+      unlistenComplete = await listen<RestoreCompletePayload>('restore-complete', (event) => {
+        // SETTIMEOUT EVITA A TELA PRETA (RACE CONDITION DO REACT)
+        setTimeout(() => {
+          setRestoringPath(null);
+          setProgress(0);
+          setStatusText('');
+          
+          sessionStorage.removeItem('restoringPath');
+          sessionStorage.removeItem('restoreProgress');
+          sessionStorage.removeItem('restoreStatus');
+          
+          if (!sessionStorage.getItem('isBulkRestoring')) {
+              showToast('Restauro Finalizado', 'O relatório de auditoria foi enviado por e-mail.', 'success');
+          }
+        }, 0);
+      });
+
+      unlistenError = await listen<string>('restore-error', (event) => {
+        setTimeout(() => {
+          setRestoringPath(null);
+          setProgress(0);
+          setStatusText('');
+          
+          sessionStorage.removeItem('restoringPath');
+          sessionStorage.removeItem('restoreProgress');
+          sessionStorage.removeItem('restoreStatus');
+          
+          showToast('Atenção no Restauro', event.payload, 'error');
+        }, 0);
+      });
+    };
+
+    setupListeners();
+
+    return () => {
+      if (unlistenProgress) unlistenProgress();
+      if (unlistenComplete) unlistenComplete();
+      if (unlistenError) unlistenError();
+    };
+  }, []);
+
+  const handleSelectFolder = async () => {
     try {
       const path = await invoke<string>('select_folder_dialog');
       if (path) {
-        setVaultPath(path);
-        scanVault(path);
+        setLocalPath(path);
+        scanLocal(path);
       }
     } catch (error) {
       console.log("Cancelado:", error);
     }
   };
 
-  const scanVault = async (path: string) => {
-    setIsScanning(true);
-    setManifests([]);
-    setSelectedManifests([]);
-    showToast('Procurando Backups', 'A realizar busca recursiva no cofre...', 'info');
-    
+  const scanLocal = async (path: string) => {
+    setIsLoading(true);
+    setSelectedManifests(new Set()); 
     try {
-      const foundManifests = await invoke<BackupManifest[]>('scan_local_vault', { vaultPath: path });
-      setManifests(foundManifests);
-      
-      if (foundManifests.length > 0) {
-        showToast('Sucesso', `${foundManifests.length} backup(s) localizado(s).`, 'success');
-      } else {
-        showToast('Vazio', 'Nenhum manifesto (.kopher) encontrado.', 'error');
-      }
+      const data = await invoke<BackupManifest[]>('scan_local_vault', { vaultPath: path });
+      setManifests(data);
+      if (data.length === 0) showToast('Aviso', 'Nenhum cofre .coopshield encontrado nesta pasta.', 'info');
     } catch (error) {
-      showToast('Erro de Leitura', `Falha ao abrir o cofre: ${error}`, 'error');
+      showToast('Erro', `Falha ao escanear cofre local: ${error}`, 'error');
     } finally {
-      setIsScanning(false);
+      setIsLoading(false);
     }
   };
 
-  // Motor de Filtros: Filtra a lista em tempo real sem ir ao backend
-  const filteredManifests = useMemo(() => {
-    return manifests.filter(manifest => {
-      // Filtro de Texto (Nome ou Caminho)
-      const matchesSearch = manifest.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                            manifest.path.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      // Filtro de Status
-      const matchesStatus = statusFilter === 'Todos' || manifest.status.includes(statusFilter);
+  const scanCloud = async () => {
+    if (!selectedCloudVault) {
+      showToast('Aviso', 'Selecione um cofre de nuvem válido.', 'info');
+      return;
+    }
+    setIsLoading(true);
+    setSelectedManifests(new Set()); 
+    try {
+      const data = await invoke<BackupManifest[]>('scan_cloud_vault', { vaultName: selectedCloudVault });
+      setManifests(data);
+      if (data.length === 0) showToast('Aviso', 'Nenhum backup encontrado neste cofre Cloud.', 'info');
+      else showToast('Sucesso', `${data.length} ponto(s) de restauro encontrados na Nuvem.`, 'success');
+    } catch (error) {
+      showToast('Erro', `Falha ao conectar à Nuvem: ${error}`, 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-      // (Futuro) Filtro de Data: Aqui você conectará com a propriedade manifest.date que o Rust enviar
-      // const matchesDate = ...
+  const handleExecuteRestore = async (manifest: BackupManifest) => {
+    const targetFolder = await invoke<string>('select_folder_dialog');
+    if (!targetFolder) return;
 
-      return matchesSearch && matchesStatus;
-    });
-  }, [manifests, searchTerm, statusFilter, dateStart, dateEnd]);
+    const confirmed = await ask(`Deseja restaurar o cofre '${manifest.name}' para a pasta selecionada?`, { title: 'CoopShield Recovery', kind: 'info' });
+    if (!confirmed) return;
+
+    setRestoringPath(manifest.path);
+    setProgress(1);
+    setStatusText('Ligando motores de restauro...');
+    
+    sessionStorage.setItem('restoringPath', manifest.path);
+    sessionStorage.setItem('restoreProgress', '1');
+    sessionStorage.setItem('restoreStatus', 'Ligando motores de restauro...');
+
+    try {
+      if (sourceType === 'local') {
+        await invoke('execute_restore', { manifestPath: manifest.path, restorePath: targetFolder });
+      } else {
+        await invoke('execute_cloud_restore', { vaultName: selectedCloudVault, manifestKey: manifest.path, restorePath: targetFolder });
+      }
+    } catch (error) {
+      showToast('Erro Crítico', `Falha ao acionar restauro: ${error}`, 'error');
+      setRestoringPath(null);
+      sessionStorage.removeItem('restoringPath');
+    }
+  };
+
+  const handleExecuteBulkRestore = async () => {
+    if (selectedManifests.size === 0) return;
+    
+    const targetFolder = await invoke<string>('select_folder_dialog');
+    if (!targetFolder) return;
+
+    const confirmed = await ask(`Atenção: Você está prestes a restaurar ${selectedManifests.size} cofres em lote para a mesma pasta. O processo ocorrerá em fila. Deseja prosseguir?`, { title: 'Operação em Lote - CoopShield', kind: 'warning' });
+    if (!confirmed) return;
+
+    setIsBulkRestoring(true);
+    sessionStorage.setItem('isBulkRestoring', 'true');
+    
+    const manifestList = manifests.filter(m => selectedManifests.has(m.path));
+
+    let successLote = 0;
+
+    for (const manifest of manifestList) {
+      setRestoringPath(manifest.path);
+      setProgress(1);
+      setStatusText(`Processando lote: ${manifest.name}...`);
+
+      try {
+        if (sourceType === 'local') {
+          await invoke('execute_restore', { manifestPath: manifest.path, restorePath: targetFolder });
+        } else {
+          await invoke('execute_cloud_restore', { vaultName: selectedCloudVault, manifestKey: manifest.path, restorePath: targetFolder });
+        }
+        successLote++;
+      } catch (error) {
+        showToast('Falha no Lote', `Erro ao restaurar ${manifest.name}. O sistema avançará para o próximo.`, 'error');
+      }
+    }
+
+    setTimeout(() => {
+        setRestoringPath(null);
+        setProgress(0);
+        setIsBulkRestoring(false);
+        setSelectedManifests(new Set());
+        sessionStorage.removeItem('isBulkRestoring');
+        
+        showToast('Lote Finalizado', `Operação concluída. ${successLote} de ${manifestList.length} processados. Relatórios enviados por e-mail.`, 'success');
+    }, 0);
+  };
 
   const toggleSelection = (path: string) => {
-    setSelectedManifests(prev => prev.includes(path) ? prev.filter(p => p !== path) : [...prev, path]);
+    const newSet = new Set(selectedManifests);
+    if (newSet.has(path)) newSet.delete(path);
+    else newSet.add(path);
+    setSelectedManifests(newSet);
   };
 
-  // O Selecionar Todos agora é inteligente: seleciona apenas os que aparecem no filtro!
-  const toggleAll = () => {
-    if (selectedManifests.length === filteredManifests.length) {
-      setSelectedManifests([]);
+  const toggleAllSelection = () => {
+    if (selectedManifests.size === filteredManifests.length && filteredManifests.length > 0) {
+      setSelectedManifests(new Set()); 
     } else {
-      setSelectedManifests(filteredManifests.map(m => m.path));
+      const allPaths = filteredManifests.map(m => m.path);
+      setSelectedManifests(new Set(allPaths)); 
     }
   };
 
-  const handleBatchRestore = async () => {
-    if (selectedManifests.length === 0) return;
+  const filteredManifests = manifests.filter(manifest => {
+    const matchSearch = manifest.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                        manifest.original_source.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    let matchDate = true;
+    
+    if (startDate || endDate) {
+      const datePart = manifest.date_formatted.split(' ')[0];
+      const [day, month, year] = datePart.split('/');
+      const mDate = new Date(Number(year), Number(month) - 1, Number(day), 12, 0, 0);
 
-    try {
-      showToast('Ação Necessária', 'Selecione a pasta destino para os ficheiros recuperados.', 'info');
-      const restoreDest = await invoke<string>('select_folder_dialog');
-      if (!restoreDest) {
-        showToast('Cancelado', 'Nenhuma pasta de destino selecionada.', 'info');
-        return;
+      if (startDate) {
+        const [sYear, sMonth, sDay] = startDate.split('-');
+        const sDate = new Date(Number(sYear), Number(sMonth) - 1, Number(sDay), 0, 0, 0); 
+        if (mDate < sDate) matchDate = false;
       }
-
-      showToast('Motor Reverso Ativado', `Iniciando restauro de ${selectedManifests.length} ficheiro(s)...`, 'info');
-
-      for (const path of selectedManifests) {
-        setRestoringPath(path);
-        await invoke('execute_restore', { manifestPath: path, restorePath: restoreDest });
+      
+      if (endDate) {
+        const [eYear, eMonth, eDay] = endDate.split('-');
+        const eDate = new Date(Number(eYear), Number(eMonth) - 1, Number(eDay), 23, 59, 59); 
+        if (mDate > eDate) matchDate = false;
       }
-
-      showToast('Restauro Concluído', 'Todos os ficheiros selecionados foram reconstruídos!', 'success');
-      setSelectedManifests([]); 
-    } catch (error) {
-      showToast('Erro', `Falha durante o restauro em lote: ${error}`, 'error');
-    } finally {
-      setRestoringPath(null);
     }
-  };
+    
+    return matchSearch && matchDate;
+  });
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 max-w-[1600px] mx-auto relative pb-24">
       
       <div className="fixed bottom-6 right-6 z-[100] flex flex-col space-y-3 pointer-events-none">
         {toasts.map(toast => (
-          <div key={toast.id} className={`w-80 p-4 rounded-xl shadow-2xl border flex items-start space-x-3 pointer-events-auto animate-in slide-in-from-right-8 fade-in duration-300 ${toast.type === 'success' ? 'bg-surface/95 border-green-500/40' : toast.type === 'error' ? 'bg-surface/95 border-red-500/40' : 'bg-surface/95 border-blue-500/40'}`}>
+          <div key={toast.id} className={`w-80 p-4 rounded-xl shadow-2xl border flex items-start space-x-3 pointer-events-auto animate-in slide-in-from-right-8 fade-in duration-300 ${toast.type === 'success' ? 'bg-surface/95 border-green-500/40 backdrop-blur-sm' : toast.type === 'error' ? 'bg-surface/95 border-red-500/40 backdrop-blur-sm' : 'bg-surface/95 border-blue-500/40 backdrop-blur-sm'}`}>
             <div className="shrink-0 mt-0.5">{toast.type === 'success' && <CheckCircle2 size={18} className="text-green-500" />}{toast.type === 'error' && <AlertCircle size={18} className="text-red-500" />}{toast.type === 'info' && <Info size={18} className="text-blue-500" />}</div>
-            <div className="flex flex-col"><h4 className={`text-sm font-bold ${toast.type === 'success' ? 'text-green-500' : toast.type === 'error' ? 'text-red-500' : 'text-blue-500'}`}>{toast.title}</h4><p className="text-xs text-textMuted mt-1 leading-relaxed">{toast.message}</p></div>
+            <div className="flex flex-col flex-1">
+              <h4 className={`text-sm font-bold ${toast.type === 'success' ? 'text-green-500' : toast.type === 'error' ? 'text-red-500' : 'text-blue-500'}`}>{toast.title}</h4>
+              <p className="text-xs text-textMuted mt-1 leading-relaxed">{toast.message}</p>
+            </div>
           </div>
         ))}
       </div>
 
-      <div className="flex justify-between items-center border-b border-border/50 pb-6">
-        <div>
-          <h1 className="text-3xl font-bold mb-2 tracking-tight flex items-center text-red-500"><ShieldAlert size={28} className="mr-3" />Disaster Recovery</h1>
-          <p className="text-sm text-textMuted">Restaure os seus ficheiros críticos a partir de cofres seguros em lote.</p>
-        </div>
+      <div className="border-b border-border/50 pb-6">
+        <h1 className="text-3xl font-bold mb-2 tracking-tight text-textMain">Restauração de Backup</h1>
+        <p className="text-sm text-textMuted">Recuperação de desastres e auditoria de integridade de cofres.</p>
       </div>
 
-      {/* 1. MÓDULO DE LOCALIZAÇÃO DO COFRE */}
-      <div className="bg-surface border border-border rounded-xl p-6">
-        <label className="block text-sm font-medium text-textMuted mb-2">Localizar Cofre de Segurança (Busca Recursiva)</label>
-        <div className="flex space-x-3">
-          <input type="text" value={vaultPath} readOnly placeholder="Selecione a pasta raiz do cofre..." className="w-full bg-background border border-border rounded-lg px-4 py-3 text-sm text-textMain outline-none cursor-pointer" onClick={handleSelectVault} />
-          <button onClick={handleSelectVault} className="bg-primary/20 hover:bg-primary/30 border border-primary/40 text-primary px-6 py-3 rounded-lg font-medium text-sm flex items-center transition-all shrink-0 cursor-pointer"><FolderSearch size={18} className="mr-2" />Abrir Cofre</button>
+      <div className="bg-surface border border-border rounded-xl p-6 shadow-sm space-y-5">
+        <div className="flex space-x-4 border-b border-border/50 pb-4">
+          <button 
+            onClick={() => { setSourceType('local'); setManifests([]); setSelectedManifests(new Set()); }} 
+            className={`flex items-center px-4 py-2 rounded-lg font-medium text-sm transition-all cursor-pointer ${sourceType === 'local' ? 'bg-primary text-white shadow-md shadow-primary/20' : 'bg-background text-textMuted hover:text-textMain border border-border'}`}
+          >
+            <HardDrive size={16} className="mr-2" /> Cofre Local / NAS
+          </button>
+          <button 
+            onClick={() => { sourceType !== 'cloud' && setSourceType('cloud'); setManifests([]); setSelectedManifests(new Set()); }} 
+            className={`flex items-center px-4 py-2 rounded-lg font-medium text-sm transition-all cursor-pointer ${sourceType === 'cloud' ? 'bg-primary text-white shadow-md shadow-primary/20' : 'bg-background text-textMuted hover:text-textMain border border-border'}`}
+          >
+            <Cloud size={16} className="mr-2" /> Cofre Nuvem (S3 / Cloudflare)
+          </button>
         </div>
-      </div>
 
-      {/* 2. MÓDULO DE PESQUISA E FILTROS (Ativado apenas se houver ficheiros) */}
-      {manifests.length > 0 && (
-        <div className="bg-surface border border-border rounded-xl p-5 shadow-sm animate-in fade-in duration-300">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted" size={18} />
-              <input 
-                type="text" 
-                placeholder="Pesquisar por nome do ficheiro, extensão ou caminho..." 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-background border border-border rounded-lg pl-10 pr-4 py-2.5 text-sm text-textMain focus:border-primary outline-none transition-all"
-              />
+        {sourceType === 'local' ? (
+          <div className="space-y-2">
+            <label className="block text-xs font-semibold text-textMuted uppercase tracking-wider">Localizar Cofre de Segurança Local</label>
+            <div className="flex space-x-3">
+              <input type="text" value={localPath} readOnly placeholder="Selecione a pasta raiz do cofre local..." className="w-full bg-background border border-border rounded-lg px-4 py-2.5 text-sm text-textMain outline-none cursor-pointer truncate" onClick={handleSelectFolder} />
+              <button onClick={handleSelectFolder} className="bg-primary/20 hover:bg-primary/30 border border-primary/30 text-primary px-5 py-2.5 rounded-lg font-medium text-sm flex items-center transition-all shrink-0 cursor-pointer">
+                <FolderOpen size={16} className="mr-2" /> Abrir Cofre
+              </button>
             </div>
-            <button 
-              onClick={() => setShowFilters(!showFilters)} 
-              className={`px-4 py-2.5 rounded-lg font-medium text-sm flex items-center transition-all border cursor-pointer shrink-0 ${showFilters ? 'bg-primary/10 border-primary/30 text-primary' : 'bg-background border-border text-textMuted hover:text-textMain'}`}
-            >
-              <Filter size={16} className="mr-2" /> Filtros Avançados <ChevronDown size={14} className={`ml-2 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
-            </button>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <label className="block text-xs font-semibold text-textMuted uppercase tracking-wider">Selecione o Cofre Cloud Registado</label>
+            <div className="flex space-x-3">
+              <select 
+                value={selectedCloudVault} 
+                onChange={(e) => setSelectedCloudVault(e.target.value)} 
+                className="w-full bg-background border border-border rounded-lg px-4 py-2.5 text-sm text-textMain focus:border-primary outline-none cursor-pointer"
+              >
+                {cloudVaults.length === 0 ? (
+                  <option value="">Nenhum cofre cloud configurado no sistema</option>
+                ) : (
+                  cloudVaults.map(v => (
+                    <option key={v.id} value={v.name}>☁️ {v.name} ({v.provider})</option>
+                  ))
+                )}
+              </select>
+              <button onClick={scanCloud} disabled={isLoading || cloudVaults.length === 0} className="bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-lg font-medium text-sm flex items-center transition-all shrink-0 cursor-pointer disabled:opacity-50 shadow-lg shadow-primary/20">
+                {isLoading ? <RefreshCcw size={16} className="mr-2 animate-spin" /> : <ShieldCheck size={16} className="mr-2" />}
+                Escanear Nuvem
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="bg-surface border border-border rounded-xl p-4 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+        
+        <div className="flex flex-col xl:flex-row w-full md:w-auto gap-4 flex-1 items-start xl:items-center">
+          
+          <div className="relative w-full xl:w-80 shrink-0">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted" size={16} />
+            <input 
+              type="text" 
+              placeholder="Pesquisar por nome ou caminho..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-background border border-border rounded-lg pl-10 pr-4 py-2 text-sm text-textMain focus:border-primary outline-none transition-colors"
+            />
           </div>
 
-          {/* Painel Expansível de Filtros */}
-          {showFilters && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-5 mt-5 border-t border-border/50 animate-in slide-in-from-top-2">
-              <div>
-                <label className="block text-xs font-medium text-textMuted mb-1.5 flex items-center"><Calendar size={12} className="mr-1.5"/> Data Inicial do Backup</label>
-                <input type="date" value={dateStart} onChange={e => setDateStart(e.target.value)} className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm text-textMain focus:border-primary outline-none" />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-textMuted mb-1.5 flex items-center"><Calendar size={12} className="mr-1.5"/> Data Final do Backup</label>
-                <input type="date" value={dateEnd} onChange={e => setDateEnd(e.target.value)} className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm text-textMain focus:border-primary outline-none" />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-textMuted mb-1.5 flex items-center"><Filter size={12} className="mr-1.5"/> Status de Integridade</label>
-                <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm text-textMain focus:border-primary outline-none appearance-none cursor-pointer">
-                  <option value="Todos">Todos os Status</option>
-                  <option value="Íntegro">Apenas Íntegros (AES-256)</option>
-                  <option value="Alerta">Com Alertas / Corrompidos</option>
-                </select>
-              </div>
+          <div className="flex items-center space-x-2 w-full sm:w-auto bg-background border border-border rounded-lg px-2 py-1">
+            <Calendar className="text-textMuted ml-2 shrink-0" size={16} />
+            <div className="relative w-full sm:w-32">
+              <input 
+                type="date" 
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full bg-transparent border-none px-2 py-1 text-sm text-textMain outline-none cursor-pointer"
+                style={{ colorScheme: 'dark' }}
+                title="Data Inicial"
+              />
             </div>
-          )}
-        </div>
-      )}
+            <span className="text-textMuted text-xs font-bold uppercase">Até</span>
+            <div className="relative w-full sm:w-32">
+              <input 
+                type="date" 
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full bg-transparent border-none px-2 py-1 text-sm text-textMain outline-none cursor-pointer"
+                style={{ colorScheme: 'dark' }}
+                title="Data Final"
+              />
+            </div>
+          </div>
 
-      {/* 3. MÓDULO DE RESULTADOS */}
+        </div>
+
+        <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 border-border/50 pt-4 md:pt-0">
+          <div className="text-xs text-textMuted font-medium flex items-center">
+            <span className="bg-primary/10 text-primary px-2 py-0.5 rounded mr-2">{selectedManifests.size}</span> selecionados
+          </div>
+          <button 
+            onClick={handleExecuteBulkRestore}
+            disabled={selectedManifests.size === 0 || isBulkRestoring || !!restoringPath}
+            className="bg-primary hover:bg-primary/90 text-white px-5 py-2 rounded-lg font-medium text-sm flex items-center transition-all disabled:opacity-50 cursor-pointer shadow-md shadow-primary/20"
+          >
+            <ListChecks size={16} className="mr-2" /> Restaurar Lote
+          </button>
+        </div>
+      </div>
+
       <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h2 className="text-lg font-bold flex items-center text-textMain">
-            <Search size={18} className="mr-2 text-primary" /> Backups Localizados <span className="text-xs text-textMuted font-normal ml-2">({filteredManifests.length} ficheiros)</span>
-          </h2>
-          {filteredManifests.length > 0 && (
-            <button onClick={toggleAll} className="text-sm text-textMuted hover:text-primary transition-colors flex items-center cursor-pointer">
-              <CheckSquare size={16} className="mr-2" />
-              {selectedManifests.length === filteredManifests.length ? 'Desmarcar Todos' : 'Selecionar Resultados'}
-            </button>
-          )}
+        
+        <div className="flex items-center px-2 py-1">
+          <button 
+            onClick={toggleAllSelection} 
+            disabled={filteredManifests.length === 0 || isBulkRestoring}
+            className="flex items-center text-sm font-medium text-textMuted hover:text-primary transition-colors cursor-pointer disabled:opacity-50 mr-4"
+          >
+            {selectedManifests.size === filteredManifests.length && filteredManifests.length > 0 ? (
+              <CheckSquare size={18} className="mr-2 text-primary" />
+            ) : (
+              <Square size={18} className="mr-2" />
+            )}
+            Selecionar Todos ({filteredManifests.length})
+          </button>
         </div>
 
-        {isScanning ? (
-          <div className="bg-surface border border-border border-dashed rounded-xl p-12 flex flex-col items-center justify-center space-y-4"><div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div><p className="text-textMuted text-sm font-medium">A procurar recursivamente em todas as subpastas...</p></div>
+        {manifests.length > 0 && filteredManifests.length === 0 ? (
+          <div className="bg-surface border border-border border-dashed rounded-xl p-12 text-center text-textMuted text-sm">
+            Nenhum backup corresponde aos filtros informados.
+          </div>
         ) : manifests.length === 0 ? (
-          <div className="bg-surface border border-border border-dashed rounded-xl p-12 text-center text-textMuted text-sm">Nenhum ponto de restauro localizado. Selecione um cofre válido acima.</div>
-        ) : filteredManifests.length === 0 ? (
-          <div className="bg-surface border border-border border-dashed rounded-xl p-12 text-center text-textMuted text-sm">Nenhum ficheiro corresponde aos filtros de pesquisa atuais.</div>
+          <div className="bg-surface border border-border border-dashed rounded-xl p-12 text-center text-textMuted text-sm">
+            Nenhum ponto de restauro localizado. Selecione a origem acima para carregar os cofres.
+          </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 animate-in fade-in slide-in-from-bottom-4">
-            {filteredManifests.map((manifest, index) => {
-              const isSelected = selectedManifests.includes(manifest.path);
-              const isRestoringThis = restoringPath === manifest.path;
+          <div className="grid grid-cols-1 gap-4">
+            {filteredManifests.map((manifest, idx) => {
+              const isRestoring = restoringPath === manifest.path;
+              const isSelected = selectedManifests.has(manifest.path);
               
               return (
-                <div key={index} 
-                     onClick={() => !isRestoringThis && toggleSelection(manifest.path)}
-                     className={`bg-surface border rounded-xl p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-all shadow-sm cursor-pointer ${isSelected ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/40'}`}>
-                  
-                  <div className="flex items-center space-x-4 w-full">
-                    <div className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 transition-colors ${isSelected ? 'bg-primary border-primary text-white' : 'border-textMuted bg-background'}`}>
-                      {isSelected && <CheckCircle2 size={14} />}
-                    </div>
+                <div key={idx} className={`bg-surface border rounded-xl p-6 shadow-sm transition-all flex flex-col justify-between space-y-4 ${isSelected ? 'border-primary/60 bg-primary/5' : 'border-border hover:border-primary/40'}`}>
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     
-                    <div className="bg-blue-500/10 p-3 rounded-lg text-blue-500 shrink-0"><FileKey2 size={24} /></div>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="text-base font-bold text-textMain mb-1 truncate">{manifest.name}</h3>
-                      <div className="flex space-x-4 text-xs text-textMuted">
-                        <span className="flex items-center text-green-500 shrink-0"><CheckCircle2 size={12} className="mr-1" /> {manifest.status}</span>
-                        <span className="truncate max-w-[200px] lg:max-w-md" title={manifest.path}>{manifest.path}</span>
+                    <div className="flex items-start">
+                      <button 
+                        onClick={() => toggleSelection(manifest.path)}
+                        disabled={isBulkRestoring || !!restoringPath}
+                        className="mt-1 mr-4 text-textMuted hover:text-primary transition-colors cursor-pointer disabled:opacity-50"
+                      >
+                        {isSelected ? <CheckSquare size={20} className="text-primary" /> : <Square size={20} />}
+                      </button>
+                      <div>
+                        <div className="flex items-center space-x-3 mb-1">
+                          <h3 className="text-lg font-bold text-textMain">{manifest.name}</h3>
+                          <span className="bg-green-500/10 text-green-500 border border-green-500/20 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">{manifest.status}</span>
+                        </div>
+                        <p className="text-xs text-textMuted font-mono truncate max-w-[300px] md:max-w-md" title={manifest.original_source}>Origem: {manifest.original_source}</p>
                       </div>
+                    </div>
+
+                    <div className="flex items-center space-x-6 text-xs text-textMuted ml-9 md:ml-0">
+                      <div>Data: <strong className="text-textMain">{manifest.date_formatted}</strong></div>
+                      <div>Blocos Encriptados: <strong className="text-textMain">{manifest.total_files}</strong></div>
+                      <button 
+                        onClick={() => handleExecuteRestore(manifest)} 
+                        disabled={isRestoring || isBulkRestoring || (restoringPath !== null && restoringPath !== manifest.path)}
+                        className={`px-5 py-2.5 rounded-lg font-medium shadow-lg transition-all flex items-center text-sm ${isRestoring ? 'bg-primary text-white shadow-primary/20' : 'bg-surface border border-border hover:border-primary hover:text-primary cursor-pointer shadow-none'}`}
+                      >
+                        <Download size={16} className="mr-2" /> {isRestoring ? 'Restaurando...' : 'Restaurar'}
+                      </button>
                     </div>
                   </div>
 
-                  {isRestoringThis && (
-                    <span className="text-primary text-sm font-bold flex items-center animate-pulse shrink-0">
-                      <RefreshCw size={16} className="mr-2 animate-spin" /> Reconstruindo...
-                    </span>
+                  {isRestoring && (
+                    <div className="bg-background/80 border border-primary/20 rounded-xl p-4 space-y-2 animate-in fade-in ml-9">
+                      <div className="flex justify-between text-xs text-textMuted font-semibold">
+                        <span>{statusText}</span>
+                        <span className="text-primary">{progress}%</span>
+                      </div>
+                      <div className="w-full bg-surface rounded-full h-2 border border-border overflow-hidden">
+                        <div className="bg-primary h-2 rounded-full transition-all duration-200" style={{ width: `${progress}%` }}></div>
+                      </div>
+                    </div>
                   )}
                 </div>
               );
@@ -254,25 +528,6 @@ export default function Restore() {
           </div>
         )}
       </div>
-
-      {/* 4. BARRA DE AÇÃO FLUTUANTE (Em Lote) */}
-      {selectedManifests.length > 0 && (
-        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 ml-32 bg-surface border border-primary shadow-[0_0_30px_rgba(59,130,246,0.3)] rounded-full px-6 py-4 flex items-center space-x-6 animate-in slide-in-from-bottom-8 z-50">
-          <span className="text-textMain font-bold">
-            <span className="text-primary text-xl mr-2">{selectedManifests.length}</span>
-            Ficheiros Selecionados
-          </span>
-          <button 
-            onClick={handleBatchRestore}
-            disabled={restoringPath !== null}
-            className="bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-full font-bold shadow-md transition-all flex items-center disabled:opacity-50 cursor-pointer"
-          >
-            {restoringPath !== null ? <RefreshCw size={18} className="mr-2 animate-spin" /> : <HardDriveDownload size={18} className="mr-2" />}
-            Restaurar Lote
-          </button>
-        </div>
-      )}
-
     </div>
   );
 }

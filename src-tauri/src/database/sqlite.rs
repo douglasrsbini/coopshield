@@ -65,6 +65,8 @@ pub fn init_db(app_handle: &AppHandle) -> Result<()> {
     conn.execute(
         "INSERT OR IGNORE INTO system_settings (setting_key, setting_value) VALUES 
         ('theme', 'dark'),
+        ('language', 'pt-BR'),
+        ('setup_completed', 'false'),
         ('accent_color', '#3b82f6'),
         ('license_status', 'unlicensed'),
         ('license_key', ''),
@@ -75,6 +77,19 @@ pub fn init_db(app_handle: &AppHandle) -> Result<()> {
         ('whatsapp_token', ''),
         ('whatsapp_number', '')",
         []
+    )?;
+
+    // --- NOVA TABELA PARA O SININHO DE NOTIFICAÇÕES ---
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS system_notifications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            message TEXT NOT NULL,
+            type TEXT NOT NULL,
+            is_read INTEGER DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )",
+        [],
     )?;
 
     Ok(())

@@ -6,6 +6,8 @@ use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 use base64::{engine::general_purpose, Engine as _};
 use std::collections::HashSet;
+use rusqlite::Connection;
+use crate::database::sqlite::get_db_path;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct AuditLog {
@@ -143,4 +145,107 @@ pub fn get_dashboard_telemetry(app_handle: AppHandle) -> Result<DashboardTelemet
 #[tauri::command]
 pub fn read_file_binary(path: String) -> Result<Vec<u8>, String> {
     std::fs::read(&path).map_err(|e| e.to_string())
+}
+
+// ==========================================
+// MOTOR DO SININHO DE NOTIFICAÇÕES (UI)
+// ==========================================
+
+#[derive(Serialize, Deserialize)]
+pub struct SystemNotification {
+    pub id: i64,
+    pub title: String,
+    pub message: String,
+    pub type_str: String, // "info", "warning", "success", "error"
+    pub is_read: bool,
+    pub created_at: String,
+}
+
+#[command]
+pub fn get_system_notifications(app_handle: AppHandle) -> Result<Vec<SystemNotification>, String> {
+    let db_path = get_db_path(&app_handle);
+    let conn = Connection::open(db_path).map_err(|e| e.to_string())?;
+
+    // Busca as notificações ordenadas da mais recente para a mais antiga (Limite 50)
+    let mut stmt = conn
+        .prepare("SELECT id, title, message, type, is_read, created_at FROM system_notifications ORDER BY created_at DESC LIMIT 50")
+        .map_err(|e| e.to_string())?;
+
+    let rows = stmt.query_map([], |row| {
+        let is_read_int: i32 = row.get(4)?;
+        Ok(SystemNotification {
+            id: row.get(0)?,
+            title: row.get(1)?,
+            message: row.get(2)?,
+            type_str: row.get(3)?,
+            is_read: is_read_int == 1,
+            created_at: row.get(5)?,
+        })
+    }).map_err(|e| e.to_string())?;
+
+    let mut notifications = Vec::new();
+    for row in rows {
+        if let Ok(notif) = row {
+            notifications.push(notif);
+        }
+    }
+
+    Ok(notifications)
+}
+
+#[command]
+pub fn mark_notifications_as_read(app_handle: AppHandle) -> Result<(), String> {
+    let db_path = get_db_path(&app_handle);
+    let conn = Connection::open(db_path).map_err(|e| e.to_string())?;
+    
+    // Transforma todas as notificações não lidas (0) em lidas (1)
+    conn.execute("UPDATE system_notifications SET is_read = 1 WHERE is_read = 0", [])
+        .map_err(|e| e.to_string())?;
+        
+    Ok(())
+}
+
+// Esta função não precisa do `#[command]` porque será usada internamente pelo motor Rust
+pub fn emit_system_notification(app_handle: &AppHandle, title: &str, message: &str, notif_type: &str) {
+    let db_path = get_db_path(app_handle);
+    if let Ok(conn) = Connection::open(&db_path) {
+        let _ = conn.execute(
+            "INSERT INTO system_notifications (title, message, type, is_read) VALUES (?1, ?2, ?3, 0)",
+            (title, message, notif_type),
+        );
+    }
+}
+
+#[tauri::command]
+pub fn get_os_hostname() -> Result<String, String> {
+    // Tenta pelas variáveis de ambiente padrão do SO (muito rápido e seguro)
+    if let Ok(name) = std::env::var("COMPUTERNAME") { // Windows
+        if !name.trim().is_empty() { return Ok(name.trim().to_string()); }
+    }
+    if let Ok(name) = std::env::var("HOSTNAME") { // Linux / macOS
+        if !name.trim().is_empty() { return Ok(name.trim().to_string()); }
+    }
+    
+    // Fallback executando o comando nativo do SO
+    #[cfg(target_os = "windows")]
+    {
+        if let Ok(output) = std::process::Command::new("hostname").output() {
+            if let Ok(s) = String::from_utf8(output.stdout) {
+                let trimmed = s.trim();
+                if !trimmed.is_empty() { return Ok(trimmed.to_string()); }
+            }
+        }
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    {
+        if let Ok(output) = std::process::Command::new("uname").arg("-n").output() {
+            if let Ok(s) = String::from_utf8(output.stdout) {
+                let trimmed = s.trim();
+                if !trimmed.is_empty() { return Ok(trimmed.to_string()); }
+            }
+        }
+    }
+
+    Ok("Dispositivo Desconhecido".to_string())
 }

@@ -3,13 +3,24 @@
 @tailwind utilities;
 
 @layer base {
+  /* MODO CLARO (Default) */
   :root {
-    --primary: 59 130 246;
-    --background: 15 17 21;
-    --surface: 22 25 32;
-    --border: 30 41 59;
-    --text-main: 248 250 252;
-    --text-muted: 148 163 184;
+    --primary: 59 130 246;     /* Azul da marca preservado */
+    --background: 248 250 252; /* slate-50 - Fundo principal claro */
+    --surface: 255 255 255;    /* white - Fundo dos cards (branco puro) */
+    --border: 226 232 240;     /* slate-200 - Bordas sutis */
+    --text-main: 15 23 42;     /* slate-900 - Texto principal escuro */
+    --text-muted: 100 116 139; /* slate-500 - Texto secundário */
+  }
+
+  /* MODO ESCURO (Deep Tech Black) */
+  .dark {
+    --primary: 59 130 246;     /* Azul da marca preservado */
+    --background: 15 17 21;    /* Fundo original */
+    --surface: 22 25 32;       /* Fundo dos cards original */
+    --border: 30 41 59;        /* Bordas originais */
+    --text-main: 248 250 252;  /* Texto claro original */
+    --text-muted: 148 163 184; /* Texto secundário original */
   }
 }
 
@@ -17,4 +28,31 @@
 body {
   background-color: rgb(var(--background));
   color: rgb(var(--text-main));
+}
+
+/* =========================================================
+   MÁGICA DA IMPRESSÃO CORPORATIVA (WEBVIEW2 / CHROMIUM)
+========================================================= */
+@media print {
+  @page {
+    /* Força a folha a ficar na horizontal (Paisagem) para o gráfico caber perfeito */
+    size: landscape;
+    margin: 10mm;
+  }
+  
+  body, html {
+    background-color: white !important;
+    color: black !important;
+    /* A diretiva abaixo impede que a impressora remova as cores de fundo do gráfico */
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .bg-surface, .bg-background {
+    background-color: white !important;
+  }
+
+  .text-textMain, .text-textMuted {
+    color: black !important;
+  }
 }

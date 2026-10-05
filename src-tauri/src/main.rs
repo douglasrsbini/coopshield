@@ -19,10 +19,11 @@ pub mod engine {
 use std::sync::{Arc, Mutex};
 use std::collections::HashSet;
 
+use tauri::{Manager, menu::{Menu, MenuItem}, tray::{TrayIconBuilder, MouseButton, TrayIconEvent}};
+use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
+
 #[tauri::command]
 fn close_splashscreen(app: tauri::AppHandle) {
-    use tauri::Manager;
-    
     if let Some(main) = app.get_webview_window("main") {
         let _ = main.show();
         let _ = main.set_focus(); 
@@ -37,14 +38,41 @@ fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_notification::init()) 
+        .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec!["--silent"])))
         .setup(|app| {
             let app_handle = app.handle().clone();
+            let _ = app.autolaunch().enable();
 
-            // 1. Inicializa a base de dados
-            crate::database::sqlite::init_db(&app_handle)
-                .expect("Falha ao inicializar a base de dados do CoopShield");
+            let show_i = MenuItem::with_id(app, "show", "Abrir Painel do CoopShield", true, None::<&str>)?;
+            let quit_i = MenuItem::with_id(app, "quit", "Encerrar Serviço de Proteção", true, None::<&str>)?;
+            let menu = Menu::with_items(app, &[&show_i, &quit_i])?;
 
-            // 2. VIGIA DE AGENDAMENTO COM TELEMETRIA DE TERMINAL
+            let _tray = TrayIconBuilder::new()
+                .icon(app.default_window_icon().unwrap().clone())
+                .menu(&menu)
+                .on_menu_event(|app, event| match event.id.as_ref() {
+                    "quit" => std::process::exit(0),
+                    "show" => {
+                        if let Some(window) = app.get_webview_window("main") {
+                            let _ = window.show();
+                            let _ = window.set_focus();
+                        }
+                    },
+                    _ => {}
+                })
+                .on_tray_icon_event(|tray, event| {
+                    if let TrayIconEvent::Click { button: MouseButton::Left, .. } = event {
+                        let app = tray.app_handle();
+                        if let Some(window) = app.get_webview_window("main") {
+                            let _ = window.show();
+                            let _ = window.set_focus();
+                        }
+                    }
+                })
+                .build(app)?;
+
+            crate::database::sqlite::init_db(&app_handle).expect("Falha ao inicializar a base de dados do CoopShield");
+
             std::thread::spawn(move || {
                 let executed_slots: Arc<Mutex<HashSet<String>>> = Arc::new(Mutex::new(HashSet::new()));
 
@@ -58,62 +86,34 @@ fn main() {
                     let db_path = crate::database::sqlite::get_db_path(&app_handle);
                     
                     if let Ok(conn) = rusqlite::Connection::open(&db_path) {
-                        let mut stmt = match conn.prepare(
-                            "SELECT id, name, schedule, source_path, destination_vault, status 
-                            FROM backup_routines"
-                        ) {
-                            Ok(s) => s,
-                            Err(_) => continue,
+                        let mut stmt = match conn.prepare("SELECT id, name, schedule, source_path, destination_vault, status FROM backup_routines") {
+                            Ok(s) => s, Err(_) => continue,
                         };
 
                         let rows = stmt.query_map([], |row| {
-                            Ok((
-                                row.get::<_, i64>(0)?,
-                                row.get::<_, String>(1)?,
-                                row.get::<_, String>(2)?, // schedule
-                                row.get::<_, String>(3)?, // source_path
-                                row.get::<_, String>(4)?, // destination_vault
-                                row.get::<_, String>(5)?, // status
-                            ))
+                            Ok((row.get::<_, i64>(0)?, row.get::<_, String>(1)?, row.get::<_, String>(2)?, row.get::<_, String>(3)?, row.get::<_, String>(4)?, row.get::<_, String>(5)?))
                         });
 
                         if let Ok(routine_iter) = rows {
                             for routine_result in routine_iter {
                                 if let Ok((id, name, schedule, source, dest, status)) = routine_result {
-                                    
                                     let is_active = status.to_uppercase() == "ATIVO";
                                     let time_matches = schedule.contains(&current_time_str);
 
                                     if is_active && time_matches {
                                         let slot_key = format!("{}_{}_{}", id, current_date_str, current_time_str);
-                                        
                                         let mut slots = executed_slots.lock().unwrap();
                                         if !slots.contains(&slot_key) {
                                             slots.insert(slot_key.clone());
-                                            
-                                            if slots.len() > 100 {
-                                                slots.clear();
-                                                slots.insert(slot_key);
-                                            }
-                                            
+                                            if slots.len() > 100 { slots.clear(); slots.insert(slot_key); }
                                             drop(slots); 
 
-                                            crate::commands::system::write_audit_log(
-                                                &app_handle,
-                                                "INFO",
-                                                &format!("Agendamento disparado automaticamente para a rotina '{}' (ID: {})", name, id)
-                                            );
+                                            crate::commands::system::write_audit_log(&app_handle, "INFO", &format!("Agendamento disparado para a rotina '{}' (ID: {})", name, id));
 
                                             let handle_clone = app_handle.clone();
                                             let routine_name = name.clone();
                                             std::thread::spawn(move || {
-                                                let _ = crate::commands::backup::execute_backup_routine(
-                                                    handle_clone, 
-                                                    id, 
-                                                    routine_name, 
-                                                    source, 
-                                                    dest
-                                                );
+                                                let _ = crate::commands::backup::execute_backup_routine(handle_clone, id, routine_name, source, dest);
                                             });
                                         }
                                     }
@@ -123,8 +123,16 @@ fn main() {
                     }
                 }
             });
-
             Ok(())
+        })
+        .on_window_event(|window, event| match event {
+            tauri::WindowEvent::CloseRequested { api, .. } => {
+                if window.label() == "main" {
+                    window.hide().unwrap();
+                    api.prevent_close();
+                }
+            }
+            _ => {}
         })
         .invoke_handler(tauri::generate_handler![
             crate::commands::storage::add_cloud_vault,
@@ -138,7 +146,6 @@ fn main() {
             crate::commands::backup::execute_backup_routine,
             crate::commands::backup::scan_local_vault,
             crate::commands::backup::execute_restore,
-            // COMANDOS DE RESTAURO CLOUD ADICIONADOS AQUI:
             crate::commands::backup::scan_cloud_vault,
             crate::commands::backup::execute_cloud_restore,
             close_splashscreen,
@@ -150,8 +157,17 @@ fn main() {
             crate::commands::system::save_report_file,
             crate::commands::system::get_dashboard_telemetry,
             crate::commands::system::read_file_binary,
-            // COMANDOS DE LICENCIAMENTO ADICIONADOS AQUI:
-            crate::engine::licensing::get_machine_id
+            crate::engine::licensing::get_machine_id,
+            crate::commands::settings::test_smtp_connection,
+            crate::commands::settings::finish_setup,
+            crate::engine::licensing::validate_license_key,
+            crate::commands::settings::request_2fa_token,
+            crate::engine::licensing::authenticate_and_activate,
+            crate::engine::licensing::generate_totp_qr,
+            crate::engine::licensing::verify_totp_code,
+            crate::commands::system::get_system_notifications,
+            crate::commands::system::mark_notifications_as_read,
+            crate::commands::system::get_os_hostname
         ])
         .run(tauri::generate_context!())
         .expect("Erro fatal: Falha ao iniciar a engine do CoopShield");

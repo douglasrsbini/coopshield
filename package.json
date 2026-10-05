@@ -1,5 +1,5 @@
 {
-  "name": "exodus-shield",
+  "name": "coop-shield",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -11,10 +11,18 @@
   },
   "dependencies": {
     "@tauri-apps/api": "2.0.0",
+    "@tauri-apps/plugin-autostart": "^2.7.0",
     "@tauri-apps/plugin-dialog": "^2.7.3",
+    "@tauri-apps/plugin-notification": "^2.5.0",
+    "html2canvas": "^1.4.1",
+    "i18next": "^26.4.2",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.8",
     "lucide-react": "^0.446.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-i18next": "^17.0.15",
+    "react-joyride": "^3.2.0",
     "react-router-dom": "^7.18.4"
   },
   "devDependencies": {
