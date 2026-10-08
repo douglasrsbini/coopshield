@@ -1,18 +1,18 @@
 {
   "app": {
     "name": "Kopher Shield",
-    "tagline": "Proteção imutável. Recuperação confiável."
+    "tagline": "Proteção imutável. Recuperação fiável."
   },
   "common": {
     "actions": {
       "back": "Voltar",
       "continue": "Continuar",
-      "save": "Salvar alterações",
+      "save": "Guardar alterações",
       "cancel": "Cancelar",
       "close": "Fechar"
     },
     "status": {
-      "loading": "Carregando",
+      "loading": "A carregar",
       "ready": "Pronto",
       "error": "Erro",
       "success": "Sucesso"
@@ -20,7 +20,7 @@
   },
   "welcome": {
     "title": "Bem-vindo(a) ao Kopher Shield",
-    "subtitle": "Para começarmos, selecione o idioma da sua preferência.",
+    "subtitle": "Para começar, selecione o idioma da sua preferência.",
     "languageLabel": "Idioma da interface",
     "languages": {
       "pt-BR": "Português (Brasil)",
@@ -31,7 +31,7 @@
     },
     "hero": {
       "title": "Bem-vindo à sua Fortaleza Digital",
-      "subtitle": "Backup imutável, auditoria e soberania de dados. Escolha seu idioma e tema para começar."
+      "subtitle": "Cópias imutáveis, auditoria e soberania de dados. Escolha o idioma e o tema para começar."
     },
     "theme": {
       "label": "Tema da interface",
@@ -42,39 +42,39 @@
     "setup": "Configuração inicial",
     "auth": {
       "title": "Ativação Híbrida",
-      "subtitle": "Autentique-se com a sua conta BINAVER. A licença será vinculada automaticamente.",
+      "subtitle": "Autentique-se com a sua conta BINAVER. A licença será associada automaticamente.",
       "email": "E-mail da Conta BINAVER",
-      "password": "Senha",
+      "password": "Palavra-passe",
       "manualKey": "Possuo uma Chave de Produto Manual (Opcional)",
       "keyPh": "Ex: HCTNAW-ZV28YO...",
       "keyLabel": "Chave de produto",
-      "twoFaTitle": "Verificação em Duas Etapas",
+      "twoFaTitle": "Verificação em Dois Passos",
       "twoFaSubtitle": "Por segurança, confirme a sua identidade.",
       "emailMethod": "E-mail",
-      "tokenSent": "Enviamos um token temporário para {{email}}.",
+      "tokenSent": "Enviámos um token temporário para {{email}}.",
       "tokenLabel": "Token de verificação",
       "doneTitle": "Tudo Pronto!",
-      "doneText": "O Kopher Shield foi autenticado com sucesso e vinculado à sua conta BINAVER.",
+      "doneText": "O Kopher Shield foi autenticado com sucesso e associado à sua conta BINAVER.",
       "back": "Voltar",
       "authenticate": "Autenticar Conta",
       "validate": "Validar Token",
-      "enter": "Acessar Painel de Controle",
-      "errFill": "Por favor, preencha o e-mail e a senha.",
+      "enter": "Aceder ao Painel de Controlo",
+      "errFill": "Por favor, preencha o e-mail e a palavra-passe.",
       "errKey": "A chave está incompleta.",
       "errToken": "O token deve ter 6 dígitos.",
-      "errFatal": "Erro fatal ao salvar as configurações."
+      "errFatal": "Erro fatal ao guardar as definições."
     }
   },
   "settings": {
     "language": {
       "title": "Idioma da aplicação",
-      "description": "Selecione o idioma usado nos menus e nas mensagens do Kopher Shield.",
-      "saveError": "Não foi possível salvar o idioma."
+      "description": "Selecione o idioma utilizado nos menus e nas mensagens do Kopher Shield.",
+      "saveError": "Não foi possível guardar o idioma."
     },
     "loading": "CARREGANDO...",
     "hardwareFail": "FALHA-AO-LER-HARDWARE",
     "localDevice": "Dispositivo Local",
-    "noKey": "NENHUMA CHAVE REGISTRADA",
+    "noKey": "NENHUMA CHAVE REGISTADA",
     "imagesFilter": "Imagens",
     "cancel": "Cancelar",
     "toast": {
@@ -84,26 +84,26 @@
       "readErrorTitle": "Erro de Leitura",
       "readError": "Falha ao carregar as configurações do SQLite.",
       "iconLoaded": "Ícone Carregado",
-      "iconReady": "A imagem está pronta para ser salva.",
+      "iconReady": "A imagem está pronta para ser guardada.",
       "selectError": "Erro de Seleção",
       "imageLoadFail": "Não foi possível carregar a imagem.",
       "avatarUpdated": "Avatar Atualizado",
-      "avatarUploaded": "Sua imagem de perfil (Upload) foi salva com sucesso.",
+      "avatarUploaded": "A sua imagem de perfil (Upload) foi guardada com sucesso.",
       "avatarLoadFail": "Não foi possível carregar o avatar.",
-      "avatarPresetSaved": "Seu avatar corporativo foi salvo com sucesso.",
-      "avatarSaveFail": "Não foi possível salvar o avatar.",
+      "avatarPresetSaved": "O seu avatar corporativo foi guardado com sucesso.",
+      "avatarSaveFail": "Não foi possível guardar o avatar.",
       "avatarRemoved": "Avatar Removido",
       "avatarRemovedMsg": "A sua imagem de perfil foi removida e voltará ao padrão.",
       "avatarRemoveFail": "Não foi possível remover o avatar.",
       "profileUpdated": "Dados Atualizados",
-      "profileUpdatedMsg": "Informações do responsável técnico salvas com sucesso.",
-      "profileSaveFail": "Falha ao salvar dados no banco de dados.",
+      "profileUpdatedMsg": "Informações do responsável técnico guardadas com sucesso.",
+      "profileSaveFail": "Falha ao guardar dados na base de dados.",
       "invalidColor": "Cor inválida",
       "invalidColorMsg": "Informe uma cor hexadecimal válida no formato #RRGGBB.",
       "saved": "Configurações corporativas atualizadas com sucesso!",
-      "saveFail": "Falha ao salvar no SQLite",
+      "saveFail": "Falha ao guardar no SQLite",
       "incompleteFields": "Campos Incompletos",
-      "incompleteFieldsMsg": "Preencha todos os campos do servidor SMTP Customizado.",
+      "incompleteFieldsMsg": "Preencha todos os campos do servidor SMTP personalizado.",
       "smtpError": "Erro SMTP",
       "comingSoon": "Em Breve",
       "comingSoonMsg": "A integração nativa será injetada no motor Rust.",
@@ -114,17 +114,17 @@
     },
     "license": {
       "qrFail": "Falha ao gerar QR Code offline.",
-      "fillCredentials": "Preencha o e-mail e a senha corporativa.",
+      "fillCredentials": "Preencha o e-mail e a palavra-passe corporativa.",
       "keyIncomplete": "A chave de licença está incompleta.",
       "tokenDigits": "O token deve conter 6 dígitos.",
-      "unlinkConfirm": "Atenção: Tem certeza de que deseja desvincular esta máquina? O acesso será bloqueado.",
+      "unlinkConfirm": "Atenção: Tem a certeza de que pretende desvincular esta máquina? O acesso será bloqueado.",
       "tokenSent": "Token enviado para {{email}}",
       "noOwner": "Licença Local Não Associada",
       "holderAlt": "Avatar do Titular",
       "edit": "Editar",
       "activeVerified": "Conta Ativa e Verificada",
       "technicalOwner": "Responsável Técnico",
-      "manageAccount": "Gerenciar Conta",
+      "manageAccount": "Gerir Conta",
       "resetMfa": "Redefinir MFA",
       "endSession": "Encerrar Sessão",
       "editOwnerTitle": "Editar Dados do Responsável Técnico",
@@ -132,26 +132,26 @@
       "adminNamePlaceholder": "Ex: Douglas Richard",
       "role": "Cargo / Departamento",
       "rolePlaceholder": "Ex: Analista de Infraestrutura",
-      "saveChanges": "Salvar Alterações",
+      "saveChanges": "Guardar Alterações",
       "linkedDevice": "Dispositivo Vinculado",
       "hostName": "Nome do Host (SO)",
       "machineId": "Assinatura de Hardware (Machine ID)",
       "activeKey": "Chave de Licença Ativa",
-      "encryptedKey": "Chave de Produto Criptografada",
-      "encryption": "Criptografia",
+      "encryptedKey": "Chave de Produto Encriptada",
+      "encryption": "Encriptação",
       "resetMfaTitle": "Redefinição de Autenticador (MFA)",
       "authTitle": "Autenticação e Vínculo",
-      "resetMfaDesc": "Escaneie o novo QR Code com seu aplicativo autenticador.",
-      "authDesc": "Insira as credenciais da nova conta que irá assumir esta máquina.",
-      "enterKeyManually": "Inserir Chave Manualmente",
+      "resetMfaDesc": "Leia o novo QR Code com a sua aplicação de autenticação.",
+      "authDesc": "Introduza as credenciais da nova conta que irá assumir esta máquina.",
+      "enterKeyManually": "Introduzir Chave Manualmente",
       "keyPlaceholder": "Ex: HCTNAW-ZV28YO...",
       "continue": "Continuar",
-      "appMethod": "App Autenticador",
+      "appMethod": "Aplicação de Autenticação",
       "emailMethod": "E-mail",
-      "scanQr": "Escaneie o Novo QR Code",
+      "scanQr": "Leia o Novo QR Code",
       "qrAlt": "QR Code 2FA",
-      "enterAppCode": "Insira o código gerado pelo seu celular.",
-      "validateSave": "Validar e Salvar"
+      "enterAppCode": "Introduza o código gerado pelo seu telemóvel.",
+      "validateSave": "Validar e Guardar"
     },
     "avatar": {
       "title": "Alterar Imagem de Perfil",
@@ -187,7 +187,7 @@
       "scaleLarge": "Grande",
       "accent": "Cor de Destaque Primária",
       "useAccent": "Usar destaque {{label}}",
-      "custom": "Customizada:",
+      "custom": "Personalizada:",
       "pickColor": "Selecionar cor personalizada",
       "hexCode": "Código hexadecimal da cor de destaque"
     },
@@ -204,8 +204,8 @@
       "smtpPort": "Porta",
       "smtpSecurity": "Segurança",
       "smtpSender": "E-mail Remetente (Envio)",
-      "smtpPassword": "Senha de Aplicativo",
-      "managedByCloud": "Os e-mails de alerta e relatórios estão sendo gerenciados automaticamente pelo <strong>Motor de Notificações Cloud</strong>. Nenhuma configuração adicional é necessária.",
+      "smtpPassword": "Palavra-passe de Aplicação",
+      "managedByCloud": "Os e-mails de alerta e relatórios estão a ser geridos automaticamente pelo <strong>Motor de Notificações Cloud</strong>. Não é necessária nenhuma configuração adicional.",
       "copies": "Cópias Silenciosas e Auditoria (CC/CCO)",
       "cc": "Com Cópia (Cc)",
       "ccPlaceholder": "Ex: gestao@dominio.com",
@@ -214,33 +214,33 @@
       "testEmail": "Disparar E-mail de Teste",
       "teamsDesc": "Receba relatórios e falhas diretamente num canal do Teams.",
       "teamsUrl": "URL do Webhook (Canal do Teams)",
-      "teamsPlaceholder": "https://sua-empresa.webhook.office.com/...",
+      "teamsPlaceholder": "https://a-sua-empresa.webhook.office.com/...",
       "teamsTest": "Testar Ping no Teams",
       "prefsTitle": "Preferências de Notificação",
-      "prefsDesc": "Escolha quais os eventos do sistema que disparam alertas sonoros e e-mails para a equipe.",
+      "prefsDesc": "Escolha quais os eventos do sistema que disparam alertas sonoros e e-mails para a equipa.",
       "backupStart": "Início de Rotina de Backup",
       "backupStartDesc": "Avisa quando uma cópia de segurança for iniciada.",
       "backupEnd": "Conclusão e Relatórios de Backup",
       "backupEndDesc": "Envia o relatório final quando o backup terminar (Sucesso ou Falha).",
       "restore": "Procedimentos de Restauro",
-      "restoreDesc": "Alerta a equipe sempre que dados sensíveis forem restaurados.",
+      "restoreDesc": "Alerta a equipa sempre que dados sensíveis forem restaurados.",
       "systemErrors": "Avisos Críticos do Sistema",
-      "systemErrorsDesc": "Erros de motor, perda de conexão e falhas no agendamento.",
+      "systemErrorsDesc": "Erros de motor, perda de ligação e falhas no agendamento.",
       "historyNote": "Todas as notificações ficam sempre gravadas no histórico do sistema (Sino Superior)."
     },
     "actions": {
-      "saving": "Salvando...",
-      "save": "Salvar Configurações"
+      "saving": "A guardar...",
+      "save": "Guardar Configurações"
     }
   },
   "nav": {
-    "dashboard": "Dashboard",
-    "routines": "Rotinas de Backup",
+    "dashboard": "Painel",
+    "routines": "Rotinas de Cópia",
     "cloud": "Cofres Cloud",
-    "restore": "Restaurar Backup",
-    "audit": "Auditoria de Sistema",
+    "restore": "Restaurar Cópia",
+    "audit": "Auditoria do Sistema",
     "support": "Suporte",
-    "settings": "Configurações"
+    "settings": "Definições"
   },
   "sidebar": {
     "ariaLabel": "Navegação lateral",
@@ -248,41 +248,41 @@
     "collapse": "Recolher barra lateral",
     "expand": "Expandir barra lateral",
     "workspaceLocal": "Workspace Local",
-    "consoleLocal": "Console Local",
+    "consoleLocal": "Consola Local",
     "poweredBy": "Powered by Kopher Shield"
   },
   "header": {
-    "managementPanel": "Painel de Gerenciamento - {{name}}",
-    "localConsole": "Console de Gerenciamento Local",
+    "managementPanel": "Painel de Gestão - {{name}}",
+    "localConsole": "Consola de Gestão Local",
     "backgroundProcesses": "{{count}} processo(s) em segundo plano"
   },
   "notifications": {
-    "center": "Central de Notificações",
+    "center": "Centro de Notificações",
     "title": "Notificações",
     "unread": "Não lidas",
     "all": "Todas",
-    "empty": "Nenhuma notificação por aqui.",
+    "empty": "Não existem notificações.",
     "markAllRead": "Marcar todas como lidas"
   },
   "audit": {
-    "subtitle": "Registro imutável de eventos para auditoria e conformidade legal.",
+    "subtitle": "Registo imutável de eventos para auditoria e conformidade legal.",
     "searchPlaceholder": "Pesquisar por rotina, avisos ou origem...",
     "refresh": "Atualizar",
-    "loading": "Analisando trilha de auditoria...",
-    "empty": "Nenhum registro corresponde aos parâmetros.",
-    "shown": "{{count}} ocorrências exibidas",
+    "loading": "A analisar o registo de auditoria...",
+    "empty": "Nenhum registo corresponde aos parâmetros.",
+    "shown": "{{count}} ocorrências apresentadas",
     "toast": {
-      "loadFailed": "Falha ao carregar os logs.",
-      "csvOk": "Planilha exportada com sucesso.",
+      "loadFailed": "Falha ao carregar os registos.",
+      "csvOk": "Folha de cálculo exportada com sucesso.",
       "pdfOk": "Relatório PDF exportado com sucesso.",
-      "saveFailed": "Falha ao salvar: {{error}}",
+      "saveFailed": "Falha ao guardar: {{error}}",
       "exportError": "Erro na exportação"
     },
     "export": {
       "csv": "Exportar (Excel)",
       "pdf": "Relatório PDF",
-      "generating": "Gerando PDF...",
-      "csvFilter": "Planilha Excel (CSV)",
+      "generating": "A gerar PDF...",
+      "csvFilter": "Folha Excel (CSV)",
       "pdfFilter": "Relatório de Auditoria (PDF)",
       "csvHeader": "Data e Hora,Nível,Descrição"
     },
@@ -306,36 +306,36 @@
   },
   "cloud": {
     "title": "Cofres Cloud",
-    "subtitle": "Gerencie os destinos de armazenamento seguros dos seus backups.",
-    "connectNew": "Conectar novo cofre",
-    "connected": "Conectado",
+    "subtitle": "Gira os destinos de armazenamento seguros das suas cópias.",
+    "connectNew": "Ligar novo cofre",
+    "connected": "Ligado",
     "bucket": "Bucket",
-    "crypto": "Criptografia",
+    "crypto": "Encriptação",
     "cryptoReady": "AES-256 pronto",
     "edit": "Editar cofre",
-    "delete": "Eliminar conexão",
+    "delete": "Eliminar ligação",
     "addTitle": "Adicionar cofre cloud",
-    "addDesc": "Conecte AWS S3, Cloudflare R2, Google Cloud, Azure ou Backblaze B2.",
+    "addDesc": "Ligue AWS S3, Cloudflare R2, Google Cloud, Azure ou Backblaze B2.",
     "actions": {
-      "connect": "Conectar nuvem",
-      "testing": "Testando nuvem..."
+      "connect": "Ligar ? nuvem",
+      "testing": "A testar a nuvem..."
     },
     "confirm": {
-      "deleteMessage": "Tem certeza que deseja eliminar esta conexão de cofre? Os ficheiros na nuvem NÃO serão apagados."
+      "deleteMessage": "Tem a certeza de que pretende eliminar esta ligação ao cofre? Os ficheiros na nuvem NÃO serão apagados."
     },
     "modal": {
       "createTitle": "Autenticar cofre cloud",
-      "editTitle": "Editar conexão",
-      "validationHint": "A conexão será validada ao salvar."
+      "editTitle": "Editar ligação",
+      "validationHint": "A ligação será validada ao guardar."
     },
     "form": {
       "nameLabel": "Nome de identificação",
-      "namePlaceholder": "Ex: Backup AWS São Paulo",
+      "namePlaceholder": "Ex.: Backup AWS São Paulo",
       "providerLabel": "Fornecedor (provider)",
       "bucketLabel": "Nome do bucket (contentor)",
       "bucketPlaceholder": "kopher-shield-production",
       "credentialsTitle": "Credenciais de segurança IAM",
-      "endpointLabel": "URL endpoint da API (se for Cloudflare R2 / Backblaze)",
+      "endpointLabel": "URL do endpoint da API (se for Cloudflare R2 / Backblaze)",
       "endpointPlaceholder": "https://<ID>.r2.cloudflarestorage.com",
       "accessKeyLabel": "Access Key ID",
       "accessKeyPlaceholder": "AKIA...",
@@ -343,9 +343,9 @@
       "secretKeyPlaceholder": "••••••••••••",
       "providers": {
         "aws": "Amazon Web Services (S3)",
-        "cloudflareR2": "Cloudflare R2 (Compatível S3)",
-        "backblazeB2": "Backblaze B2 (Compatível S3)",
-        "otherS3Compatible": "Outro (S3 Compatível)"
+        "cloudflareR2": "Cloudflare R2 (Compatível com S3)",
+        "backblazeB2": "Backblaze B2 (Compatível com S3)",
+        "otherS3Compatible": "Outro (Compatível com S3)"
       }
     },
     "toast": {
@@ -356,8 +356,8 @@
   },
   "routines": {
     "nextRun": "Próxima execução",
-    "runningNow": "Executando agora",
-    "manualOnly": "Somente manual",
+    "runningNow": "A executar agora",
+    "manualOnly": "Apenas manual",
     "running": "Em execução",
     "active": "Ativo",
     "schedule": {
@@ -377,9 +377,9 @@
       "repeat": "Repetir a cada",
       "hours_one": "{{count}} hora",
       "hours_other": "{{count}} horas",
-      "baseTime": "Horário base",
+      "baseTime": "Hora base",
       "name": "Nome da rotina",
-      "namePlaceholder": "Ex: Servidor de Arquivos Sicoob",
+      "namePlaceholder": "Ex: Servidor de Ficheiros Sicoob",
       "source": "Pasta de origem",
       "browse": "Procurar",
       "vault": "Cofre de destino",
@@ -388,8 +388,8 @@
       "localFolder": "Selecione a pasta do servidor/NAS",
       "browseNas": "Procurar NAS",
       "cancel": "Cancelar",
-      "save": "Salvar",
-      "saving": "Salvando..."
+      "save": "Guardar",
+      "saving": "A guardar..."
     },
     "failed": "Falhou",
     "title": "Rotinas de Backup",
@@ -398,22 +398,22 @@
     "selectBatch": "Selecionar lote",
     "deselectAll": "Desmarcar todos",
     "search": "Pesquisar rotina...",
-    "viewGrid": "Visualização em grade",
+    "viewGrid": "Visualização em grelha",
     "viewCompact": "Visualização compacta",
     "emptyNone": "Nenhuma rotina de backup configurada no motor.",
     "emptyNoMatch": "Nenhuma rotina encontrada com esse nome.",
-    "processing": "Processando",
+    "processing": "A processar",
     "source": "Origem",
     "destination": "Destino",
     "scheduleLabel": "Agendamento",
     "runNow": "Executar agora",
     "run": "Executar",
     "edit": "Editar rotina",
-    "delete": "Excluir rotina",
+    "delete": "Eliminar rotina",
     "selected_one": "Rotina selecionada",
     "selected_other": "Rotinas selecionadas",
     "runFleet": "Executar frota",
-    "confirmDelete": "Deseja excluir esta rotina?",
+    "confirmDelete": "Deseja eliminar esta rotina?",
     "modal": {
       "create": "Nova rotina de backup",
       "edit": "Editar rotina",
@@ -422,28 +422,28 @@
     "toast": {
       "error": "Erro",
       "loadFailed": "Não foi possível carregar os dados.",
-      "deleted": "Excluída",
+      "deleted": "Eliminada",
       "deletedMsg": "A rotina foi removida.",
-      "deleteFailed": "Falha ao excluir: {{error}}",
+      "deleteFailed": "Falha ao eliminar: {{error}}",
       "warning": "Aviso",
       "required": "Preencha todos os campos obrigatórios.",
       "destRequired": "Defina a pasta de destino ou escolha um cofre Cloud.",
       "success": "Sucesso",
-      "saved": "Rotina salva no motor.",
-      "starting": "Iniciando motor",
+      "saved": "Rotina guardada no motor.",
+      "starting": "A iniciar motor",
       "startingMsg": "A rotina foi enviada para as threads de processamento.",
       "engineFail": "Falha no motor",
       "engineFailMsg": "Erro ao acionar o Rust: {{error}}",
       "fleet": "Frota despachada",
-      "fleetMsg_one": "Iniciando {{count}} rotina...",
-      "fleetMsg_other": "Iniciando {{count}} rotinas simultaneamente...",
+      "fleetMsg_one": "A iniciar {{count}} rotina...",
+      "fleetMsg_other": "A iniciar {{count}} rotinas em simultâneo...",
       "batchError": "Erro de lote",
       "batchErrorMsg": "Falha ao iniciar a rotina {{name}}: {{error}}"
     }
   },
   "noc": {
     "title": "Centro de Operações",
-    "filtersLabel": "Filtros de status",
+    "filtersLabel": "Filtros de estado",
     "filters": {
       "all": "Todos",
       "success": "Sucesso",
@@ -457,8 +457,8 @@
       "errors": "Falhas"
     },
     "sqlite": {
-      "title": "Banco SQLite",
-      "checking": "Verificando…",
+      "title": "Base de dados SQLite",
+      "checking": "A verificar…",
       "online": "Online",
       "offline": "Offline",
       "events": "Eventos",
@@ -474,10 +474,10 @@
   },
   "dashboard": {
     "title": "Visão Geral",
-    "subtitle": "Painel gerencial de telemetria, integridade dos cofres e métricas de proteção.",
+    "subtitle": "Painel de gestão de telemetria, integridade dos cofres e métricas de proteção.",
     "export": "Exportar Relatório",
-    "exporting": "Gerando Arquivo...",
-    "loading": "Carregando telemetria do motor...",
+    "exporting": "A gerar ficheiro...",
+    "loading": "A carregar telemetria do motor...",
     "kpi_blocks": "Blocos Protegidos",
     "kpi_routines": "Rotinas Ativas",
     "kpi_vaults": "Cofres Ativos",
@@ -486,13 +486,13 @@
     "today": "Hoje, {{time}}",
     "system": "Sistema",
     "filters": "Filtros:",
-    "search": "Buscar rotina...",
+    "search": "Pesquisar rotina...",
     "clear": "Limpar",
     "until": "Até",
-    "dateStart": "Data início",
-    "dateEnd": "Data fim",
+    "dateStart": "Data de início",
+    "dateEnd": "Data de fim",
     "status": {
-      "ALL": "Todos os Status",
+      "ALL": "Todos os Estados",
       "SUCCESS": "Sucesso",
       "WARNING": "Alertas",
       "ERROR": "Falhas",
@@ -513,24 +513,24 @@
       "volume": "Volume",
       "current": "Atual",
       "history": "Histórico",
-      "views": "Visões",
+      "views": "Vistas",
       "focus": "Foco: {{date}}"
     },
     "views": {
       "detailed": "Detalhado",
-      "board": "Diretoria (Mensal)",
+      "board": "Administração (Mensal)",
       "strategic": "Estratégico (Anual)",
       "week": "Últimos 7 Dias",
       "month": "Este Mês",
-      "sem1": "1º Semestre (Jan-Jun)",
-      "sem2": "2º Semestre (Jul-Dez)",
+      "sem1": "1.º Semestre (Jan-Jun)",
+      "sem2": "2.º Semestre (Jul-Dez)",
       "year": "Este Ano (Jan-Dez)",
       "y5": "Últimos 5 Anos",
-      "custom": "Visão Personalizada"
+      "custom": "Vista Personalizada"
     },
     "unit": {
       "ALL": "eventos",
-      "SUCCESS": "arquivos criptografados",
+      "SUCCESS": "ficheiros cifrados",
       "ERROR": "falhas críticas",
       "WARNING": "alertas",
       "INFO": "eventos"
@@ -540,161 +540,161 @@
     "exportModal": {
       "title": "Exportar Visão Geral",
       "print": "Imprimir (Papel)",
-      "printDesc": "Enviar direto para a impressora local",
+      "printDesc": "Enviar diretamente para a impressora local",
       "pdf": "Documento PDF",
-      "pdfDesc": "Relatório formatado para arquivo",
-      "png": "Imagem Alta Resolução",
-      "pngDesc": "Arquivo PNG ideal para apresentações",
+      "pdfDesc": "Relatório formatado para ficheiro",
+      "png": "Imagem de Alta Resolução",
+      "pngDesc": "Ficheiro PNG ideal para apresentações",
       "cancel": "Cancelar",
       "pdfName": "Relatório PDF",
       "pngName": "Imagem PNG"
     },
     "exportOk": "Exportação concluída com sucesso!",
-    "exportFail": "Falha ao gerar o arquivo. Verifique os logs.",
+    "exportFail": "Falha ao gerar o ficheiro. Verifique os registos.",
     "pdfTitle": "KOPHER SHIELD - RELATÓRIO DE AUDITORIA",
-    "pdfIssued": "Emitido em: {{date}}  |  Visão: {{view}}"
+    "pdfIssued": "Emitido em: {{date}}  |  Vista: {{view}}"
   },
   "tour": {
     "stepOf": "Passo {{current}} de {{total}}",
-    "skip": "Pular tour",
+    "skip": "Saltar tour",
     "back": "Voltar",
-    "next": "Próximo",
+    "next": "Seguinte",
     "finish": "Concluir",
     "steps": {
       "welcome": {
-        "body": "Este é o painel NOC do Kopher Shield: integridade, tráfego e histórico dos seus backups em tempo real. Vamos fazer um tour rápido pelas áreas principais.",
+        "body": "Este é o painel NOC do Kopher Shield: integridade, tráfego e histórico das suas cópias de segurança em tempo real. Vamos fazer uma visita rápida às áreas principais.",
         "title": "Bem-vindo à sua Fortaleza Digital"
       },
       "sidebar": {
-        "body": "Todo o Kopher Shield está a um clique daqui. Ao avançar, vamos abrir a tela de Rotinas para você.",
+        "body": "Todo o Kopher Shield está a um clique daqui. Ao avançar, vamos abrir o ecrã de Rotinas.",
         "title": "Menu de navegação"
       },
       "routines": {
-        "body": "Aqui você agenda backups e define políticas de execução paralela (multithread), compressão e retenção. Cada rotina mostra status, progresso e a próxima execução.",
+        "body": "Aqui agenda cópias de segurança e define políticas de execução paralela (multithread), compressão e retenção. Cada rotina mostra estado, progresso e a próxima execução.",
         "title": "Rotinas e políticas multithread"
       },
       "cloud": {
-        "body": "Gerencie seus provedores de armazenamento (Amazon S3, Cloudflare R2 e outros). Cada cofre exibe o status de conexão em tempo real.",
+        "body": "Gira os seus fornecedores de armazenamento (Amazon S3, Cloudflare R2 e outros). Cada cofre mostra o estado da ligação em tempo real.",
         "title": "Cofres Cloud"
       },
       "audit": {
-        "body": "Todas as ações ficam registradas em logs imutáveis e à prova de adulteração, prontos para conformidade e investigação forense. Isso conclui o tour!",
+        "body": "Todas as ações ficam registadas em logs imutáveis e invioláveis, prontos para conformidade e investigação forense. Isto conclui o tour!",
         "title": "Auditoria imutável"
       }
     }
   },
   "manual": {
-    "title": "Manual do Usuário",
+    "title": "Manual do Utilizador",
     "subtitle": "Guia operacional do Kopher Shield",
-    "nav": "Seções do manual",
+    "nav": "Secções do manual",
     "on_page": "Nesta página",
     "multithread": {
       "nav": "Políticas Multithread",
       "title": "Políticas Multithread de Backup",
-      "intro": "O motor do Kopher Shield processa arquivos em paralelo, distribuindo o trabalho entre várias threads para reduzir a janela de backup sem saturar a máquina.",
+      "intro": "O motor do Kopher Shield processa ficheiros em paralelo, distribuindo o trabalho por várias threads para reduzir a janela de backup sem saturar a máquina.",
       "blocks": [
         {
-          "h": "Criando uma rotina",
-          "p": "Em Rotinas, clique em Nova Rotina, informe a pasta de origem, o cofre de destino (local ou nuvem) e o agendamento (manual, diário, semanal ou mensal)."
+          "h": "Criar uma rotina",
+          "p": "Em Rotinas, clique em Nova Rotina, indique a pasta de origem, o cofre de destino (local ou cloud) e o agendamento (manual, diário, semanal ou mensal)."
         },
         {
           "h": "Execução paralela",
-          "p": "Cada arquivo é dividido em blocos, cifrado com AES-256 e enviado em paralelo. Várias rotinas podem rodar ao mesmo tempo usando o botão Selecionar Lote."
+          "p": "Cada ficheiro é dividido em blocos, cifrado com AES-256 e enviado em paralelo. Pode executar várias rotinas em simultâneo com Selecionar Lote."
         },
         {
           "h": "Acompanhamento",
-          "p": "O progresso aparece em tempo real em cada rotina. Se ocorrer uma falha, a etiqueta vermelha Falhou exibe o motivo ao passar o mouse."
+          "p": "O progresso surge em tempo real em cada rotina. Se ocorrer uma falha, a etiqueta vermelha Falhou mostra o motivo ao passar o rato."
         }
       ],
-      "tip": "Agende backups pesados fora do horário comercial para preservar a performance dos servidores."
+      "tip": "Agende backups pesados fora do horário de expediente para preservar o desempenho dos servidores."
     },
     "cloud": {
       "nav": "Cofres Cloud e Chaves S3",
       "title": "Cofres Cloud e Chaves S3",
-      "intro": "Um Cofre Cloud é um bucket compatível com S3 (AWS S3, Cloudflare R2, MinIO, Backblaze) onde os blocos cifrados são armazenados fora da sua rede.",
+      "intro": "Um Cofre Cloud é um bucket compatível com S3 (AWS S3, Cloudflare R2, MinIO, Backblaze) onde os blocos cifrados são guardados fora da sua rede.",
       "blocks": [
         {
-          "h": "Cadastrando um cofre",
-          "p": "Em Cofres Cloud, informe o nome, endpoint, bucket, Access Key e Secret Key. As chaves são guardadas apenas no backend, nunca expostas na interface."
+          "h": "Registar um cofre",
+          "p": "Em Cofres Cloud, indique o nome, endpoint, bucket, Access Key e Secret Key. As chaves ficam apenas no backend, nunca expostas na interface."
         },
         {
           "h": "Boas práticas de chaves",
-          "p": "Crie uma chave exclusiva para o Kopher Shield com permissão apenas de escrita e leitura no bucket, e rotacione-a periodicamente."
+          "p": "Crie uma chave exclusiva para o Kopher Shield com permissão apenas de escrita e leitura no bucket e rode-a periodicamente."
         },
         {
           "h": "Imutabilidade",
-          "p": "Ative o Object Lock (WORM) no bucket para impedir a exclusão ou alteração dos backups, inclusive em caso de ransomware."
+          "p": "Ative o Object Lock (WORM) no bucket para impedir a eliminação ou alteração dos backups, mesmo em caso de ransomware."
         }
       ],
-      "tip": "Nunca reutilize chaves administrativas da conta cloud em um cofre."
+      "tip": "Nunca reutilize chaves administrativas da conta cloud num cofre."
     },
     "restore": {
-      "nav": "Restauração",
-      "title": "Processo de Restauração",
-      "intro": "A restauração recompõe os arquivos a partir de um manifesto .kophershield, validando a integridade de cada bloco antes da gravação.",
+      "nav": "Restauro",
+      "title": "Processo de Restauro",
+      "intro": "O restauro recompõe os ficheiros a partir de um manifesto .kophershield, validando a integridade de cada bloco antes da escrita.",
       "blocks": [
         {
-          "h": "Escolhendo o cofre",
-          "p": "Em Restauração, selecione o cofre local ou cloud e aguarde a listagem dos manifestos disponíveis."
+          "h": "Escolher o cofre",
+          "p": "Em Restauro, selecione o cofre local ou cloud e aguarde a listagem dos manifestos disponíveis."
         },
         {
-          "h": "Selecionando o ponto",
-          "p": "Cada manifesto representa um ponto no tempo. Escolha o desejado e defina a pasta de destino da recuperação."
+          "h": "Selecionar o ponto",
+          "p": "Cada manifesto representa um ponto no tempo. Escolha o pretendido e defina a pasta de destino da recuperação."
         },
         {
           "h": "Validação",
-          "p": "Os blocos são decifrados e verificados por hash. Restaure primeiro em uma pasta alternativa para conferir os dados antes de substituir os originais."
+          "p": "Os blocos são decifrados e verificados por hash. Restaure primeiro numa pasta alternativa para confirmar os dados antes de substituir os originais."
         }
       ],
-      "tip": "Teste restaurações periodicamente: um backup só é confiável se foi restaurado com sucesso."
+      "tip": "Teste restauros periodicamente: um backup só é fiável se foi restaurado com sucesso."
     },
     "audit": {
       "nav": "Auditoria e Conformidade",
       "title": "Auditoria e Conformidade",
-      "intro": "Todas as ações relevantes são registradas em um log imutável, apoiando requisitos como LGPD, GDPR e ISO 27001.",
+      "intro": "Todas as ações relevantes são registadas num log imutável, apoiando requisitos como RGPD e ISO 27001.",
       "blocks": [
         {
-          "h": "O que é registrado",
-          "p": "Execuções de rotinas, falhas, restaurações, alterações de configuração e acessos administrativos, sempre com data e hora."
+          "h": "O que é registado",
+          "p": "Execuções de rotinas, falhas, restauros, alterações de configuração e acessos administrativos, sempre com data e hora."
         },
         {
           "h": "Consulta e filtros",
-          "p": "Em Auditoria, filtre por nível e busque por texto. A tabela é virtualizada e suporta dezenas de milhares de registros sem perda de desempenho."
+          "p": "Em Auditoria, filtre por nível e pesquise por texto. A tabela é virtualizada e suporta dezenas de milhares de registos sem perda de desempenho."
         },
         {
           "h": "Retenção",
-          "p": "Os registros são append-only, sem edição pelo usuário, e podem ser exportados como evidência para auditorias externas."
+          "p": "Os registos são append-only, sem edição pelo utilizador, e podem ser exportados como evidência para auditorias externas."
         }
       ],
-      "tip": "Exporte os logs com regularidade e armazene-os junto à sua política de retenção."
+      "tip": "Exporte os logs com regularidade e guarde-os de acordo com a sua política de retenção."
     }
   },
   "support": {
-    "tab_ticket": "Chamado",
+    "tab_ticket": "Pedido",
     "tab_manual": "Manual",
-    "tabs_label": "Seções do suporte",
-    "title": "Service Desk & Suporte Corporativo",
+    "tabs_label": "Secções do suporte",
+    "title": "Service Desk e Suporte Empresarial",
     "subtitle": "Central de atendimento avançada, base de conhecimento e gestão de incidentes BINAVER.",
-    "dbConnected": "Base SQLite Conectada",
+    "dbConnected": "Base SQLite Ligada",
     "sla": "SLA: 4h úteis",
-    "filePickerName": "Mídia e Documentos",
+    "filePickerName": "Multimédia e Documentos",
     "form": {
-      "title": "Abertura de Chamado Prioritário",
-      "subtitle": "Envio seguro à equipe BINAVER com registro local e suporte a anexos.",
+      "title": "Abertura de Pedido Prioritário",
+      "subtitle": "Envio seguro à equipa BINAVER com registo local e suporte a anexos.",
       "badge": "Ponte Segura",
       "subject": "Assunto do Incidente",
-      "subjectPh": "Ex: Erro ao sincronizar cofre na nuvem",
+      "subjectPh": "Ex: Erro ao sincronizar cofre na cloud",
       "priority": "Prioridade / SLA",
-      "category": "Categoria da Solicitação",
+      "category": "Categoria do Pedido",
       "description": "Descrição Detalhada do Cenário",
-      "descriptionPh": "Descreva os passos para reproduzir o problema, mensagens de erro exibidas ou detalhes da sua necessidade...",
-      "attachments": "Anexos de Diagnóstico (Prints, Vídeos, Logs)",
-      "attachmentsHint": "Adicione capturas de tela ou gravações curtas para facilitar a análise técnica.",
-      "addFiles": "Adicionar Arquivos",
+      "descriptionPh": "Descreva os passos para reproduzir o problema, mensagens de erro apresentadas ou detalhes da sua necessidade...",
+      "attachments": "Anexos de Diagnóstico (Capturas, Vídeos, Logs)",
+      "attachmentsHint": "Adicione capturas de ecrã ou gravações curtas para facilitar a análise técnica.",
+      "addFiles": "Adicionar Ficheiros",
       "copyDiag": "Copiar Diagnóstico do Sistema",
       "diagCopied": "Diagnóstico Copiado!",
-      "sending": "Enviando chamado...",
-      "submit": "Enviar Chamado"
+      "sending": "A enviar pedido...",
+      "submit": "Enviar Pedido"
     },
     "priority": {
       "low": "Baixa",
@@ -709,44 +709,44 @@
     },
     "guide": {
       "title": "Guia Interativo de Operação",
-      "text": "Precisa relembrar como configurar rotinas ou navegar pelo painel?",
+      "text": "Precisa de relembrar como configurar rotinas ou navegar pelo painel?",
       "button": "Refazer Tour de Apresentação"
     },
     "faq": {
       "title": "Perguntas Frequentes (FAQ)",
-      "q0": "Como restaurar arquivos a partir de um cofre local?",
-      "a0": "Vá até o menu \"Restauração\", selecione a pasta do cofre desejado, escolha o manifesto correspondente e clique em \"Executar Restauração\".",
+      "q0": "Como restaurar ficheiros a partir de um cofre local?",
+      "a0": "Aceda ao menu \"Restauro\", selecione a pasta do cofre pretendido, escolha o manifesto correspondente e clique em \"Executar Restauro\".",
       "q1": "O que fazer se uma rotina agendada falhar?",
-      "a1": "Verifique a tela de Auditoria para inspecionar o log detalhado do erro e garanta que a origem dos dados possui permissão de leitura.",
-      "q2": "Como renovar ou alterar a chave de licença corporativa?",
-      "a2": "Acesse \"Configurações\" > \"Licenciamento\" para atualizar sua chave de ativação ou gerenciar os tokens de autenticação em dois fatores (2FA)."
+      "a1": "Consulte o ecrã de Auditoria para inspecionar o log detalhado do erro e garanta que a origem dos dados tem permissão de leitura.",
+      "q2": "Como renovar ou alterar a chave de licença empresarial?",
+      "a2": "Aceda a \"Definições\" > \"Licenciamento\" para atualizar a chave de ativação ou gerir os tokens de autenticação de dois fatores (2FA)."
     },
     "info": {
-      "engine": "Versão do Engine",
-      "developer": "Desenvolvedora",
+      "engine": "Versão do Motor",
+      "developer": "Programadora",
       "direct": "Suporte Direto"
     },
     "toast": {
-      "filesAdded": "Arquivos Adicionados",
+      "filesAdded": "Ficheiros Adicionados",
       "filesAddedMsg_one": "{{count}} anexo selecionado com sucesso.",
       "filesAddedMsg_other": "{{count}} anexos selecionados com sucesso.",
       "error": "Erro",
-      "filesError": "Não foi possível carregar os arquivos.",
+      "filesError": "Não foi possível carregar os ficheiros.",
       "required": "Campos Obrigatórios",
-      "requiredMsg": "Preencha o assunto e a descrição detalhada do chamado.",
-      "sent": "Chamado Enviado",
-      "sentMsg": "Seu chamado foi registrado e encaminhado à equipe de suporte BINAVER.",
+      "requiredMsg": "Preencha o assunto e a descrição detalhada do pedido.",
+      "sent": "Pedido Enviado",
+      "sentMsg": "O seu pedido foi registado e encaminhado à equipa de suporte BINAVER.",
       "sendError": "Erro ao Enviar",
-      "sendErrorMsg": "Não foi possível enviar o chamado: {{error}}",
+      "sendErrorMsg": "Não foi possível enviar o pedido: {{error}}",
       "diagCopied": "Diagnóstico Copiado",
-      "diagCopiedMsg": "Cole estas informações no seu chamado, se necessário."
+      "diagCopiedMsg": "Cole estas informações no seu pedido, se necessário."
     },
     "diag": {
       "version": "Versão",
-      "engine": "Engine",
+      "engine": "Motor",
       "workspace": "Workspace",
       "active": "Ativo",
-      "dbStatus": "Status DB",
+      "dbStatus": "Estado da BD",
       "healthy": "Saudável",
       "category": "Categoria",
       "priority": "Prioridade",
@@ -755,11 +755,11 @@
     }
   },
   "restore": {
-    "title": "Restauração de Backup",
-    "subtitle": "Recuperação de desastres e auditoria de integridade de cofres.",
+    "title": "Restauro de Backup",
+    "subtitle": "Recuperação de desastres e auditoria de integridade dos cofres.",
     "sourceType": {
       "local": "Cofre Local / NAS",
-      "cloud": "Cofre Nuvem (S3 / Cloudflare)"
+      "cloud": "Cofre Cloud (S3 / Cloudflare)"
     },
     "localVault": {
       "label": "Localizar Cofre de Segurança Local",
@@ -767,10 +767,10 @@
       "open": "Abrir Cofre"
     },
     "cloudVault": {
-      "label": "Selecione o Cofre Cloud Registrado",
+      "label": "Selecione o Cofre Cloud Registado",
       "emptyOption": "Nenhum cofre cloud configurado no sistema",
       "optionLabel": "☁️ {{name}} ({{provider}})",
-      "scan": "Escanear Nuvem"
+      "scan": "Analisar Cloud"
     },
     "filters": {
       "searchPlaceholder": "Pesquisar por nome ou caminho...",
@@ -782,13 +782,13 @@
     "selection": {
       "selected_one": "selecionado",
       "selected_other": "selecionados",
-      "bulkRestore": "Restaurar Lote",
-      "clearAllAriaLabel": "Limpar seleção de {{count}} backups",
+      "bulkRestore": "Restaurar em lote",
+      "clearAllAriaLabel": "Limpar a seleção de {{count}} backups",
       "selectAllAriaLabel": "Selecionar {{count}} backups",
       "selectAll": "Selecionar Todos ({{count}})"
     },
     "empty": {
-      "filtered": "Nenhum backup corresponde aos filtros informados.",
+      "filtered": "Nenhum backup corresponde aos filtros indicados.",
       "initial": "Nenhum ponto de restauro localizado. Selecione a origem acima para carregar os cofres."
     },
     "manifest": {
@@ -797,7 +797,7 @@
       "date": "Data: {{date}}",
       "encryptedBlocks": "Blocos Encriptados: {{count}}",
       "restore": "Restaurar",
-      "restoring": "Restaurando...",
+      "restoring": "A restaurar...",
       "restoreAriaLabel": "Restaurar o cofre {{name}}",
       "selection": {
         "select": "Selecionar o cofre {{name}}",
@@ -805,60 +805,60 @@
       },
       "status": {
         "localIntact": "Íntegro (ZSTD+AES256)",
-        "cloudIntact": "Íntegro na Nuvem (S3)"
+        "cloudIntact": "Íntegro na Cloud (S3)"
       }
     },
     "progress": {
-      "starting": "Ligando motores de restauro...",
-      "downloading": "Baixando: {{path}}",
-      "extracting": "Descompactando: {{path}}",
-      "completeCloud": "Restauro Cloud concluído!",
+      "starting": "A ligar os motores de restauro...",
+      "downloading": "A transferir: {{path}}",
+      "extracting": "A descompactar: {{path}}",
+      "completeCloud": "Restauro cloud concluído!",
       "complete": "Concluído!"
     },
     "modal": {
-      "singleRestoreMessage": "Deseja restaurar o cofre '{{name}}' para a pasta selecionada?",
+      "singleRestoreMessage": "Pretende restaurar o cofre '{{name}}' para a pasta selecionada?",
       "singleRestoreTitle": "Kopher Shield Recovery",
-      "bulkRestoreMessage_one": "Atenção: Você está prestes a restaurar {{count}} cofre em lote para a mesma pasta. O processo ocorrerá em fila. Deseja prosseguir?",
-      "bulkRestoreMessage_other": "Atenção: Você está prestes a restaurar {{count}} cofres em lote para a mesma pasta. O processo ocorrerá em fila. Deseja prosseguir?",
+      "bulkRestoreMessage_one": "Atenção: está prestes a restaurar {{count}} cofre em lote para a mesma pasta. O processo decorrerá em fila. Pretende continuar?",
+      "bulkRestoreMessage_other": "Atenção: está prestes a restaurar {{count}} cofres em lote para a mesma pasta. O processo decorrerá em fila. Pretende continuar?",
       "bulkRestoreTitle": "Operação em Lote - Kopher Shield"
     },
     "batch": {
-      "processing": "Processando lote: {{name}}..."
+      "processing": "A processar lote: {{name}}..."
     },
     "toast": {
-      "restoreFinishedTitle": "Restauro Finalizado",
+      "restoreFinishedTitle": "Restauro concluído",
       "restoreFinishedMessage": "O relatório de auditoria foi enviado por e-mail.",
-      "restoreAttentionTitle": "Atenção no Restauro",
+      "restoreAttentionTitle": "Atenção no restauro",
       "warningTitle": "Aviso",
       "errorTitle": "Erro",
       "localVaultEmpty": "Nenhum cofre Kopher Shield (.kophershield ou legado .coopshield) encontrado nesta pasta.",
-      "scanLocalFailed": "Falha ao escanear cofre local: {{error}}",
-      "invalidCloudVault": "Selecione um cofre de nuvem válido.",
-      "cloudEmpty": "Nenhum backup encontrado neste cofre Cloud.",
-      "cloudFound_one": "{{count}} ponto de restauro encontrado na Nuvem.",
-      "cloudFound_other": "{{count}} pontos de restauro encontrados na Nuvem.",
-      "cloudConnectFailed": "Falha ao conectar à Nuvem: {{error}}",
-      "criticalErrorTitle": "Erro Crítico",
-      "confirmRestoreFailed": "Falha ao acionar restauro: {{error}}",
-      "batchFailureTitle": "Falha no Lote",
-      "batchFailedItem": "Erro ao restaurar {{name}}. O sistema avançará para o próximo.",
-      "batchFinishedTitle": "Lote Finalizado",
+      "scanLocalFailed": "Falha ao analisar o cofre local: {{error}}",
+      "invalidCloudVault": "Selecione um cofre cloud válido.",
+      "cloudEmpty": "Nenhum backup encontrado neste cofre cloud.",
+      "cloudFound_one": "{{count}} ponto de restauro encontrado na cloud.",
+      "cloudFound_other": "{{count}} pontos de restauro encontrados na cloud.",
+      "cloudConnectFailed": "Falha ao ligar à cloud: {{error}}",
+      "criticalErrorTitle": "Erro crítico",
+      "confirmRestoreFailed": "Falha ao iniciar o restauro: {{error}}",
+      "batchFailureTitle": "Falha no lote",
+      "batchFailedItem": "Erro ao restaurar {{name}}. O sistema avançará para o seguinte.",
+      "batchFinishedTitle": "Lote concluído",
       "batchFinishedMessage": "Operação concluída. {{successCount}} de {{totalCount}} processados. Relatórios enviados por e-mail."
     }
   },
   "lock": {
     "badge": "Licença Requer Validação",
     "title": "Acesso Restrito",
-    "description": "O terminal vinculado a <strong>{{name}}</strong> encontra-se bloqueado. Verifique as credenciais administrativas ou o status da subscrição.",
+    "description": "O terminal associado a <strong>{{name}}</strong> encontra-se bloqueado. Verifique as credenciais administrativas ou o estado da subscrição.",
     "email": "E-mail Administrativo",
-    "password": "Senha",
+    "password": "Palavra-passe",
     "manualKey": "Inserir Chave Manualmente",
     "continue": "Continuar Autenticação",
     "methodApp": "App Autenticador",
     "methodEmail": "E-mail",
-    "codeHintApp": "Insira o código de 6 dígitos do seu autenticador.",
-    "codeHintEmail": "Enviamos um token temporário para {{email}}.",
-    "resending": "Reenviando...",
+    "codeHintApp": "Introduza o código de 6 dígitos do seu autenticador.",
+    "codeHintEmail": "Enviámos um token temporário para {{email}}.",
+    "resending": "A reenviar...",
     "resent": "Código Reenviado!",
     "wait": "Aguarde {{seconds}}s para reenviar",
     "resend": "Reenviar código por e-mail",
@@ -869,19 +869,19 @@
     "copied": "Copiado!",
     "copyId": "Copiar ID",
     "subscriptionHelp": "Dúvidas com a subscrição?",
-    "contact": "Entrar em Contato",
-    "errFill": "Preencha o e-mail e a senha.",
+    "contact": "Entrar em Contacto",
+    "errFill": "Preencha o e-mail e a palavra-passe.",
     "errKey": "A chave está incompleta.",
     "errToken": "O token deve ter 6 dígitos.",
     "unavailable": "INDISPONÍVEL"
   },
   "splash": {
     "company": "BINAVER Soluções Tecnológicas",
-    "tagline": "Proteção imutável. Recuperação confiável.",
+    "tagline": "Proteção imutável. Recuperação fiável.",
     "failed": "Não foi possível confirmar a inicialização segura.",
     "retry": "Tentar novamente",
     "ariaFailed": "Falha ao iniciar Kopher Shield",
-    "ariaStarting": "Iniciando Kopher Shield",
+    "ariaStarting": "A iniciar Kopher Shield",
     "timeout": "O serviço seguro não confirmou a inicialização em 30 segundos."
   }
 }

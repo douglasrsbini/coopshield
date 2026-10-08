@@ -22,7 +22,7 @@ async fn build_s3_client(vault: &CloudVault) -> Client {
         &vault.secret_key,
         None,
         None,
-        "coopshield",
+        "kopher-shield",
     );
 
     let region = Region::new("us-east-1");

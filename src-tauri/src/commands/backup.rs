@@ -45,6 +45,12 @@ pub struct ProgressPayload {
 }
 
 #[derive(Clone, Serialize)]
+pub struct FailedPayload {
+    pub routine_id: i64,
+    pub reason: String,
+}
+
+#[derive(Clone, Serialize)]
 pub struct CompletePayload {
     pub routine_id: i64,
 }
@@ -201,12 +207,13 @@ pub fn execute_backup_routine(app: AppHandle, routine_id: i64, routine_name: Str
             if let Err(e) = std::fs::create_dir_all(&vault_dir) {
                 let err_msg = format!("Falha de I/O no disco: {}", e);
                 let _ = app.emit("backup-error", err_msg.clone());
+                let _ = app.emit("backup-failed", FailedPayload { routine_id, reason: err_msg.clone() });
                 let _ = app.emit("backup-complete", CompletePayload { routine_id }); 
                 
                 let _ = emit_system_notification(&app, &format!("Falha Crítica - {}", r_name), &err_msg, "error");
 
                 let relatorio_erro = format!("A rotina foi abortada devido a uma falha crítica de acesso ao disco.\n\n• Horário de Início: {}\n• Motivo da Falha: {}", start_time_str, e);
-                let _ = crate::commands::settings::send_email_alert(&app, &format!("CoopShield: FALHA CRÍTICA - {}", r_name), "error", &relatorio_erro);
+                let _ = crate::commands::settings::send_email_alert(&app, &format!("Kopher Shield: FALHA CRÍTICA - {}", r_name), "error", &relatorio_erro);
                 return; 
             }
         } else if is_cloud {
@@ -239,12 +246,13 @@ pub fn execute_backup_routine(app: AppHandle, routine_id: i64, routine_name: Str
                 Err(e) => {
                     let err_msg = format!("Falha ao obter credenciais da nuvem: {:?}", e);
                     write_audit_log(&app, "ERROR", &err_msg); 
+                    let _ = app.emit("backup-failed", FailedPayload { routine_id, reason: err_msg.clone() });
                     let _ = app.emit("backup-complete", CompletePayload { routine_id }); 
                     
                     let _ = emit_system_notification(&app, &format!("Falha Crítica - {}", r_name), &err_msg, "error");
 
                     let relatorio_erro = format!("A rotina foi abortada. O sistema não conseguiu ligar-se à nuvem.\n\n• Horário de Início: {}\n• Cofre Alvo: {}\n• Detalhes Técnicos: {:?}", start_time_str, vault_name, e);
-                    let _ = crate::commands::settings::send_email_alert(&app, &format!("CoopShield: FALHA CRÍTICA - {}", r_name), "error", &relatorio_erro);
+                    let _ = crate::commands::settings::send_email_alert(&app, &format!("Kopher Shield: FALHA CRÍTICA - {}", r_name), "error", &relatorio_erro);
                     return;
                 }
             }
@@ -318,11 +326,12 @@ pub fn execute_backup_routine(app: AppHandle, routine_id: i64, routine_name: Str
             let final_err = format!("A rotina '{}' falhou e foi abortada.\n\n• Início: {}\n• Término: {}\n• Motivo: {}", r_name, start_time_str, end_time_str, err_msg);
             write_audit_log(&app, "ERROR", &final_err);
             let _ = app.emit("backup-error", final_err.clone());
+            let _ = app.emit("backup-failed", FailedPayload { routine_id, reason: err_msg.to_string() });
             let _ = app.emit("backup-complete", CompletePayload { routine_id });
             
             let _ = emit_system_notification(&app, &format!("Falha no Backup - {}", r_name), &err_msg, "error");
 
-            let _ = crate::commands::settings::send_email_alert(&app, &format!("CoopShield: FALHA CRÍTICA - {}", r_name), "error", &final_err);
+            let _ = crate::commands::settings::send_email_alert(&app, &format!("Kopher Shield: FALHA CRÍTICA - {}", r_name), "error", &final_err);
             return;
         }
 
@@ -340,7 +349,7 @@ pub fn execute_backup_routine(app: AppHandle, routine_id: i64, routine_name: Str
         };
         
         if let Ok(json_data) = serde_json::to_string_pretty(&final_manifest) {
-            let manifest_filename = format!("{}_{}.coopshield", safe_name, timestamp);
+            let manifest_filename = format!("{}_{}.kophershield", safe_name, timestamp);
             if is_local {
                 let manifest_path = vault_dir.join(&manifest_filename);
                 let _ = std::fs::write(&manifest_path, json_data);
@@ -359,7 +368,7 @@ pub fn execute_backup_routine(app: AppHandle, routine_id: i64, routine_name: Str
         let taxa_falha = 100.0 - taxa_sucesso;
         let total_gerado = manifest_files.len();
 
-        let bar_color = if success_count == 0 { "#ef4444" } else if error_count > 0 { "#2F80ED" } else { "#27AE60" };
+        let bar_color = if success_count == 0 { "#ef4444" } else if error_count > 0 { "#F59E0B" } else { "#27AE60" };
         let fail_color = if error_count > 0 { "#ef4444" } else { "#64748B" };
         let status_type = if error_count > 0 { "warning" } else { "success" };
 
@@ -422,20 +431,20 @@ pub fn execute_backup_routine(app: AppHandle, routine_id: i64, routine_name: Str
         if error_count > 0 {
             let msg = format!("Rotina '{}' com alertas: {} arquivos blindados, mas {} falharam.", r_name, success_count, error_count);
             write_audit_log(&app, "WARNING", &msg);
-            let _ = app.notification().builder().title("CoopShield - Aviso").body(&msg).show();
+            let _ = app.notification().builder().title("Kopher Shield - Aviso").body(&msg).show();
             
             // Grava no histórico do Sininho (Aviso)
             let _ = emit_system_notification(&app, &format!("Aviso de Backup - {}", r_name), &msg, "warning");
         } else {
             let msg = format!("Rotina '{}' finalizada! {} arquivos seguros.", r_name, success_count);
             write_audit_log(&app, "SUCCESS", &msg);
-            let _ = app.notification().builder().title("CoopShield - Operação Concluída").body(&msg).show();
+            let _ = app.notification().builder().title("Kopher Shield - Operação Concluída").body(&msg).show();
             
             // Grava no histórico do Sininho (Sucesso)
             let _ = emit_system_notification(&app, &format!("Backup Concluído - {}", r_name), &msg, "success");
         }
         
-        let _ = crate::commands::settings::send_email_alert(&app, &format!("Auditoria CoopShield: {}", r_name), status_type, &relatorio_email);
+        let _ = crate::commands::settings::send_email_alert(&app, &format!("Auditoria Kopher Shield: {}", r_name), status_type, &relatorio_email);
     });
 
     Ok("A rotina foi acionada. O processamento começou.".to_string())
@@ -448,7 +457,7 @@ pub fn scan_local_vault(vault_path: String) -> Result<Vec<BackupManifest>, Strin
     for entry in WalkDir::new(&vault_path).into_iter().filter_map(|e| e.ok()) {
         let path = entry.path();
         
-        if path.is_file() && path.extension().map_or(false, |ext| ext == "coopshield") {
+        if path.is_file() && path.extension().map_or(false, |ext| ext == "coopshield" || ext == "kophershield") {
             let mut date_formatted = "Data Desconhecida".to_string();
             let mut original_source = "Origem Desconhecida".to_string();
             let mut total_files = 0;
@@ -465,7 +474,7 @@ pub fn scan_local_vault(vault_path: String) -> Result<Vec<BackupManifest>, Strin
             }
 
             let raw_name = path.file_name().unwrap_or_default().to_string_lossy().to_string();
-            let clean_name = raw_name.split('_').filter(|p| !p.chars().all(char::is_numeric)).collect::<Vec<&str>>().join(" ").replace(".coopshield", "");
+            let clean_name = raw_name.split('_').filter(|p| !p.chars().all(char::is_numeric)).collect::<Vec<&str>>().join(" ").replace(".kophershield", "").replace(".coopshield", "");
             
             let clean_name = if !clean_name.is_empty() {
                 let mut chars = clean_name.chars();
@@ -517,7 +526,7 @@ pub fn scan_cloud_vault(app: AppHandle, vault_name: String) -> Result<Vec<Backup
         if let Some(contents) = list_output.contents {
             for obj in contents {
                 if let Some(key) = obj.key {
-                    if key.ends_with(".coopshield") {
+                    if key.ends_with(".coopshield") || key.ends_with(".kophershield") {
                         let get_output = match s3.get_object().bucket(&bucket).key(&key).send().await {
                             Ok(res) => res,
                             Err(_) => continue,
@@ -535,7 +544,7 @@ pub fn scan_cloud_vault(app: AppHandle, vault_name: String) -> Result<Vec<Backup
                                     date_formatted = dt.format("%d/%m/%Y às %H:%M").to_string();
                                 }
 
-                                let clean_name = key.split('_').filter(|p| !p.chars().all(char::is_numeric)).collect::<Vec<&str>>().join(" ").replace(".coopshield", "");
+                                let clean_name = key.split('_').filter(|p| !p.chars().all(char::is_numeric)).collect::<Vec<&str>>().join(" ").replace(".kophershield", "").replace(".coopshield", "");
                                 let clean_name = if !clean_name.is_empty() {
                                     let mut chars = clean_name.chars();
                                     match chars.next() { None => "Backup Cloud".to_string(), Some(f) => f.to_uppercase().collect::<String>() + chars.as_str() }
@@ -581,7 +590,7 @@ pub fn execute_cloud_restore(app: AppHandle, vault_name: String, manifest_key: S
                 let err_msg = format!("Erro de credenciais S3: {}", e);
                 let _ = app.emit("restore-error", err_msg.clone());
                 let _ = emit_system_notification(&app, &format!("Falha no Restauro - {}", v_name), &err_msg, "error");
-                let _ = crate::commands::settings::send_email_alert(&app, &format!("CoopShield: FALHA CRÍTICA NO RESTAURO - {}", v_name), "error", &err_msg);
+                let _ = crate::commands::settings::send_email_alert(&app, &format!("Kopher Shield: FALHA CRÍTICA NO RESTAURO - {}", v_name), "error", &err_msg);
                 return;
             }
         };
@@ -623,7 +632,7 @@ pub fn execute_cloud_restore(app: AppHandle, vault_name: String, manifest_key: S
                     let err_msg = format!("Erro ao descarregar manifesto da Nuvem: {:?}", e);
                     let _ = app.emit("restore-error", err_msg.clone());
                     let _ = emit_system_notification(&app, &format!("Falha no Restauro - {}", v_name), &err_msg, "error");
-                    let _ = crate::commands::settings::send_email_alert(&app, &format!("CoopShield: FALHA CRÍTICA NO RESTAURO - {}", v_name), "error", &err_msg);
+                    let _ = crate::commands::settings::send_email_alert(&app, &format!("Kopher Shield: FALHA CRÍTICA NO RESTAURO - {}", v_name), "error", &err_msg);
                     return None;
                 }
             };
@@ -642,7 +651,7 @@ pub fn execute_cloud_restore(app: AppHandle, vault_name: String, manifest_key: S
                 let err_msg = "Falha ao obter o manifesto da nuvem.";
                 let _ = app.emit("restore-error", err_msg.to_string());
                 let _ = emit_system_notification(&app, "Falha Crítica no Restauro", err_msg, "error");
-                let _ = crate::commands::settings::send_email_alert(&app, &format!("CoopShield: FALHA CRÍTICA NO RESTAURO - {}", v_name), "error", err_msg);
+                let _ = crate::commands::settings::send_email_alert(&app, &format!("Kopher Shield: FALHA CRÍTICA NO RESTAURO - {}", v_name), "error", err_msg);
                 return;
             }
         };
@@ -653,7 +662,7 @@ pub fn execute_cloud_restore(app: AppHandle, vault_name: String, manifest_key: S
                  let err_msg = "Falha ao analisar o manifesto (JSON inválido).";
                  let _ = app.emit("restore-error", err_msg.to_string());
                  let _ = emit_system_notification(&app, "Falha no Restauro", err_msg, "error");
-                 let _ = crate::commands::settings::send_email_alert(&app, &format!("CoopShield: FALHA CRÍTICA NO RESTAURO - {}", v_name), "error", err_msg);
+                 let _ = crate::commands::settings::send_email_alert(&app, &format!("Kopher Shield: FALHA CRÍTICA NO RESTAURO - {}", v_name), "error", err_msg);
                  return;
             }
         };
@@ -664,17 +673,17 @@ pub fn execute_cloud_restore(app: AppHandle, vault_name: String, manifest_key: S
                 let err_msg = "Falha ao descodificar a chave de encriptação.";
                 let _ = app.emit("restore-error", err_msg.to_string());
                 let _ = emit_system_notification(&app, "Falha no Restauro", err_msg, "error");
-                let _ = crate::commands::settings::send_email_alert(&app, &format!("CoopShield: FALHA CRÍTICA NO RESTAURO - {}", v_name), "error", err_msg);
+                let _ = crate::commands::settings::send_email_alert(&app, &format!("Kopher Shield: FALHA CRÍTICA NO RESTAURO - {}", v_name), "error", err_msg);
                 return;
             }
         };
 
-        let dest_dir = Path::new(&r_path).join(format!("CoopShield_Cloud_Restaurado_{}", manifest.timestamp));
+        let dest_dir = Path::new(&r_path).join(format!("KopherShield_Cloud_Restaurado_{}", manifest.timestamp));
         if let Err(e) = fs::create_dir_all(&dest_dir) {
             let err_msg = format!("Erro ao criar pasta destino: {}", e);
             let _ = app.emit("restore-error", err_msg.clone());
             let _ = emit_system_notification(&app, "Falha no Restauro", &err_msg, "error");
-            let _ = crate::commands::settings::send_email_alert(&app, &format!("CoopShield: FALHA CRÍTICA NO RESTAURO - {}", v_name), "error", &err_msg);
+            let _ = crate::commands::settings::send_email_alert(&app, &format!("Kopher Shield: FALHA CRÍTICA NO RESTAURO - {}", v_name), "error", &err_msg);
             return;
         }
 
@@ -783,14 +792,14 @@ pub fn execute_cloud_restore(app: AppHandle, vault_name: String, manifest_key: S
         let taxa_falha = 100.0 - taxa_integridade;
 
         let relatorio_path = dest_dir.join("Relatorio_Auditoria.txt");
-        let relatorio_content = format!("COOPSHIELD - DADOS RESTAURADOS DA NUVEM\n\nOs seus ficheiros originais foram remontados a partir de {} blocos (chunks) encriptados.\nBlocos reconstruídos: {}\nFalhas em blocos: {}\n", total_chunks, success_count, error_count);
+        let relatorio_content = format!("KOPHER SHIELD - DADOS RESTAURADOS DA NUVEM\n\nOs seus ficheiros originais foram remontados a partir de {} blocos (chunks) encriptados.\nBlocos reconstruídos: {}\nFalhas em blocos: {}\n", total_chunks, success_count, error_count);
         let _ = fs::write(&relatorio_path, relatorio_content);
 
-        let bar_color = if success_count == 0 { "#ef4444" } else if error_count > 0 { "#2F80ED" } else { "#27AE60" };
+        let bar_color = if success_count == 0 { "#ef4444" } else if error_count > 0 { "#F59E0B" } else { "#27AE60" };
         let fail_color = if error_count > 0 { "#ef4444" } else { "#64748B" };
         let status_type = if error_count > 0 { "warning" } else { "success" };
 
-        let clean_name = m_key.split('_').filter(|p| !p.chars().all(char::is_numeric)).collect::<Vec<&str>>().join(" ").replace(".coopshield", "");
+        let clean_name = m_key.split('_').filter(|p| !p.chars().all(char::is_numeric)).collect::<Vec<&str>>().join(" ").replace(".kophershield", "").replace(".coopshield", "");
 
         let relatorio_email = format!(
             r#"
@@ -876,7 +885,7 @@ pub fn execute_restore(app: AppHandle, manifest_path: String, restore_path: Stri
         let start_time_str = start_time.format("%d/%m/%Y às %H:%M:%S").to_string();
 
         let file_name = Path::new(&m_path_str).file_name().unwrap_or_default().to_string_lossy();
-        let clean_name = file_name.split('_').filter(|p| !p.chars().all(char::is_numeric)).collect::<Vec<&str>>().join(" ").replace(".coopshield", "");
+        let clean_name = file_name.split('_').filter(|p| !p.chars().all(char::is_numeric)).collect::<Vec<&str>>().join(" ").replace(".kophershield", "").replace(".coopshield", "");
         let clean_name = if clean_name.is_empty() { "Desconhecido".to_string() } else { clean_name };
 
         write_audit_log(&app, "INFO", &format!("Iniciando restauro do cofre '{}' para a pasta destino.", clean_name));
@@ -887,7 +896,7 @@ pub fn execute_restore(app: AppHandle, manifest_path: String, restore_path: Stri
                 let err_msg = format!("Falha ao ler o manifesto: {}", e);
                 let _ = app.emit("restore-error", err_msg.clone());
                 let _ = emit_system_notification(&app, &format!("Falha no Restauro - {}", clean_name), &err_msg, "error");
-                let _ = crate::commands::settings::send_email_alert(&app, &format!("CoopShield: FALHA CRÍTICA NO RESTAURO - {}", clean_name), "error", &err_msg);
+                let _ = crate::commands::settings::send_email_alert(&app, &format!("Kopher Shield: FALHA CRÍTICA NO RESTAURO - {}", clean_name), "error", &err_msg);
                 return;
             }
         };
@@ -898,7 +907,7 @@ pub fn execute_restore(app: AppHandle, manifest_path: String, restore_path: Stri
                 let err_msg = format!("Manifesto corrompido: {}", e);
                 let _ = app.emit("restore-error", err_msg.clone());
                 let _ = emit_system_notification(&app, &format!("Falha no Restauro - {}", clean_name), &err_msg, "error");
-                let _ = crate::commands::settings::send_email_alert(&app, &format!("CoopShield: FALHA CRÍTICA NO RESTAURO - {}", clean_name), "error", &err_msg);
+                let _ = crate::commands::settings::send_email_alert(&app, &format!("Kopher Shield: FALHA CRÍTICA NO RESTAURO - {}", clean_name), "error", &err_msg);
                 return;
             }
         };
@@ -909,18 +918,18 @@ pub fn execute_restore(app: AppHandle, manifest_path: String, restore_path: Stri
                 let err_msg = "Falha ao extrair a chave de segurança.";
                 let _ = app.emit("restore-error", err_msg.to_string());
                 let _ = emit_system_notification(&app, "Falha no Restauro", err_msg, "error");
-                let _ = crate::commands::settings::send_email_alert(&app, &format!("CoopShield: FALHA CRÍTICA NO RESTAURO - {}", clean_name), "error", err_msg);
+                let _ = crate::commands::settings::send_email_alert(&app, &format!("Kopher Shield: FALHA CRÍTICA NO RESTAURO - {}", clean_name), "error", err_msg);
                 return;
             }
         };
 
         let vault_dir = Path::new(&m_path_str).parent().unwrap_or(Path::new(""));
-        let dest_dir = Path::new(&r_path_str).join(format!("CoopShield_Restaurado_{}", manifest.timestamp));
+        let dest_dir = Path::new(&r_path_str).join(format!("KopherShield_Restaurado_{}", manifest.timestamp));
         if let Err(e) = fs::create_dir_all(&dest_dir) {
             let err_msg = format!("Acesso negado ao criar pasta de destino: {}", e);
             let _ = app.emit("restore-error", err_msg.clone());
             let _ = emit_system_notification(&app, "Falha no Restauro", &err_msg, "error");
-            let _ = crate::commands::settings::send_email_alert(&app, &format!("CoopShield: FALHA CRÍTICA NO RESTAURO - {}", clean_name), "error", &err_msg);
+            let _ = crate::commands::settings::send_email_alert(&app, &format!("Kopher Shield: FALHA CRÍTICA NO RESTAURO - {}", clean_name), "error", &err_msg);
             return;
         }
 
@@ -1000,10 +1009,10 @@ pub fn execute_restore(app: AppHandle, manifest_path: String, restore_path: Stri
         let taxa_falha = 100.0 - taxa_integridade;
 
         let relatorio_path = dest_dir.join("Relatorio_Auditoria.txt");
-        let relatorio_content = format!("COOPSHIELD - DADOS RESTAURADOS\n\nForam descompactados e reconstruídos ficheiros a partir de {} blocos.\nErros: {}\n", success_count, error_count);
+        let relatorio_content = format!("KOPHER SHIELD - DADOS RESTAURADOS\n\nForam descompactados e reconstruídos ficheiros a partir de {} blocos.\nErros: {}\n", success_count, error_count);
         let _ = fs::write(&relatorio_path, relatorio_content);
 
-        let bar_color = if success_count == 0 { "#ef4444" } else if error_count > 0 { "#2F80ED" } else { "#27AE60" };
+        let bar_color = if success_count == 0 { "#ef4444" } else if error_count > 0 { "#F59E0B" } else { "#27AE60" };
         let fail_color = if error_count > 0 { "#ef4444" } else { "#64748B" };
         let status_type = if error_count > 0 { "warning" } else { "success" };
 
@@ -1079,4 +1088,28 @@ pub fn execute_restore(app: AppHandle, manifest_path: String, restore_path: Stri
     });
 
     Ok("Motor de restauro ativado.".to_string())
+}
+/// Decide se o agendamento vence neste minuto. Aceita JSON neutro (v1) ou o texto legado.
+pub fn schedule_is_due(schedule: &str, now: &chrono::DateTime<chrono::Local>) -> bool {
+    use chrono::{Datelike, Timelike};
+    let hm = now.format("%H:%M").to_string();
+    let Ok(v) = serde_json::from_str::<serde_json::Value>(schedule) else {
+        return schedule.contains(&hm);
+    };
+    let time = v["time"].as_str().unwrap_or("");
+    let (th, tm) = match time.split_once(':') {
+        Some((h, m)) => (h.parse::<u32>().unwrap_or(99), m.parse::<u32>().unwrap_or(99)),
+        None => return false,
+    };
+    let wd = now.weekday().num_days_from_sunday();
+    match v["kind"].as_str().unwrap_or("manual") {
+        "daily" => now.hour() == th && now.minute() == tm,
+        "weekdays" => (1..=5).contains(&wd) && now.hour() == th && now.minute() == tm,
+        "weekly" => wd as u64 == v["day"].as_u64().unwrap_or(1) && now.hour() == th && now.minute() == tm,
+        "interval" => {
+            let every = v["every"].as_i64().unwrap_or(1).max(1);
+            now.minute() == tm && (now.hour() as i64 - th as i64).rem_euclid(every) == 0
+        }
+        _ => false,
+    }
 }

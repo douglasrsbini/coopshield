@@ -67,7 +67,7 @@ pub fn init_db(app_handle: &AppHandle) -> Result<()> {
         ('theme', 'dark'),
         ('language', 'pt-BR'),
         ('setup_completed', 'false'),
-        ('accent_color', '#3b82f6'),
+        ('accent_color', '#F59E0B'),
         ('license_status', 'unlicensed'),
         ('license_key', ''),
         ('smtp_host', ''),

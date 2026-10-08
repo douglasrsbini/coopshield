@@ -1,47 +1,71 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kopher Shield</title>
   <style>
+    * { box-sizing: border-box; }
     body {
-      margin: 0; height: 100vh; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      background-color: #0f1115; color: #3b82f6;
-      font-family: system-ui, -apple-system, sans-serif;
-      overflow: hidden; border-radius: 12px;
+      margin: 0; min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; position: relative;
+      background: radial-gradient(ellipse at 50% 80%, rgba(245,158,11,.12), transparent 48%), linear-gradient(180deg, #020617, #0f172a 62%, #020617);
+      color: #f8fafc; font-family: system-ui, -apple-system, sans-serif;
+      overflow: hidden;
     }
-    .logo {
-      width: 80px; height: 80px; border-radius: 20px;
-      background: rgba(59, 130, 246, 0.1);
-      border: 2px solid rgba(59, 130, 246, 0.3);
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 20px; animation: pulse 2s infinite;
+    .scene {
+      width: 256px; height: 160px; position: relative; display: flex;
+      align-items: flex-end; justify-content: center; margin-bottom: 28px;
     }
+    .beam {
+      position: absolute; left: calc(50% + 8px); top: 42px; width: min(42vw, 288px); height: 48px;
+      transform-origin: left center;
+      background: linear-gradient(90deg, rgba(252,211,77,.48), rgba(245,158,11,.12), transparent);
+      clip-path: polygon(0 32%,100% 0,100% 100%,0 68%);
+      animation: sweep 7s ease-in-out infinite alternate;
+    }
+    .lighthouse {
+      z-index: 1; width: 96px; height: 144px;
+      filter: drop-shadow(0 0 26px rgba(245,158,11,.16));
+    }
+    .brand { text-align: center; z-index: 1; }
+    .company { color: #fbbf24; font-size: 10px; font-weight: 600; letter-spacing: .32em; text-transform: uppercase; }
+    h1 { margin: 12px 0 0; font-size: 26px; font-weight: 600; letter-spacing: .16em; }
+    h1 span { color: #f59e0b; }
+    p { margin: 12px 0 0; color: #94a3b8; font-size: 12px; letter-spacing: .04em; }
     .loader {
-      width: 150px; height: 4px; background: rgba(255,255,255,0.1);
-      border-radius: 4px; overflow: hidden; margin-top: 20px;
+      width: 176px; height: 4px; background: #1e293b;
+      border-radius: 999px; overflow: hidden; margin-top: 38px; z-index: 1;
     }
     .loader-bar {
-      height: 100%; width: 50%; background: #3b82f6; border-radius: 4px;
-      animation: loading 1.5s infinite ease-in-out;
+      height: 100%; width: 33%; border-radius: 999px;
+      background: linear-gradient(90deg, #d97706, #fcd34d, #f59e0b);
+      animation: loading 1.6s ease-in-out infinite;
     }
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
-      70% { box-shadow: 0 0 0 15px rgba(59, 130, 246, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
-    }
-    @keyframes loading {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(200%); }
-    }
+    @keyframes sweep { from { transform: rotate(-11deg); opacity: .35; } to { transform: rotate(11deg); opacity: .75; } }
+    @keyframes loading { from { transform: translateX(-130%); } to { transform: translateX(320%); } }
+    @media (prefers-reduced-motion: reduce) { .beam, .loader-bar { animation: none; } }
   </style>
 </head>
-<body>
-  <div class="logo">
-    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+<body role="status" aria-live="polite">
+  <div class="scene" aria-hidden="true">
+    <div class="beam"></div>
+    <svg class="lighthouse" viewBox="0 0 96 144" fill="none">
+      <path d="M18 140h60L67 57H29L18 140Z" fill="#1E293B" stroke="#475569" stroke-width="2"/>
+      <path d="M29 57h38V31H29v26Z" fill="#0F172A" stroke="#64748B" stroke-width="2"/>
+      <path d="M24 31h48l-5-8H29l-5 8Z" fill="#334155" stroke="#64748B" stroke-width="2"/>
+      <path d="M34 23V10h28v13M42 10V5h12v5" stroke="#64748B" stroke-width="3"/>
+      <path d="M36 42h24v14H36z" fill="#F59E0B" fill-opacity=".9"/>
+      <path d="M48 42v14M12 140h72" stroke="#94A3B8" stroke-linecap="round" stroke-width="3"/>
+      <path d="M44 88v12m8-12v12" stroke="#94A3B8" stroke-linecap="round" stroke-width="3"/>
+      <circle cx="48" cy="49" r="4" fill="#FEF3C7"/>
+    </svg>
   </div>
-  <h1 style="margin:0; font-size: 24px; color: white; letter-spacing: 2px;">COOPSHIELD</h1>
-  <p style="margin: 8px 0 0 0; font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 4px;">Iniciando Motor Seguro...</p>
+  <div class="brand">
+    <div class="company">BINAVER Soluções Tecnológicas</div>
+    <h1>KOPHER <span>SHIELD</span></h1>
+    <p>Proteção imutável. Recuperação confiável.</p>
+  </div>
   <div class="loader"><div class="loader-bar"></div></div>
 </body>
 </html>

@@ -1,6 +1,887 @@
 {
+  "app": {
+    "name": "Kopher Shield",
+    "tagline": "Immutable protection. Reliable recovery."
+  },
+  "common": {
+    "actions": {
+      "back": "Back",
+      "continue": "Continue",
+      "save": "Save changes",
+      "cancel": "Cancel",
+      "close": "Close"
+    },
+    "status": {
+      "loading": "Loading",
+      "ready": "Ready",
+      "error": "Error",
+      "success": "Success"
+    }
+  },
   "welcome": {
     "title": "Welcome to Kopher Shield",
-    "subtitle": "To get started, please select your preferred language."
+    "subtitle": "To get started, please select your preferred language.",
+    "languageLabel": "Interface language",
+    "languages": {
+      "pt-BR": "Portuguese (Brazil)",
+      "pt-PT": "Portuguese (Portugal)",
+      "en-US": "English (United States)",
+      "es-ES": "Spanish",
+      "fr-FR": "French"
+    },
+    "hero": {
+      "title": "Welcome to your Digital Fortress",
+      "subtitle": "Immutable backup, auditing and data sovereignty. Choose your language and theme to begin."
+    },
+    "theme": {
+      "label": "Interface theme",
+      "dark": "Dark",
+      "light": "Light",
+      "system": "System"
+    },
+    "setup": "Initial setup",
+    "auth": {
+      "title": "Hybrid Activation",
+      "subtitle": "Sign in with your BINAVER account. The license will be linked automatically.",
+      "email": "BINAVER account e-mail",
+      "password": "Password",
+      "manualKey": "I have a manual product key (optional)",
+      "keyPh": "E.g. HCTNAW-ZV28YO...",
+      "keyLabel": "Product key",
+      "twoFaTitle": "Two-Step Verification",
+      "twoFaSubtitle": "For your security, please confirm your identity.",
+      "emailMethod": "E-mail",
+      "tokenSent": "We sent a temporary token to {{email}}.",
+      "tokenLabel": "Verification token",
+      "doneTitle": "All Set!",
+      "doneText": "Kopher Shield was successfully authenticated and linked to your BINAVER account.",
+      "back": "Back",
+      "authenticate": "Authenticate Account",
+      "validate": "Validate Token",
+      "enter": "Open Control Panel",
+      "errFill": "Please fill in your e-mail and password.",
+      "errKey": "The key is incomplete.",
+      "errToken": "The token must have 6 digits.",
+      "errFatal": "Fatal error while saving settings."
+    }
+  },
+  "settings": {
+    "language": {
+      "title": "Application language",
+      "description": "Choose the language used in Kopher Shield menus and messages.",
+      "saveError": "Could not save the language."
+    },
+    "loading": "LOADING...",
+    "hardwareFail": "HARDWARE-READ-FAILURE",
+    "localDevice": "Local Device",
+    "noKey": "NO KEY REGISTERED",
+    "imagesFilter": "Images",
+    "cancel": "Cancel",
+    "toast": {
+      "error": "Error",
+      "success": "Success",
+      "successBang": "Success!",
+      "readErrorTitle": "Read Error",
+      "readError": "Failed to load settings from SQLite.",
+      "iconLoaded": "Icon Loaded",
+      "iconReady": "The image is ready to be saved.",
+      "selectError": "Selection Error",
+      "imageLoadFail": "Could not load the image.",
+      "avatarUpdated": "Avatar Updated",
+      "avatarUploaded": "Your profile picture (upload) was saved successfully.",
+      "avatarLoadFail": "Could not load the avatar.",
+      "avatarPresetSaved": "Your corporate avatar was saved successfully.",
+      "avatarSaveFail": "Could not save the avatar.",
+      "avatarRemoved": "Avatar Removed",
+      "avatarRemovedMsg": "Your profile picture was removed and will revert to the default.",
+      "avatarRemoveFail": "Could not remove the avatar.",
+      "profileUpdated": "Details Updated",
+      "profileUpdatedMsg": "Technical owner information saved successfully.",
+      "profileSaveFail": "Failed to save data to the database.",
+      "invalidColor": "Invalid color",
+      "invalidColorMsg": "Enter a valid hexadecimal color in the #RRGGBB format.",
+      "saved": "Corporate settings updated successfully!",
+      "saveFail": "Failed to save to SQLite",
+      "incompleteFields": "Incomplete Fields",
+      "incompleteFieldsMsg": "Fill in all fields of the custom SMTP server.",
+      "smtpError": "SMTP Error",
+      "comingSoon": "Coming Soon",
+      "comingSoonMsg": "Native integration will be added to the Rust engine.",
+      "resent": "Resent",
+      "resentMsg": "A new security token was sent to your email.",
+      "unlinking": "Unlinking",
+      "unlinkingMsg": "Removing the license from this device..."
+    },
+    "license": {
+      "qrFail": "Failed to generate offline QR Code.",
+      "fillCredentials": "Enter your corporate email and password.",
+      "keyIncomplete": "The license key is incomplete.",
+      "tokenDigits": "The token must contain 6 digits.",
+      "unlinkConfirm": "Warning: Are you sure you want to unlink this machine? Access will be blocked.",
+      "tokenSent": "Token sent to {{email}}",
+      "noOwner": "Local License Not Linked",
+      "holderAlt": "License Holder Avatar",
+      "edit": "Edit",
+      "activeVerified": "Active & Verified Account",
+      "technicalOwner": "Technical Owner",
+      "manageAccount": "Manage Account",
+      "resetMfa": "Reset MFA",
+      "endSession": "End Session",
+      "editOwnerTitle": "Edit Technical Owner Details",
+      "adminName": "Administrator Name",
+      "adminNamePlaceholder": "E.g. John Smith",
+      "role": "Role / Department",
+      "rolePlaceholder": "E.g. Infrastructure Analyst",
+      "saveChanges": "Save Changes",
+      "linkedDevice": "Linked Device",
+      "hostName": "Host Name (OS)",
+      "machineId": "Hardware Signature (Machine ID)",
+      "activeKey": "Active License Key",
+      "encryptedKey": "Encrypted Product Key",
+      "encryption": "Encryption",
+      "resetMfaTitle": "Authenticator Reset (MFA)",
+      "authTitle": "Authentication & Linking",
+      "resetMfaDesc": "Scan the new QR Code with your authenticator app.",
+      "authDesc": "Enter the credentials of the new account that will take over this machine.",
+      "enterKeyManually": "Enter Key Manually",
+      "keyPlaceholder": "E.g. HCTNAW-ZV28YO...",
+      "continue": "Continue",
+      "appMethod": "Authenticator App",
+      "emailMethod": "Email",
+      "scanQr": "Scan the New QR Code",
+      "qrAlt": "2FA QR Code",
+      "enterAppCode": "Enter the code generated by your phone.",
+      "validateSave": "Validate & Save"
+    },
+    "avatar": {
+      "title": "Change Profile Picture",
+      "gallery": "Corporate Avatars (Gallery)",
+      "preset": "Preset Avatar {{n}}",
+      "upload": "Upload Image",
+      "remove": "Remove Current Image"
+    },
+    "page": {
+      "title": "System Settings",
+      "subtitle": "Customize appearance, accessibility, alerts and licensing."
+    },
+    "tabs": {
+      "appearance": "Appearance & Accessibility",
+      "alerts": "Alert Center",
+      "license": "Licensing"
+    },
+    "appearance": {
+      "title": "Visual Identity & Layout",
+      "subtitle": "Adapt Kopher Shield to your company's identity and visual needs.",
+      "workspace": "Company Workspace (White-label)",
+      "workspaceDesc": "Replace the main logo by setting the square icon and the name of your environment.",
+      "squareIcon": "Square Icon (1:1)",
+      "logoAlt": "Client Logo",
+      "workspaceName": "Workspace / Company Name",
+      "workspaceNamePlaceholder": "E.g. Company Name",
+      "interfaceMode": "Interface Mode",
+      "dark": "Dark",
+      "light": "Light",
+      "scale": "Scale (Accessibility)",
+      "scaleSmall": "Small",
+      "scaleNormal": "Normal",
+      "scaleLarge": "Large",
+      "accent": "Primary Accent Color",
+      "useAccent": "Use accent {{label}}",
+      "custom": "Custom:",
+      "pickColor": "Select custom color",
+      "hexCode": "Accent color hexadecimal code"
+    },
+    "accent": {
+      "amber": "Amber",
+      "cobalt": "Cobalt Blue",
+      "emerald": "Emerald",
+      "violet": "Deep Purple"
+    },
+    "alerts": {
+      "title": "Alerts & Notifications Center",
+      "smtpServer": "Email Server (SMTP)",
+      "smtpHost": "SMTP Host",
+      "smtpPort": "Port",
+      "smtpSecurity": "Security",
+      "smtpSender": "Sender Email (Outgoing)",
+      "smtpPassword": "App Password",
+      "managedByCloud": "Alert and report emails are being managed automatically by the <strong>Cloud Notification Engine</strong>. No additional configuration is required.",
+      "copies": "Silent Copies & Audit (CC/BCC)",
+      "cc": "Carbon Copy (Cc)",
+      "ccPlaceholder": "E.g. management@domain.com",
+      "bcc": "Blind Carbon Copy (Bcc)",
+      "bccPlaceholder": "E.g. logs@domain.com",
+      "testEmail": "Send Test Email",
+      "teamsDesc": "Receive reports and failures directly in a Teams channel.",
+      "teamsUrl": "Webhook URL (Teams Channel)",
+      "teamsPlaceholder": "https://your-company.webhook.office.com/...",
+      "teamsTest": "Test Teams Ping",
+      "prefsTitle": "Notification Preferences",
+      "prefsDesc": "Choose which system events trigger sound alerts and emails to the team.",
+      "backupStart": "Backup Routine Start",
+      "backupStartDesc": "Notifies when a backup starts.",
+      "backupEnd": "Backup Completion & Reports",
+      "backupEndDesc": "Sends the final report when the backup finishes (success or failure).",
+      "restore": "Restore Procedures",
+      "restoreDesc": "Alerts the team whenever sensitive data is restored.",
+      "systemErrors": "Critical System Warnings",
+      "systemErrorsDesc": "Engine errors, connection loss and scheduling failures.",
+      "historyNote": "All notifications are always recorded in the system history (top bell)."
+    },
+    "actions": {
+      "saving": "Saving...",
+      "save": "Save Settings"
+    }
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "routines": "Backup Routines",
+    "cloud": "Cloud Vaults",
+    "restore": "Restore Backup",
+    "audit": "System Audit",
+    "support": "Support",
+    "settings": "Settings"
+  },
+  "sidebar": {
+    "ariaLabel": "Sidebar",
+    "mainNavigation": "Main navigation",
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar",
+    "workspaceLocal": "Local Workspace",
+    "consoleLocal": "Local Console",
+    "poweredBy": "Powered by Kopher Shield"
+  },
+  "header": {
+    "managementPanel": "Management Panel - {{name}}",
+    "localConsole": "Local Management Console",
+    "backgroundProcesses": "{{count}} background process(es)"
+  },
+  "notifications": {
+    "center": "Notification Center",
+    "title": "Notifications",
+    "unread": "Unread",
+    "all": "All",
+    "empty": "No notifications here.",
+    "markAllRead": "Mark all as read"
+  },
+  "audit": {
+    "subtitle": "Immutable event record for auditing and legal compliance.",
+    "searchPlaceholder": "Search by routine, warnings or source...",
+    "refresh": "Refresh",
+    "loading": "Analyzing audit trail...",
+    "empty": "No records match the parameters.",
+    "shown": "{{count}} events shown",
+    "toast": {
+      "loadFailed": "Failed to load logs.",
+      "csvOk": "Spreadsheet exported successfully.",
+      "pdfOk": "PDF report exported successfully.",
+      "saveFailed": "Failed to save: {{error}}",
+      "exportError": "Export error"
+    },
+    "export": {
+      "csv": "Export (Excel)",
+      "pdf": "PDF report",
+      "generating": "Generating PDF...",
+      "csvFilter": "Excel spreadsheet (CSV)",
+      "pdfFilter": "Audit report (PDF)",
+      "csvHeader": "Date and Time,Level,Description"
+    },
+    "pdf": {
+      "title": "OFFICIAL AUDIT AND SECURITY REPORT",
+      "issued": "Issued on: {{date}} | Events: {{count}}"
+    },
+    "columns": {
+      "timestamp": "Date and Time",
+      "level": "Level",
+      "message": "Description"
+    },
+    "filter": {
+      "label": "Filter by level",
+      "all": "All events",
+      "info": "Information",
+      "success": "Successes",
+      "warning": "Warnings",
+      "error": "Critical failures"
+    }
+  },
+  "cloud": {
+    "title": "Cloud Vaults",
+    "subtitle": "Manage the secure storage destinations for your backups.",
+    "connectNew": "Connect new vault",
+    "connected": "Connected",
+    "bucket": "Bucket",
+    "crypto": "Encryption",
+    "cryptoReady": "AES-256 ready",
+    "edit": "Edit vault",
+    "delete": "Delete connection",
+    "addTitle": "Add cloud vault",
+    "addDesc": "Connect AWS S3, Cloudflare R2, Google Cloud, Azure or Backblaze B2.",
+    "actions": {
+      "connect": "Connect cloud",
+      "testing": "Testing cloud..."
+    },
+    "confirm": {
+      "deleteMessage": "Are you sure you want to delete this vault connection? Files in the cloud will NOT be deleted."
+    },
+    "modal": {
+      "createTitle": "Authenticate cloud vault",
+      "editTitle": "Edit connection",
+      "validationHint": "The connection will be validated when you save."
+    },
+    "form": {
+      "nameLabel": "Display name",
+      "namePlaceholder": "Example: AWS Backup São Paulo",
+      "providerLabel": "Provider",
+      "bucketLabel": "Bucket name (container)",
+      "bucketPlaceholder": "kopher-shield-production",
+      "credentialsTitle": "IAM security credentials",
+      "endpointLabel": "API endpoint URL (for Cloudflare R2 / Backblaze)",
+      "endpointPlaceholder": "https://<ID>.r2.cloudflarestorage.com",
+      "accessKeyLabel": "Access Key ID",
+      "accessKeyPlaceholder": "AKIA...",
+      "secretKeyLabel": "Secret Access Key",
+      "secretKeyPlaceholder": "••••••••••••",
+      "providers": {
+        "aws": "Amazon Web Services (S3)",
+        "cloudflareR2": "Cloudflare R2 (S3-compatible)",
+        "backblazeB2": "Backblaze B2 (S3-compatible)",
+        "otherS3Compatible": "Other (S3-compatible)"
+      }
+    },
+    "toast": {
+      "requiredFields": "Security keys and the bucket name are required.",
+      "deleteFailed": "Failed to delete: {{error}}",
+      "invalidCredentials": "The server rejected the credentials:\n\n{{error}}"
+    }
+  },
+  "routines": {
+    "nextRun": "Next run",
+    "runningNow": "Running now",
+    "manualOnly": "Manual only",
+    "running": "Running",
+    "active": "Active",
+    "schedule": {
+      "manual": "Manual execution",
+      "daily": "Daily at {{time}}",
+      "weekdays": "Weekdays at {{time}}",
+      "weekly": "Weekly at {{time}}",
+      "interval": "Every {{hours}}h (base {{time}})"
+    },
+    "form": {
+      "frequency": "Frequency",
+      "custom": "Custom...",
+      "model": "Model",
+      "daily": "Daily",
+      "weekdays": "Weekdays",
+      "weekly": "Weekly",
+      "repeat": "Repeat every",
+      "hours_one": "{{count}} hour",
+      "hours_other": "{{count}} hours",
+      "baseTime": "Base time",
+      "name": "Routine name",
+      "namePlaceholder": "E.g.: Sicoob File Server",
+      "source": "Source folder",
+      "browse": "Browse",
+      "vault": "Destination vault",
+      "vaultLocal": "Local server / NAS (Sicoob)",
+      "vaultCloud": "Cloud: {{name}} ({{provider}})",
+      "localFolder": "Select the server/NAS folder",
+      "browseNas": "Browse NAS",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "failed": "Failed",
+    "title": "Backup Routines",
+    "subtitle": "Multithreaded protection policy management.",
+    "newRoutine": "New routine",
+    "selectBatch": "Select batch",
+    "deselectAll": "Deselect all",
+    "search": "Search routines...",
+    "viewGrid": "Grid view",
+    "viewCompact": "Compact view",
+    "emptyNone": "No backup routines configured in the engine.",
+    "emptyNoMatch": "No routines found with that name.",
+    "processing": "Processing",
+    "source": "Source",
+    "destination": "Destination",
+    "scheduleLabel": "Schedule",
+    "runNow": "Run now",
+    "run": "Run",
+    "edit": "Edit routine",
+    "delete": "Delete routine",
+    "selected_one": "Routine selected",
+    "selected_other": "Routines selected",
+    "runFleet": "Run fleet",
+    "confirmDelete": "Do you want to delete this routine?",
+    "modal": {
+      "create": "New backup routine",
+      "edit": "Edit routine",
+      "close": "Close"
+    },
+    "toast": {
+      "error": "Error",
+      "loadFailed": "Could not load the data.",
+      "deleted": "Deleted",
+      "deletedMsg": "The routine was removed.",
+      "deleteFailed": "Failed to delete: {{error}}",
+      "warning": "Warning",
+      "required": "Fill in all required fields.",
+      "destRequired": "Set the destination folder or choose a Cloud vault.",
+      "success": "Success",
+      "saved": "Routine saved to the engine.",
+      "starting": "Starting engine",
+      "startingMsg": "The routine was sent to the processing threads.",
+      "engineFail": "Engine failure",
+      "engineFailMsg": "Error triggering Rust: {{error}}",
+      "fleet": "Fleet dispatched",
+      "fleetMsg_one": "Starting {{count}} routine...",
+      "fleetMsg_other": "Starting {{count}} routines simultaneously...",
+      "batchError": "Batch error",
+      "batchErrorMsg": "Failed to start routine {{name}}: {{error}}"
+    }
+  },
+  "noc": {
+    "title": "Operations Center",
+    "filtersLabel": "Status filters",
+    "filters": {
+      "all": "All",
+      "success": "Success",
+      "warning": "Warnings",
+      "error": "Failures"
+    },
+    "traffic": {
+      "title": "Event Traffic",
+      "range": "Last {{days}} days",
+      "events": "Events",
+      "errors": "Failures"
+    },
+    "sqlite": {
+      "title": "SQLite Database",
+      "checking": "Checking…",
+      "online": "Online",
+      "offline": "Offline",
+      "events": "Events",
+      "successRate": "Success rate"
+    },
+    "heatmap": {
+      "title": "Execution heatmap",
+      "less": "Less",
+      "more": "More",
+      "cell_one": "{{day}} {{hour}}:00 — {{count}} event",
+      "cell_other": "{{day}} {{hour}}:00 — {{count}} events"
+    }
+  },
+  "dashboard": {
+    "title": "Overview",
+    "subtitle": "Management dashboard for telemetry, vault integrity and protection metrics.",
+    "export": "Export Report",
+    "exporting": "Generating file...",
+    "loading": "Loading engine telemetry...",
+    "kpi_blocks": "Protected Blocks",
+    "kpi_routines": "Active Routines",
+    "kpi_vaults": "Active Vaults",
+    "kpi_last": "Last Success",
+    "active": "Active",
+    "today": "Today, {{time}}",
+    "system": "System",
+    "filters": "Filters:",
+    "search": "Search routine...",
+    "clear": "Clear",
+    "until": "To",
+    "dateStart": "Start date",
+    "dateEnd": "End date",
+    "status": {
+      "ALL": "All Statuses",
+      "SUCCESS": "Success",
+      "WARNING": "Warnings",
+      "ERROR": "Failures",
+      "INFO": "Information"
+    },
+    "group": {
+      "day": "Group by Day",
+      "month": "Group by Month",
+      "year": "Group by Year"
+    },
+    "chart": {
+      "ERROR": "Critical Failure Spikes",
+      "WARNING": "Integrity Alerts",
+      "INFO": "Event Volume (Informational)",
+      "SUCCESS": "Processed Blocks Volume",
+      "ALL": "Activity History (Statement)",
+      "subtitle": "Time series grouped by the selected filters.",
+      "volume": "Volume",
+      "current": "Current",
+      "history": "History",
+      "views": "Views",
+      "focus": "Focus: {{date}}"
+    },
+    "views": {
+      "detailed": "Detailed",
+      "board": "Executive (Monthly)",
+      "strategic": "Strategic (Yearly)",
+      "week": "Last 7 Days",
+      "month": "This Month",
+      "sem1": "1st Half (Jan-Jun)",
+      "sem2": "2nd Half (Jul-Dec)",
+      "year": "This Year (Jan-Dec)",
+      "y5": "Last 5 Years",
+      "custom": "Custom View"
+    },
+    "unit": {
+      "ALL": "events",
+      "SUCCESS": "encrypted files",
+      "ERROR": "critical failures",
+      "WARNING": "alerts",
+      "INFO": "events"
+    },
+    "recent": "Recent Audit",
+    "noEvents": "No events in the selected period.",
+    "exportModal": {
+      "title": "Export Overview",
+      "print": "Print (Paper)",
+      "printDesc": "Send straight to the local printer",
+      "pdf": "PDF Document",
+      "pdfDesc": "Formatted report as a file",
+      "png": "High-Resolution Image",
+      "pngDesc": "PNG file ideal for presentations",
+      "cancel": "Cancel",
+      "pdfName": "PDF Report",
+      "pngName": "PNG Image"
+    },
+    "exportOk": "Export completed successfully!",
+    "exportFail": "Failed to generate the file. Check the logs.",
+    "pdfTitle": "KOPHER SHIELD - AUDIT REPORT",
+    "pdfIssued": "Issued on: {{date}}  |  View: {{view}}"
+  },
+  "tour": {
+    "stepOf": "Step {{current}} of {{total}}",
+    "skip": "Skip tour",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Finish",
+    "steps": {
+      "welcome": {
+        "body": "This is the Kopher Shield NOC panel: real-time integrity, traffic and backup history. Let's take a quick tour of the main areas.",
+        "title": "Welcome to your Digital Fortress"
+      },
+      "sidebar": {
+        "body": "All of Kopher Shield is one click away. When you continue, we will open the Routines screen for you.",
+        "title": "Navigation menu"
+      },
+      "routines": {
+        "body": "Schedule backups and define parallel (multithread) execution, compression and retention policies. Each routine shows its status, progress and next run.",
+        "title": "Routines and multithread policies"
+      },
+      "cloud": {
+        "body": "Manage your storage providers (Amazon S3, Cloudflare R2 and more). Each vault shows its live connection status.",
+        "title": "Cloud Vaults"
+      },
+      "audit": {
+        "body": "Every action is recorded in immutable, tamper-proof logs, ready for compliance and forensic investigation. That completes the tour!",
+        "title": "Immutable audit"
+      }
+    }
+  },
+  "manual": {
+    "title": "User Manual",
+    "subtitle": "Kopher Shield operations guide",
+    "nav": "Manual sections",
+    "on_page": "On this page",
+    "multithread": {
+      "nav": "Multithread Policies",
+      "title": "Multithread Backup Policies",
+      "intro": "The Kopher Shield engine processes files in parallel, spreading work across several threads to shorten the backup window without saturating the machine.",
+      "blocks": [
+        {
+          "h": "Creating a routine",
+          "p": "Under Routines, click New Routine, set the source folder, the destination vault (local or cloud) and the schedule (manual, daily, weekly or monthly)."
+        },
+        {
+          "h": "Parallel execution",
+          "p": "Each file is split into blocks, encrypted with AES-256 and uploaded in parallel. Run several routines at once with Select Batch."
+        },
+        {
+          "h": "Monitoring",
+          "p": "Progress is shown in real time on each routine. If a run fails, the red Failed tag shows the reason on hover."
+        }
+      ],
+      "tip": "Schedule heavy backups outside business hours to preserve server performance."
+    },
+    "cloud": {
+      "nav": "Cloud Vaults & S3 Keys",
+      "title": "Cloud Vaults & S3 Keys",
+      "intro": "A Cloud Vault is an S3-compatible bucket (AWS S3, Cloudflare R2, MinIO, Backblaze) where encrypted blocks are stored outside your network.",
+      "blocks": [
+        {
+          "h": "Adding a vault",
+          "p": "Under Cloud Vaults, enter the name, endpoint, bucket, Access Key and Secret Key. Keys are kept in the backend only and never exposed in the UI."
+        },
+        {
+          "h": "Key best practices",
+          "p": "Create a dedicated key for Kopher Shield with read/write permission on the bucket only, and rotate it regularly."
+        },
+        {
+          "h": "Immutability",
+          "p": "Enable Object Lock (WORM) on the bucket to prevent deletion or tampering of backups, even during a ransomware attack."
+        }
+      ],
+      "tip": "Never reuse cloud account admin keys in a vault."
+    },
+    "restore": {
+      "nav": "Restore",
+      "title": "Restore Process",
+      "intro": "Restore rebuilds your files from a .kophershield manifest, verifying the integrity of each block before writing.",
+      "blocks": [
+        {
+          "h": "Choosing the vault",
+          "p": "Under Restore, pick the local or cloud vault and wait for the available manifests to load."
+        },
+        {
+          "h": "Selecting the point",
+          "p": "Each manifest is a point in time. Choose the one you need and set the recovery destination folder."
+        },
+        {
+          "h": "Validation",
+          "p": "Blocks are decrypted and hash-verified. Restore to an alternate folder first to check the data before replacing originals."
+        }
+      ],
+      "tip": "Test restores regularly: a backup is only trustworthy once it has been restored successfully."
+    },
+    "audit": {
+      "nav": "Audit & Compliance",
+      "title": "Audit & Compliance",
+      "intro": "Every relevant action is recorded in an immutable log, supporting requirements such as GDPR and ISO 27001.",
+      "blocks": [
+        {
+          "h": "What is recorded",
+          "p": "Routine runs, failures, restores, configuration changes and administrative access, always timestamped."
+        },
+        {
+          "h": "Search and filters",
+          "p": "Under Audit, filter by level and search by text. The table is virtualized and handles tens of thousands of records without slowdown."
+        },
+        {
+          "h": "Retention",
+          "p": "Records are append-only, cannot be edited by users, and can be exported as evidence for external audits."
+        }
+      ],
+      "tip": "Export logs regularly and store them according to your retention policy."
+    }
+  },
+  "support": {
+    "tab_ticket": "Ticket",
+    "tab_manual": "Manual",
+    "tabs_label": "Support sections",
+    "title": "Service Desk & Enterprise Support",
+    "subtitle": "Advanced support center, knowledge base and BINAVER incident management.",
+    "dbConnected": "SQLite Database Connected",
+    "sla": "SLA: 4 business hours",
+    "filePickerName": "Media and Documents",
+    "form": {
+      "title": "Open a Priority Ticket",
+      "subtitle": "Secure delivery to the BINAVER team with local record and attachment support.",
+      "badge": "Secure Bridge",
+      "subject": "Incident Subject",
+      "subjectPh": "E.g. Error syncing cloud vault",
+      "priority": "Priority / SLA",
+      "category": "Request Category",
+      "description": "Detailed Scenario Description",
+      "descriptionPh": "Describe the steps to reproduce the problem, error messages shown or details of your request...",
+      "attachments": "Diagnostic Attachments (Screenshots, Videos, Logs)",
+      "attachmentsHint": "Add screenshots or short recordings to speed up technical analysis.",
+      "addFiles": "Add Files",
+      "copyDiag": "Copy System Diagnostics",
+      "diagCopied": "Diagnostics Copied!",
+      "sending": "Sending ticket...",
+      "submit": "Send Ticket"
+    },
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "urgent": "Urgent / Critical"
+    },
+    "category": {
+      "c0": "Technical Question",
+      "c1": "Failure / Bug",
+      "c2": "New Feature",
+      "c3": "Licensing"
+    },
+    "guide": {
+      "title": "Interactive Operations Guide",
+      "text": "Need a refresher on setting up routines or navigating the panel?",
+      "button": "Restart Product Tour"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions (FAQ)",
+      "q0": "How do I restore files from a local vault?",
+      "a0": "Go to the \"Restore\" menu, select the vault folder, pick the matching manifest and click \"Run Restore\".",
+      "q1": "What if a scheduled routine fails?",
+      "a1": "Check the Audit screen for the detailed error log and make sure the data source has read permission.",
+      "q2": "How do I renew or change the enterprise license key?",
+      "a2": "Go to \"Settings\" > \"Licensing\" to update your activation key or manage two-factor authentication (2FA) tokens."
+    },
+    "info": {
+      "engine": "Engine Version",
+      "developer": "Developer",
+      "direct": "Direct Support"
+    },
+    "toast": {
+      "filesAdded": "Files Added",
+      "filesAddedMsg_one": "{{count}} attachment selected successfully.",
+      "filesAddedMsg_other": "{{count}} attachments selected successfully.",
+      "error": "Error",
+      "filesError": "Could not load the files.",
+      "required": "Required Fields",
+      "requiredMsg": "Fill in the subject and the detailed description of the ticket.",
+      "sent": "Ticket Sent",
+      "sentMsg": "Your ticket was recorded and forwarded to the BINAVER support team.",
+      "sendError": "Send Failed",
+      "sendErrorMsg": "Could not send the ticket: {{error}}",
+      "diagCopied": "Diagnostics Copied",
+      "diagCopiedMsg": "Paste this information into your ticket if needed."
+    },
+    "diag": {
+      "version": "Version",
+      "engine": "Engine",
+      "workspace": "Workspace",
+      "active": "Active",
+      "dbStatus": "DB Status",
+      "healthy": "Healthy",
+      "category": "Category",
+      "priority": "Priority",
+      "subject": "Subject",
+      "description": "Problem Description"
+    }
+  },
+  "restore": {
+    "title": "Backup Restore",
+    "subtitle": "Disaster recovery and vault integrity auditing.",
+    "sourceType": {
+      "local": "Local Vault / NAS",
+      "cloud": "Cloud Vault (S3 / Cloudflare)"
+    },
+    "localVault": {
+      "label": "Locate Local Security Vault",
+      "placeholder": "Select the local vault root folder...",
+      "open": "Open Vault"
+    },
+    "cloudVault": {
+      "label": "Select a Registered Cloud Vault",
+      "emptyOption": "No cloud vault is configured in the system",
+      "optionLabel": "☁️ {{name}} ({{provider}})",
+      "scan": "Scan Cloud"
+    },
+    "filters": {
+      "searchPlaceholder": "Search by name or path...",
+      "searchAriaLabel": "Search backups by name or path",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "until": "Until"
+    },
+    "selection": {
+      "selected_one": "selected",
+      "selected_other": "selected",
+      "bulkRestore": "Bulk Restore",
+      "clearAllAriaLabel": "Clear selection for {{count}} backups",
+      "selectAllAriaLabel": "Select {{count}} backups",
+      "selectAll": "Select All ({{count}})"
+    },
+    "empty": {
+      "filtered": "No backup matches the selected filters.",
+      "initial": "No restore point was found. Select a source above to load the vaults."
+    },
+    "manifest": {
+      "source": "Source: {{source}}",
+      "sourceTitle": "Source: {{source}}",
+      "date": "Date: {{date}}",
+      "encryptedBlocks": "Encrypted Blocks: {{count}}",
+      "restore": "Restore",
+      "restoring": "Restoring...",
+      "restoreAriaLabel": "Restore vault {{name}}",
+      "selection": {
+        "select": "Select vault {{name}}",
+        "unselect": "Unselect vault {{name}}"
+      },
+      "status": {
+        "localIntact": "Intact (ZSTD+AES256)",
+        "cloudIntact": "Intact in Cloud (S3)"
+      }
+    },
+    "progress": {
+      "starting": "Starting restore engines...",
+      "downloading": "Downloading: {{path}}",
+      "extracting": "Extracting: {{path}}",
+      "completeCloud": "Cloud restore completed!",
+      "complete": "Completed!"
+    },
+    "modal": {
+      "singleRestoreMessage": "Do you want to restore vault '{{name}}' to the selected folder?",
+      "singleRestoreTitle": "Kopher Shield Recovery",
+      "bulkRestoreMessage_one": "Warning: you are about to restore {{count}} vault in bulk to the same folder. The process will run in sequence. Do you want to continue?",
+      "bulkRestoreMessage_other": "Warning: you are about to restore {{count}} vaults in bulk to the same folder. The process will run in sequence. Do you want to continue?",
+      "bulkRestoreTitle": "Bulk Operation - Kopher Shield"
+    },
+    "batch": {
+      "processing": "Processing batch: {{name}}..."
+    },
+    "toast": {
+      "restoreFinishedTitle": "Restore Finished",
+      "restoreFinishedMessage": "The audit report was sent by email.",
+      "restoreAttentionTitle": "Restore Attention",
+      "warningTitle": "Warning",
+      "errorTitle": "Error",
+      "localVaultEmpty": "No Kopher Shield vault (.kophershield or legacy .coopshield) was found in this folder.",
+      "scanLocalFailed": "Failed to scan local vault: {{error}}",
+      "invalidCloudVault": "Select a valid cloud vault.",
+      "cloudEmpty": "No backup was found in this cloud vault.",
+      "cloudFound_one": "{{count}} restore point found in the cloud.",
+      "cloudFound_other": "{{count}} restore points found in the cloud.",
+      "cloudConnectFailed": "Failed to connect to the cloud: {{error}}",
+      "criticalErrorTitle": "Critical Error",
+      "confirmRestoreFailed": "Failed to trigger restore: {{error}}",
+      "batchFailureTitle": "Batch Failure",
+      "batchFailedItem": "Failed to restore {{name}}. The system will move on to the next item.",
+      "batchFinishedTitle": "Batch Finished",
+      "batchFinishedMessage": "Operation completed. {{successCount}} of {{totalCount}} were processed. Reports were sent by email."
+    }
+  },
+  "lock": {
+    "badge": "License Requires Validation",
+    "title": "Restricted Access",
+    "description": "The terminal linked to <strong>{{name}}</strong> is locked. Check the administrative credentials or the subscription status.",
+    "email": "Administrative Email",
+    "password": "Password",
+    "manualKey": "Enter Key Manually",
+    "continue": "Continue Authentication",
+    "methodApp": "Authenticator App",
+    "methodEmail": "Email",
+    "codeHintApp": "Enter the 6-digit code from your authenticator.",
+    "codeHintEmail": "We sent a temporary token to {{email}}.",
+    "resending": "Resending...",
+    "resent": "Code Resent!",
+    "wait": "Wait {{seconds}}s to resend",
+    "resend": "Resend code by email",
+    "back": "Back",
+    "unlock": "Unlock System",
+    "machineId": "Machine ID:",
+    "copyTitle": "Copy Machine ID for support",
+    "copied": "Copied!",
+    "copyId": "Copy ID",
+    "subscriptionHelp": "Questions about the subscription?",
+    "contact": "Get in Touch",
+    "errFill": "Fill in the email and password.",
+    "errKey": "The key is incomplete.",
+    "errToken": "The token must have 6 digits.",
+    "unavailable": "UNAVAILABLE"
+  },
+  "splash": {
+    "company": "BINAVER Technology Solutions",
+    "tagline": "Immutable protection. Reliable recovery.",
+    "failed": "Could not confirm the secure startup.",
+    "retry": "Try again",
+    "ariaFailed": "Failed to start Kopher Shield",
+    "ariaStarting": "Starting Kopher Shield",
+    "timeout": "The secure service did not confirm startup within 30 seconds."
   }
 }

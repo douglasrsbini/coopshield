@@ -60,13 +60,15 @@ pub fn read_audit_logs(app_handle: AppHandle) -> Result<Vec<AuditLog>, String> {
     for line in contents.lines() {
         if line.is_empty() { continue; }
         
-        if let (Some(ts_end), Some(lvl_start), Some(lvl_end)) = (line.find("] ["), line.find("] ["), line.rfind("] ")) {
-            let timestamp = line[1..ts_end].to_string();
-            let level = line[lvl_start + 3..lvl_end].to_string();
-            let message = line[lvl_end + 2..].to_string();
-            
-            logs.push(AuditLog { timestamp, level, message });
-        }
+        // Formato: "[timestamp] [NIVEL] mensagem" - a mensagem pode conter colchetes.
+        let Some(rest) = line.strip_prefix('[') else { continue };
+        let Some((timestamp, rest)) = rest.split_once("] [") else { continue };
+        let Some((level, message)) = rest.split_once("] ") else { continue };
+        logs.push(AuditLog {
+            timestamp: timestamp.to_string(),
+            level: level.to_string(),
+            message: message.to_string(),
+        });
     }
 
     Ok(logs)
@@ -248,4 +250,52 @@ pub fn get_os_hostname() -> Result<String, String> {
     }
 
     Ok("Dispositivo Desconhecido".to_string())
+}
+
+#[command]
+pub fn submit_support_ticket(
+    app_handle: AppHandle,
+    subject: String,
+    category: String,
+    priority: String,
+    message: String,
+    attachments: Vec<String>,
+) -> Result<String, String> {
+    let db_path = get_db_path(&app_handle);
+    let conn = Connection::open(&db_path).map_err(|e| e.to_string())?;
+    
+    // Cria a tabela se não existir
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS support_tickets (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            subject TEXT NOT NULL,
+            category TEXT NOT NULL,
+            priority TEXT NOT NULL,
+            message TEXT NOT NULL,
+            status TEXT DEFAULT 'Aberto',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )",
+        [],
+    ).map_err(|e| e.to_string())?;
+
+    // Migração segura: Adiciona a coluna attachments caso ela ainda não exista na base de dados antiga
+    let _ = conn.execute("ALTER TABLE support_tickets ADD COLUMN attachments TEXT", []);
+
+    let attachments_str = attachments.join(";");
+
+    conn.execute(
+        "INSERT INTO support_tickets (subject, category, priority, message, attachments) VALUES (?1, ?2, ?3, ?4, ?5)",
+        rusqlite::params![subject, category, priority, message, attachments_str],
+    ).map_err(|e| e.to_string())?;
+
+    write_audit_log(&app_handle, "INFO", &format!("Ticket de suporte aberto: '{}' [{}] com {} anexo(s)", subject, category, attachments.len()));
+
+    emit_system_notification(
+        &app_handle,
+        "Chamado Registado",
+        &format!("O ticket '{}' foi enviado com sucesso com {} anexo(s).", subject, attachments.len()),
+        "success",
+    );
+
+    Ok("Chamado registado com sucesso!".to_string())
 }

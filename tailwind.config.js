@@ -10,7 +10,10 @@ export default {
         surface: 'rgb(var(--surface) / <alpha-value>)',
         border: 'rgb(var(--border) / <alpha-value>)',
         textMain: 'rgb(var(--text-main) / <alpha-value>)',
-        textMuted: 'rgb(var(--text-muted) / <alpha-value>)'
+        textMuted: 'rgb(var(--text-muted) / <alpha-value>)',
+        amber: {
+          500: '#F59E0B',
+        },
       }
     },
   },

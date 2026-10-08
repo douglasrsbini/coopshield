@@ -1,8 +1,8 @@
 [package]
-name = "coopshield"
+name = "kopher-shield"
 version = "1.0.0"
-description = "Enterprise Backup para o Sicoob Primavera"
-authors = ["Douglas Bini - Sicoob Primavera"]
+description = "Backup imutável, auditoria e soberania de dados corporativos"
+authors = ["BINAVER Soluções Tecnológicas"]
 edition = "2021"
 
 [build-dependencies]

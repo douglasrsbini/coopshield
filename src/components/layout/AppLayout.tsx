@@ -1,15 +1,12 @@
-import { Outlet, NavLink } from 'react-router-dom';
-import { LayoutDashboard, Layers, Cloud, ShieldCheck, Settings, RefreshCw, Activity, HardDriveDownload, PanelLeftClose, PanelLeftOpen, Bell, CheckCircle2, AlertCircle, Info, Check, Trash2, X } from 'lucide-react';
+import { Outlet } from 'react-router-dom';
+import { RefreshCw, Activity, Bell, CheckCircle2, AlertCircle, Info, Check, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import Sidebar from './Sidebar';
 import { useEffect, useState, useRef } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
-
-const hexToRgb = (hex: string) => {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return `${r} ${g} ${b}`;
-};
+import OnboardingTour from '../ui/OnboardingTour';
+import { hexToRgbChannels, normalizeAccentColor } from '../../theme';
 
 interface BackupManifest { 
   name: string; path: string; status: string; 
@@ -26,7 +23,9 @@ interface SystemNotification {
 }
 
 export default function AppLayout() {
+  const { t } = useTranslation();
   const [activeTasks, setActiveTasks] = useState<Record<number, { progress: number, status: string }>>({});
+  const [failedRuns, setFailedRuns] = useState<Record<number, string>>({});
   const [activeRestores, setActiveRestores] = useState<Record<string, { progress: number, status: string }>>({});
   
   const [restoreVaultPath, setRestoreVaultPath] = useState<string>('');
@@ -49,27 +48,28 @@ export default function AppLayout() {
         const settings = await invoke<Record<string, string>>('get_all_settings');
         if (settings) {
           const root = document.documentElement;
-          if (settings.accent_color) root.style.setProperty('--primary', hexToRgb(settings.accent_color));
+          if (settings.accent_color) {
+            root.style.setProperty('--primary', hexToRgbChannels(normalizeAccentColor(settings.accent_color)));
+          }
           if (settings.ui_scale) root.style.fontSize = `${settings.ui_scale}px`;
           
           setClientLogo(settings.client_logo || null);
           setClientName(settings.client_name || null);
 
           if (settings.theme === 'light') {
-            root.style.setProperty('--background', '249 250 251');
+            root.style.setProperty('--background', '248 250 252');
             root.style.setProperty('--surface', '255 255 255');
-            root.style.setProperty('--border', '209 213 219');
+            root.style.setProperty('--border', '226 232 240');
             root.style.setProperty('--text-main', '15 23 42');
             root.style.setProperty('--text-muted', '55 65 81');
           } else {
-            root.style.setProperty('--background', '15 17 21');
-            root.style.setProperty('--surface', '22 25 32');
+            root.style.setProperty('--background', '2 6 23');
+            root.style.setProperty('--surface', '15 23 42');
             root.style.setProperty('--border', '30 41 59');
             root.style.setProperty('--text-main', '248 250 252');
             root.style.setProperty('--text-muted', '148 163 184');
           }
         }
-        invoke('close_splashscreen').catch(e => console.error("Falha ao fechar splash:", e));
         fetchNotifications();
       } catch (e) { console.error('Erro ao arrancar sistema:', e); }
     }
@@ -91,7 +91,19 @@ export default function AppLayout() {
     let unlistenRestProg: () => void;
     let unlistenRestComp: () => void;
 
+    let unlistenFail: () => void;
+
+    listen<{ routine_id: number; reason: string }>('backup-failed', (event) => {
+      setFailedRuns(prev => ({ ...prev, [event.payload.routine_id]: event.payload.reason }));
+    }).then(f => unlistenFail = f);
+
     listen<{ routine_id: number; progress: number; status: string }>('backup-progress', (event) => {
+      setFailedRuns(prev => {
+        if (!(event.payload.routine_id in prev)) return prev;
+        const next = { ...prev };
+        delete next[event.payload.routine_id];
+        return next;
+      });
       setActiveTasks(prev => ({
         ...prev,
         [event.payload.routine_id]: { progress: event.payload.progress, status: event.payload.status }
@@ -128,6 +140,7 @@ export default function AppLayout() {
       document.removeEventListener('mousedown', handleClickOutside);
       if (unlistenProg) unlistenProg();
       if (unlistenComp) unlistenComp();
+      if (unlistenFail) unlistenFail();
       if (unlistenRestProg) unlistenRestProg();
       if (unlistenRestComp) unlistenRestComp();
     };
@@ -151,13 +164,7 @@ export default function AppLayout() {
     }
   };
 
-  const mainNavItems = [
-    { path: '/', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/rotinas', label: 'Rotinas de Backup', icon: Layers },
-    { path: '/nuvem', label: 'Cofres Cloud', icon: Cloud },
-    { path: '/restauro', label: 'Restaurar Backup', icon: HardDriveDownload },
-    { path: '/auditoria', label: 'Auditoria de Sistema', icon: ShieldCheck },
-  ];
+
 
   const taskCount = Object.keys(activeTasks).length;
   const restoreCount = Object.keys(activeRestores).length;
@@ -169,105 +176,25 @@ export default function AppLayout() {
   return (
     <div className="flex h-screen bg-background text-textMain overflow-hidden font-sans transition-colors duration-500 print:h-auto print:overflow-visible print:bg-white print:text-black">
       
-      {/* MENU LATERAL COM LARGURA AMPLIADA (w-80) */}
-      <aside className={`bg-surface border-r border-border flex flex-col shadow-xl z-10 transition-all duration-300 print:hidden relative ${isCollapsed ? 'w-20' : 'w-80'}`}>
-        
-        {/* WORKSPACE HEADER (SEM A SETA) */}
-        <div className="p-3 border-b border-border/50 shrink-0 flex items-center justify-between h-20 transition-all">
-          {isCollapsed ? (
-            <div className="w-full flex items-center justify-center group relative cursor-pointer" onClick={() => setIsCollapsed(false)}>
-              <div className="w-10 h-10 rounded-[10px] overflow-hidden bg-background border border-border flex items-center justify-center shadow-sm group-hover:opacity-0 transition-opacity absolute">
-                {clientLogo ? (
-                  <img src={clientLogo} alt="Workspace" className="w-full h-full object-cover" />
-                ) : (
-                  <img src="/logo.png" alt="CoopShield" className="w-6 h-6 object-contain" />
-                )}
-              </div>
-              <div className="w-10 h-10 rounded-[10px] bg-background border border-primary/40 flex items-center justify-center text-primary opacity-0 group-hover:opacity-100 transition-opacity shadow-sm absolute">
-                <PanelLeftOpen size={20} />
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-center justify-between w-full gap-2 min-w-0 px-1">
-              <div className="flex items-center p-1.5 rounded-lg min-w-0 flex-1">
-                <div className="w-9 h-9 rounded-[10px] overflow-hidden shrink-0 bg-background border border-border flex items-center justify-center mr-3 shadow-sm">
-                  {clientLogo ? (
-                    <img src={clientLogo} alt="Workspace" className="w-full h-full object-cover" />
-                  ) : (
-                    <img src="/logo.png" alt="CoopShield" className="w-5 h-5 object-contain" />
-                  )}
-                </div>
-                
-                <div className="flex flex-col min-w-0 flex-1">
-                  <span className="text-[14px] font-bold tracking-tight text-textMain truncate leading-tight">
-                    {clientName || 'CoopShield'}
-                  </span>
-                  <span className="text-[10px] text-textMuted font-bold uppercase tracking-widest flex items-center mt-0.5 truncate">
-                    {clientName ? 'Workspace Local' : 'Console Local'}
-                  </span>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setIsCollapsed(true)}
-                title="Fechar barra lateral"
-                className="p-2.5 rounded-xl text-textMuted hover:bg-black/5 dark:hover:bg-white/5 hover:text-textMain transition-all cursor-pointer shrink-0 border border-border/40 bg-surface shadow-xs flex items-center justify-center"
-              >
-                <PanelLeftClose size={20} />
-              </button>
-            </div>
-          )}
-        </div>
-        
-        {/* NAVEGAÇÃO */}
-        <nav className="flex-1 px-3 py-6 space-y-2 overflow-y-auto">
-          {mainNavItems.map((item) => (
-            <NavLink 
-              key={item.path} 
-              to={item.path} 
-              title={isCollapsed ? item.label : undefined}
-              className={({ isActive }) => `flex items-center px-4 py-3 rounded-lg transition-all duration-300 ${isActive ? 'bg-primary/10 text-primary border border-primary/20 shadow-sm' : 'text-textMuted hover:bg-black/5 dark:hover:bg-white/5 hover:text-textMain'} ${isCollapsed ? 'justify-center px-0' : ''}`}
-            >
-              <item.icon size={20} className={`${isCollapsed ? '' : 'mr-3'} shrink-0`} />
-              {!isCollapsed && <span className="font-medium truncate">{item.label}</span>}
-            </NavLink>
-          ))}
-        </nav>
-
-        {/* WATERMARK DO SISTEMA */}
-        {!isCollapsed && clientName && (
-          <div className="px-6 pt-2 pb-2 text-[9px] text-textMuted/40 uppercase font-bold tracking-widest flex items-center justify-center shrink-0">
-            Powered by CoopShield
-          </div>
-        )}
-
-        {/* RODAPÉ (Configurações) */}
-        <div className="p-3 border-t border-border/50 shrink-0 bg-surface transition-colors duration-500">
-          <NavLink 
-            to="/configuracoes" 
-            title={isCollapsed ? 'Configurações' : undefined}
-            className={({ isActive }) => `flex items-center px-4 py-3 rounded-lg transition-all duration-300 ${isActive ? 'bg-primary/10 text-primary border border-primary/20 shadow-sm' : 'text-textMuted hover:bg-black/5 dark:hover:bg-white/5 hover:text-textMain'} ${isCollapsed ? 'justify-center px-0' : ''}`}
-          >
-            <Settings size={20} className={`${isCollapsed ? '' : 'mr-3'} shrink-0`} />
-            {!isCollapsed && <span className="font-medium truncate">Configurações</span>}
-          </NavLink>
-        </div>
-      </aside>
+      {/* TOUR INTERATIVO DE ONBOARDING */}
+      <OnboardingTour />
+      
+      <Sidebar isCollapsed={isCollapsed} onToggle={() => setIsCollapsed(v => !v)} clientName={clientName} clientLogo={clientLogo} />
 
       {/* ÁREA PRINCIPAL */}
-      <main className="flex-1 flex flex-col h-screen overflow-hidden relative print:h-auto print:overflow-visible print:block">
+      <main className="flex-1 min-w-0 min-h-0 flex flex-col h-screen overflow-hidden relative print:h-auto print:overflow-visible print:block">
         
         {/* HEADER COM A CENTRAL DE NOTIFICAÇÕES (SININHO) */}
         <header className="h-20 bg-background border-b border-border/50 flex items-center justify-between px-8 shrink-0 transition-colors duration-500 print:hidden relative">
           <h2 className="text-xs font-semibold text-textMuted uppercase tracking-[0.2em] truncate mr-4">
-            {clientName ? `Painel de Gerenciamento - ${clientName}` : 'Console de Gerenciamento Local'}
+            {clientName ? t('header.managementPanel', { name: clientName }) : t('header.localConsole')}
           </h2>
           
           <div className="flex items-center space-x-4">
             {totalTasks > 0 && (
               <div className="flex items-center bg-primary/10 border border-primary/20 text-primary px-4 py-1.5 rounded-full text-xs font-bold animate-in fade-in slide-in-from-top-4 shadow-md shadow-primary/5 whitespace-nowrap">
                 <RefreshCw size={14} className="mr-2 animate-spin shrink-0" />
-                <span className="mr-2">{totalTasks} Processo(s) em Background</span>
+                <span className="mr-2">{t('header.backgroundProcesses', { count: totalTasks })}</span>
                 <Activity size={14} className="animate-pulse shrink-0" />
               </div>
             )}
@@ -276,10 +203,13 @@ export default function AppLayout() {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setShowNotifDropdown(!showNotifDropdown)}
-                className="relative p-2.5 rounded-xl border border-border bg-surface text-textMuted hover:text-textMain hover:border-primary/50 transition-all cursor-pointer shadow-xs flex items-center justify-center"
-                title="Central de Notificações"
+                aria-label={t('notifications.center')}
+                aria-haspopup="true"
+                aria-expanded={showNotifDropdown}
+                className="relative p-2.5 rounded-xl border border-border bg-surface text-textMuted hover:text-textMain hover:border-primary/50 transition-all duration-300 cursor-pointer shadow-xs flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+                title={t('notifications.center')}
               >
-                <Bell size={20} />
+                <Bell className="w-6 h-6" aria-hidden="true" />
                 {unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center shadow-md animate-pulse">
                     {unreadCount > 9 ? '9+' : unreadCount}
@@ -295,9 +225,9 @@ export default function AppLayout() {
                   <div className="p-4 border-b border-border flex items-center justify-between bg-black/5 dark:bg-white/5">
                     <div className="flex items-center space-x-2">
                       <Bell size={18} className="text-primary" />
-                      <h3 className="text-sm font-bold text-textMain">Notificações</h3>
+                      <h3 className="text-sm font-bold text-textMain">{t('notifications.title')}</h3>
                     </div>
-                    <button onClick={() => setShowNotifDropdown(false)} className="text-textMuted hover:text-textMain"><X size={16} /></button>
+                    <button onClick={() => setShowNotifDropdown(false)} aria-label={t('common.actions.close')} className="p-1 rounded-md text-textMuted hover:text-textMain transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"><X className="w-5 h-5" aria-hidden="true" /></button>
                   </div>
 
                   {/* Abas: Não lidas / Todas */}
@@ -306,13 +236,13 @@ export default function AppLayout() {
                       onClick={() => setNotifTab('unread')}
                       className={`flex-1 py-1.5 rounded-lg transition-all cursor-pointer ${notifTab === 'unread' ? 'bg-surface text-primary shadow-xs border border-border/50' : 'text-textMuted hover:text-textMain'}`}
                     >
-                      Não lidas ({unreadCount})
+                      {t('notifications.unread')} ({unreadCount})
                     </button>
                     <button
                       onClick={() => setNotifTab('all')}
                       className={`flex-1 py-1.5 rounded-lg transition-all cursor-pointer ${notifTab === 'all' ? 'bg-surface text-primary shadow-xs border border-border/50' : 'text-textMuted hover:text-textMain'}`}
                     >
-                      Todas ({notifications.length})
+                      {t('notifications.all')} ({notifications.length})
                     </button>
                   </div>
 
@@ -320,7 +250,7 @@ export default function AppLayout() {
                   <div className="max-h-80 overflow-y-auto divide-y divide-border/50">
                     {filteredNotifications.length === 0 ? (
                       <div className="p-8 text-center text-textMuted text-xs font-medium">
-                        Nenhuma notificação por aqui.
+                        {t('notifications.empty')}
                       </div>
                     ) : (
                       filteredNotifications.map(notif => (
@@ -329,7 +259,7 @@ export default function AppLayout() {
                             {notif.type_str === 'success' && <CheckCircle2 size={16} className="text-green-500" />}
                             {notif.type_str === 'error' && <AlertCircle size={16} className="text-red-500" />}
                             {notif.type_str === 'warning' && <AlertCircle size={16} className="text-amber-500" />}
-                            {notif.type_str === 'info' && <Info size={16} className="text-blue-500" />}
+                            {notif.type_str === 'info' && <Info size={16} className="text-amber-500" />}
                           </div>
                           <div className="flex-1 min-w-0">
                             <h4 className="text-xs font-bold text-textMain truncate">{notif.title}</h4>
@@ -345,9 +275,9 @@ export default function AppLayout() {
                   <div className="p-3 border-t border-border bg-background/50 flex justify-between items-center text-xs">
                     <button
                       onClick={handleMarkAllAsRead}
-                      className="text-primary font-bold hover:underline cursor-pointer flex items-center"
+                      className="text-primary font-bold hover:underline cursor-pointer flex items-center rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
                     >
-                      <Check size={14} className="mr-1" /> Definir todas como lidas
+                      <Check className="w-4 h-4 mr-1" aria-hidden="true" /> {t('notifications.markAllRead')}
                     </button>
                   </div>
 
@@ -357,9 +287,10 @@ export default function AppLayout() {
           </div>
         </header>
 
-        <div className="flex-1 overflow-auto p-8 print:p-0 print:overflow-visible">
+        <div data-tour="page" className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-8 pt-8 pb-8 print:p-0 print:overflow-visible">
           <Outlet context={{ 
             activeTasks, 
+            failedRuns,
             activeRestores,
             restoreVaultPath,
             setRestoreVaultPath,

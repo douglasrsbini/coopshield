@@ -1198,40 +1198,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "coopshield"
-version = "1.0.0"
-dependencies = [
- "aes-gcm",
- "aws-config",
- "aws-sdk-s3",
- "base64 0.22.1",
- "chrono",
- "dirs 5.0.1",
- "hex",
- "hostname",
- "lazy_static",
- "lettre",
- "mac_address",
- "parking_lot",
- "rand 0.8.8",
- "reqwest",
- "rfd 0.14.1",
- "rusqlite",
- "serde",
- "serde_json",
- "sha2 0.10.9",
- "tauri",
- "tauri-build",
- "tauri-plugin-autostart",
- "tauri-plugin-dialog",
- "tauri-plugin-notification",
- "tokio",
- "totp-rs",
- "walkdir",
- "zstd",
-]
-
-[[package]]
 name = "core-foundation"
 version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3136,6 +3102,40 @@ checksum = "0fbe853b403ae61a04233030ae8a79d94975281ed9770a1f9e246732b534b28d"
 dependencies = [
  "bitflags 2.13.2",
  "serde",
+]
+
+[[package]]
+name = "kopher-shield"
+version = "1.0.0"
+dependencies = [
+ "aes-gcm",
+ "aws-config",
+ "aws-sdk-s3",
+ "base64 0.22.1",
+ "chrono",
+ "dirs 5.0.1",
+ "hex",
+ "hostname",
+ "lazy_static",
+ "lettre",
+ "mac_address",
+ "parking_lot",
+ "rand 0.8.8",
+ "reqwest",
+ "rfd 0.14.1",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-autostart",
+ "tauri-plugin-dialog",
+ "tauri-plugin-notification",
+ "tokio",
+ "totp-rs",
+ "walkdir",
+ "zstd",
 ]
 
 [[package]]

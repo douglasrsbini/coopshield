@@ -4,15 +4,19 @@ import { invoke } from '@tauri-apps/api/core';
 import { save } from '@tauri-apps/plugin-dialog';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { useTranslation } from 'react-i18next';
+import NocPanel from '../components/dashboard/NocPanel';
 
 interface AuditLog { timestamp: string; level: string; message: string; }
 interface DashboardTelemetry { total_routines: number; active_vaults: number; protected_files: number; last_execution: string; recent_audits: AuditLog[]; }
-interface ChartDataPoint { height: number; value: number; label: string; isCurrent: boolean; isFuture: boolean; isError: boolean; dateKey: string; unit: string; }
+interface ChartDataPoint { height: number; value: number; label: string; isToday: boolean; isFuture: boolean; isError: boolean; dateKey: string; unit: string; }
 
 type GroupBy = 'day' | 'month' | 'year';
 type TimeViewMode = 'weekly' | 'monthly' | 'quarterly' | 'semiannual' | 'yearly' | '5years' | 'custom';
 
 export default function Dashboard() {
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language;
   const [telemetry, setTelemetry] = useState<DashboardTelemetry | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
@@ -29,7 +33,7 @@ export default function Dashboard() {
   
   const [selectedBarDate, setSelectedBarDate] = useState<string | null>(null);
   const [groupBy, setGroupBy] = useState<GroupBy>('day');
-  const [chartTitleLabel, setChartTitleLabel] = useState('Últimos 7 Dias');
+  const [chartTitleLabel, setChartTitleLabel] = useState('dashboard.views.week');
 
   const [showViewMenu, setShowViewMenu] = useState(false);
   const [viewMode, setViewMode] = useState<TimeViewMode>('weekly');
@@ -42,7 +46,7 @@ export default function Dashboard() {
         const data = await invoke<DashboardTelemetry>('get_dashboard_telemetry');
         setTelemetry(data);
       } catch (error) {
-        console.error("Erro ao carregar telemetria:", error);
+        console.error('Telemetry load failed:', error);
       } finally {
         setTimeout(() => setIsLoading(false), 500); 
       }
@@ -74,8 +78,8 @@ export default function Dashboard() {
     try {
       const ext = format;
       const filePath = await save({ 
-        filters: [{ name: format === 'pdf' ? 'Relatório PDF' : 'Imagem PNG', extensions: [ext] }], 
-        defaultPath: `visao_geral_coopshield_${new Date().toISOString().slice(0,10)}.${ext}` 
+        filters: [{ name: format === 'pdf' ? t('dashboard.exportModal.pdfName') : t('dashboard.exportModal.pngName'), extensions: [ext] }], 
+        defaultPath: `visao_geral_kopher_shield_${new Date().toISOString().slice(0,10)}.${ext}`
       });
       
       if (!filePath) { setIsExporting(false); return; }
@@ -113,7 +117,7 @@ export default function Dashboard() {
                 div.innerText = sel.options[sel.selectedIndex]?.text || val;
               } else if (el.getAttribute('type') === 'date' && val) {
                 const [y, m, d] = val.split('-');
-                div.innerText = `${d}/${m}/${y}`;
+                div.innerText = new Intl.DateTimeFormat(lang).format(new Date(Number(y), Number(m) - 1, Number(d)));
               } else {
                 div.innerText = val || el.getAttribute('placeholder') || '';
               }
@@ -152,20 +156,20 @@ export default function Dashboard() {
         
         pdf.setFontSize(14); 
         pdf.setTextColor(15, 23, 42); 
-        pdf.text("COOPSHIELD - RELATÓRIO DE AUDITORIA", marginX, 15);
+        pdf.text(t('dashboard.pdfTitle'), marginX, 15);
         
         pdf.setFontSize(10); 
         pdf.setTextColor(100, 116, 139); 
-        pdf.text(`Emitido em: ${new Date().toLocaleString('pt-BR')}  |  Visão: ${chartTitleLabel}`, marginX, 22);
+        pdf.text(t('dashboard.pdfIssued', { date: new Date().toLocaleString(lang), view: t(chartTitleLabel) }), marginX, 22);
         
         pdf.addImage(imgData, 'PNG', xOffset, 30, imgWidth, imgHeight);
         
         await invoke('save_report_file', { path: filePath, content: pdf.output('datauristring').split(',')[1], isBase64: true });
       }
-      alert(`Exportação concluída com sucesso!`);
+      alert(t('dashboard.exportOk'));
     } catch(e) { 
       console.error(e);
-      alert(`Falha ao gerar o arquivo. Verifique os logs.`); 
+      alert(t('dashboard.exportFail')); 
     } finally { 
       setIsExporting(false); 
     }
@@ -219,13 +223,13 @@ export default function Dashboard() {
     const isErrorMode = filterStatus === 'ERROR' || filterStatus === 'WARNING';
     
     const dynamicData: Record<string, { value: number, isFuture: boolean, label: string }> = {};
-    const monthNames = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
+    const monthNames = Array.from({ length: 12 }, (_, m) => new Intl.DateTimeFormat(lang, { month: 'short' }).format(new Date(2021, m, 1)).replace('.', '').toUpperCase());
     
     const today = new Date();
     today.setHours(0,0,0,0);
 
     if (viewMode === 'weekly') {
-      const daysMap = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
+      const daysMap = Array.from({ length: 7 }, (_, d) => new Intl.DateTimeFormat(lang, { weekday: 'short' }).format(new Date(2023, 0, 1 + d)).replace('.', '').toUpperCase());
       daysMap.forEach((label, index) => {
         const d = new Date(anchorDate);
         const diff = index - currentDayOfWeek;
@@ -294,10 +298,7 @@ export default function Dashboard() {
       }
     }
 
-    let dynamicUnit = "eventos";
-    if (filterStatus === 'SUCCESS') dynamicUnit = "arquivos encript.";
-    if (filterStatus === 'ERROR') dynamicUnit = "falhas críticas";
-    if (filterStatus === 'WARNING') dynamicUnit = "alertas";
+    const dynamicUnit = t(`dashboard.unit.${['SUCCESS', 'ERROR', 'WARNING', 'INFO'].includes(filterStatus) ? filterStatus : 'ALL'}`);
 
     const logsToProcess = (filterRoutine === '' && filterStatus === 'ALL') ? telemetry.recent_audits : filteredAudits;
 
@@ -354,32 +355,18 @@ export default function Dashboard() {
 
       return { height, value, label, isToday: isCurrent, isFuture, isError: isErrorMode, dateKey: key, unit: dynamicUnit };
     });
-  }, [telemetry, filteredAudits, filterStatus, filterRoutine, startDate, endDate, viewMode, selectedBarDate, groupBy]);
+  }, [telemetry, filteredAudits, filterStatus, filterRoutine, startDate, endDate, viewMode, selectedBarDate, groupBy, lang, t]);
 
   const themeMaps = {
     ALL: { main: 'bg-primary border-primary', glow: 'bg-primary/20', text: 'text-primary', past: 'bg-primary/10 hover:bg-primary/20 border-primary/20', border: 'border-primary' },
     SUCCESS: { main: 'bg-green-500 border-green-500', glow: 'bg-green-500/20', text: 'text-green-500', past: 'bg-green-500/10 hover:bg-green-500/20 border-green-500/20', border: 'border-green-500' },
     WARNING: { main: 'bg-amber-500 border-amber-500', glow: 'bg-amber-500/20', text: 'text-amber-500', past: 'bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/20', border: 'border-amber-500' },
     ERROR: { main: 'bg-red-500 border-red-500', glow: 'bg-red-500/20', text: 'text-red-500', past: 'bg-red-500/10 hover:bg-red-500/20 border-red-500/20', border: 'border-red-500' },
-    INFO: { main: 'bg-blue-400 border-blue-400', glow: 'bg-blue-400/20', text: 'text-blue-400', past: 'bg-blue-400/10 hover:bg-blue-400/20 border-blue-400/20', border: 'border-blue-400' }
+    INFO: { main: 'bg-slate-400 border-slate-400', glow: 'bg-slate-400/20', text: 'text-slate-400', past: 'bg-slate-400/10 hover:bg-slate-400/20 border-slate-400/20', border: 'border-slate-400' }
   };
   const activeTheme = themeMaps[filterStatus as keyof typeof themeMaps] || themeMaps.ALL;
 
-  const chartTitle = filterStatus === 'ERROR' ? 'Picos de Falhas Críticas' :
-                     filterStatus === 'WARNING' ? 'Alertas de Integridade' :
-                     filterStatus === 'INFO' ? 'Volume de Eventos (Informativos)' :
-                     filterStatus === 'SUCCESS' ? 'Volume de Blocos Processados' :
-                     'Histórico de Atividade (Extrato)';
-
-  const viewLabels: Record<TimeViewMode, string> = {
-    weekly: 'Semanal',
-    monthly: 'Mensal',
-    quarterly: 'Trimestral',
-    semiannual: 'Semestral',
-    yearly: 'Este Ano',
-    '5years': 'Últimos 5 Anos',
-    custom: 'Visão Personalizada'
-  };
+  const chartTitle = t(`dashboard.chart.${['ERROR', 'WARNING', 'INFO', 'SUCCESS'].includes(filterStatus) ? filterStatus : 'ALL'}`);
 
   const applyPreset = (preset: string, label: string) => {
     const d = new Date();
@@ -415,7 +402,7 @@ export default function Dashboard() {
     setFilterRoutine('');
     setFilterStatus('ALL');
     setSelectedBarDate(null);
-    applyPreset('week', 'Últimos 7 Dias');
+    applyPreset('week', 'dashboard.views.week');
   };
 
   const hasActiveFilters = filterRoutine !== '' || filterStatus !== 'ALL' || selectedBarDate !== null || viewMode !== 'weekly';
@@ -425,7 +412,7 @@ export default function Dashboard() {
       <div className="flex items-center justify-center h-full">
         <div className="flex flex-col items-center space-y-4">
           <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-textMuted font-medium animate-pulse">A carregar telemetria do motor...</p>
+          <p className="text-textMuted font-medium animate-pulse">{t('dashboard.loading')}</p>
         </div>
       </div>
     );
@@ -434,10 +421,9 @@ export default function Dashboard() {
   const maxValue = chartData.reduce((max, d) => d.value > max ? d.value : max, 0);
   const displayAudits = filteredAudits.slice(0, 12);
   
-  const monthNamesLabel = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-  const displayMonthBottomLabel = groupBy === 'day' && startDate.substring(0, 7) === endDate.substring(0, 7) 
-                                ? monthNamesLabel[new Date(startDate + "T12:00:00").getMonth()] 
-                                : null;
+  const displayMonthBottomLabel = groupBy === 'day' && startDate.substring(0, 7) === endDate.substring(0, 7)
+    ? new Intl.DateTimeFormat(lang, { month: 'long' }).format(new Date(startDate + 'T12:00:00'))
+    : null;
 
   return (
     <>
@@ -448,12 +434,12 @@ export default function Dashboard() {
         `}
       </style>
 
-      <div className="flex flex-col h-full print:h-auto space-y-6 animate-in fade-in duration-700 max-w-[1600px] mx-auto overflow-hidden print:overflow-visible print:space-y-4">
+      <div className="flex flex-col space-y-6 animate-in fade-in duration-700 max-w-[1600px] mx-auto print:space-y-4">
         
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 shrink-0">
           <div>
-            <h1 className="text-3xl font-bold mb-2 tracking-tight text-textMain">Visão Geral</h1>
-            <p className="text-sm text-textMuted">Painel gerencial de telemetria, integridade dos cofres e métricas de proteção.</p>
+            <h1 className="text-3xl font-bold mb-2 tracking-tight text-textMain">{t('dashboard.title')}</h1>
+            <p className="text-sm text-textMuted">{t('dashboard.subtitle')}</p>
           </div>
           
           <div className="flex space-x-3 w-full md:w-auto print:hidden">
@@ -463,55 +449,57 @@ export default function Dashboard() {
               className="bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-lg font-medium text-sm flex items-center shadow-lg shadow-primary/20 transition-all cursor-pointer disabled:opacity-50 h-fit"
             >
               <Download size={18} className={`mr-2 ${isExporting ? 'animate-bounce' : ''}`} /> 
-              {isExporting ? 'Gerando Arquivo...' : 'Exportar Relatório'}
+              {isExporting ? t('dashboard.exporting') : t('dashboard.export')}
             </button>
           </div>
         </div>
 
-        <div ref={dashboardRef} className="flex flex-col flex-1 space-y-5 min-h-0 bg-background rounded-xl print:bg-transparent">
+        <div ref={dashboardRef} className="flex flex-col space-y-5 bg-background rounded-xl print:bg-transparent">
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 print:grid-cols-4 gap-5 print:gap-3 shrink-0">
             <div className="bg-surface border border-border rounded-xl p-5 hover:border-primary/40 transition-all shadow-sm flex flex-col justify-between group print:border-border/50">
               <div className="flex justify-between items-start mb-3">
                 <div className="bg-primary/10 p-2.5 rounded-lg text-primary group-hover:scale-110 transition-transform"><FileLock2 size={22} /></div>
-                {telemetry.protected_files > 0 && <span className="text-xs font-bold text-green-400 bg-green-400/10 px-2 py-1 rounded flex items-center"><ArrowUpRight size={14} className="mr-1" /> Ativo</span>}
+                {telemetry.protected_files > 0 && <span className="text-xs font-bold text-green-400 bg-green-400/10 px-2 py-1 rounded flex items-center"><ArrowUpRight size={14} className="mr-1" /> {t('dashboard.active')}</span>}
               </div>
               <div>
-                <h3 className="text-3xl font-bold text-textMain mb-1">{telemetry.protected_files.toLocaleString('pt-BR')}</h3>
-                <p className="text-[11px] text-textMuted font-bold uppercase tracking-wider">Blocos Protegidos</p>
+                <h3 className="text-3xl font-bold text-textMain mb-1">{telemetry.protected_files.toLocaleString(lang)}</h3>
+                <p className="text-[11px] text-textMuted font-bold uppercase tracking-wider">{t('dashboard.kpi_blocks')}</p>
               </div>
             </div>
             <div className="bg-surface border border-border rounded-xl p-5 hover:border-primary/40 transition-all shadow-sm flex flex-col justify-between group print:border-border/50">
-              <div className="flex justify-between items-start mb-3"><div className="bg-emerald-500/10 p-2.5 rounded-lg text-emerald-400 group-hover:scale-110 transition-transform"><Activity size={22} /></div></div>
-              <div><h3 className="text-3xl font-bold text-textMain mb-1">{telemetry.total_routines}</h3><p className="text-[11px] text-textMuted font-bold uppercase tracking-wider">Rotinas Ativas</p></div>
+              <div className="flex justify-between items-start mb-3"><div className="bg-primary/10 p-2.5 rounded-lg text-primary group-hover:scale-110 transition-transform"><Activity size={22} /></div></div>
+              <div><h3 className="text-3xl font-bold text-textMain mb-1">{telemetry.total_routines}</h3><p className="text-[11px] text-textMuted font-bold uppercase tracking-wider">{t('dashboard.kpi_routines')}</p></div>
             </div>
             <div className="bg-surface border border-border rounded-xl p-5 hover:border-primary/40 transition-all shadow-sm flex flex-col justify-between group print:border-border/50">
-              <div className="flex justify-between items-start mb-3"><div className="bg-blue-500/10 p-2.5 rounded-lg text-blue-400 group-hover:scale-110 transition-transform"><Server size={22} /></div></div>
-              <div><h3 className="text-3xl font-bold text-textMain mb-1">{telemetry.active_vaults}</h3><p className="text-[11px] text-textMuted font-bold uppercase tracking-wider">Cofres Ativos</p></div>
+              <div className="flex justify-between items-start mb-3"><div className="bg-amber-500/10 p-2.5 rounded-lg text-amber-500 group-hover:scale-110 transition-transform"><Server size={22} /></div></div>
+              <div><h3 className="text-3xl font-bold text-textMain mb-1">{telemetry.active_vaults}</h3><p className="text-[11px] text-textMuted font-bold uppercase tracking-wider">{t('dashboard.kpi_vaults')}</p></div>
             </div>
             <div className="bg-surface border border-border rounded-xl p-5 hover:border-primary/40 transition-all shadow-sm flex flex-col justify-between group print:border-border/50">
               <div className="flex justify-between items-start mb-3"><div className="bg-amber-500/10 p-2.5 rounded-lg text-amber-400 group-hover:scale-110 transition-transform"><Clock size={22} /></div></div>
-              <div><h3 className="text-lg font-bold text-textMain mb-2 truncate">{telemetry.last_execution.split(' ')[0] === new Date().toISOString().slice(0,10) ? `Hoje, ${telemetry.last_execution.split(' ')[1]}` : telemetry.last_execution}</h3><p className="text-[11px] text-textMuted font-bold uppercase tracking-wider">Último Sucesso</p></div>
+              <div><h3 className="text-lg font-bold text-textMain mb-2 truncate">{telemetry.last_execution.split(' ')[0] === new Date().toISOString().slice(0,10) ? t('dashboard.today', { time: telemetry.last_execution.split(' ')[1] }) : telemetry.last_execution}</h3><p className="text-[11px] text-textMuted font-bold uppercase tracking-wider">{t('dashboard.kpi_last')}</p></div>
             </div>
           </div>
 
+          <NocPanel audits={telemetry.recent_audits} filterStatus={filterStatus} onFilterChange={setFilterStatus} />
+
           <div id="export-filters" className="bg-surface border border-border rounded-xl p-4 shadow-sm flex flex-col 2xl:flex-row gap-4 shrink-0 items-start 2xl:items-center print:hidden">
             <div className="flex items-center text-textMuted font-bold text-xs uppercase tracking-wider mr-2 shrink-0">
-              <Filter size={16} className="mr-2" /> Filtros:
+              <Filter size={16} className="mr-2" /> {t('dashboard.filters')}
             </div>
             
             <div className="relative flex-1 min-w-[200px] w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted" size={16} />
-              <input type="text" placeholder="Buscar rotina..." value={filterRoutine} onChange={(e) => setFilterRoutine(e.target.value)} className="w-full bg-background border border-border rounded-lg pl-9 pr-3 py-2 text-sm text-textMain focus:border-primary outline-none transition-all" />
+              <input type="text" placeholder={t('dashboard.search')} aria-label={t('dashboard.search')} value={filterRoutine} onChange={(e) => setFilterRoutine(e.target.value)} className="w-full bg-background border border-border rounded-lg pl-9 pr-3 py-2 text-sm text-textMain focus:border-primary outline-none transition-all" />
             </div>
             
             <div className="relative shrink-0 w-full md:w-auto">
               <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="w-full md:w-auto bg-background border border-border rounded-lg px-3 py-2 text-sm text-textMain focus:border-primary outline-none cursor-pointer appearance-none min-w-[140px]">
-                <option value="ALL" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">Todos os Status</option>
-                <option value="SUCCESS" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">✅ Sucesso</option>
-                <option value="WARNING" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">⚠️ Alertas</option>
-                <option value="ERROR" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">❌ Falhas</option>
-                <option value="INFO" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">ℹ️ Informação</option>
+                <option value="ALL" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">{t('dashboard.status.ALL')}</option>
+                <option value="SUCCESS" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">✅ {t('dashboard.status.SUCCESS')}</option>
+                <option value="WARNING" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">⚠️ {t('dashboard.status.WARNING')}</option>
+                <option value="ERROR" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">❌ {t('dashboard.status.ERROR')}</option>
+                <option value="INFO" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">ℹ️ {t('dashboard.status.INFO')}</option>
               </select>
             </div>
             
@@ -520,67 +508,67 @@ export default function Dashboard() {
                 <Layers className="text-textMuted mr-2 shrink-0" size={16} />
                 <select 
                   value={groupBy} 
-                  onChange={(e) => { setGroupBy(e.target.value as GroupBy); setChartTitleLabel("Visão Personalizada"); setSelectedBarDate(null); setViewMode('custom'); }} 
+                  onChange={(e) => { setGroupBy(e.target.value as GroupBy); setChartTitleLabel('dashboard.views.custom'); setSelectedBarDate(null); setViewMode('custom'); }} 
                   className="bg-transparent border-none text-sm text-textMain font-bold outline-none cursor-pointer appearance-none"
                 >
-                  <option value="day" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">Agrupar por Dia</option>
-                  <option value="month" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">Agrupar por Mês</option>
-                  <option value="year" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">Agrupar por Ano</option>
+                  <option value="day" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">{t('dashboard.group.day')}</option>
+                  <option value="month" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">{t('dashboard.group.month')}</option>
+                  <option value="year" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">{t('dashboard.group.year')}</option>
                 </select>
               </div>
               
               <div className="hidden md:block w-px h-5 bg-border/80 mx-2"></div>
               
               <div className="flex items-center space-x-2 w-full md:w-auto">
-                <input type="date" value={startDate} onChange={(e) => { setStartDate(e.target.value); setChartTitleLabel("Visão Personalizada"); setSelectedBarDate(null); setViewMode('custom'); }} className="flex-1 md:w-32 bg-transparent border-none px-1 text-sm text-textMain outline-none cursor-pointer [color-scheme:dark]" title="Data Início" />
-                <span className="text-textMuted text-xs font-bold uppercase">Até</span>
-                <input type="date" value={endDate} onChange={(e) => { setEndDate(e.target.value); setChartTitleLabel("Visão Personalizada"); setSelectedBarDate(null); setViewMode('custom'); }} className="flex-1 md:w-32 bg-transparent border-none px-1 text-sm text-textMain outline-none cursor-pointer [color-scheme:dark]" title="Data Fim" />
+                <input type="date" value={startDate} onChange={(e) => { setStartDate(e.target.value); setChartTitleLabel('dashboard.views.custom'); setSelectedBarDate(null); setViewMode('custom'); }} className="flex-1 md:w-32 bg-transparent border-none px-1 text-sm text-textMain outline-none cursor-pointer [color-scheme:dark]" title={t('dashboard.dateStart')} aria-label={t('dashboard.dateStart')} />
+                <span className="text-textMuted text-xs font-bold uppercase">{t('dashboard.until')}</span>
+                <input type="date" value={endDate} onChange={(e) => { setEndDate(e.target.value); setChartTitleLabel('dashboard.views.custom'); setSelectedBarDate(null); setViewMode('custom'); }} className="flex-1 md:w-32 bg-transparent border-none px-1 text-sm text-textMain outline-none cursor-pointer [color-scheme:dark]" title={t('dashboard.dateEnd')} aria-label={t('dashboard.dateEnd')} />
               </div>
             </div>
 
             <button onClick={clearFilters} className={`w-full 2xl:w-auto bg-surface hover:bg-red-500/10 ${hasActiveFilters ? 'text-red-400 border-red-500/50' : 'text-textMuted border-border'} hover:text-red-500 border hover:border-red-500/30 px-4 py-2 rounded-lg font-bold text-xs flex items-center justify-center transition-colors shrink-0 cursor-pointer`}>
-              <XCircle size={14} className="mr-1.5" /> Limpar
+              <XCircle size={14} className="mr-1.5" /> {t('dashboard.clear')}
             </button>
           </div>
 
-          <div id="export-dashboard" className="grid grid-cols-1 lg:grid-cols-3 print:grid-cols-3 gap-5 print:gap-4 flex-1 min-h-0 print:min-h-[auto] pb-2">
+          <div id="export-dashboard" className="grid grid-cols-1 lg:grid-cols-3 print:grid-cols-3 gap-5 print:gap-4 pb-2">
             
-            <div className="lg:col-span-2 print:col-span-2 bg-surface border border-border rounded-xl p-6 flex flex-col shadow-sm min-h-0 relative print:border-border/50">
+            <div className="lg:col-span-2 print:col-span-2 bg-surface border border-border rounded-xl p-6 flex flex-col shadow-sm relative print:border-border/50">
               <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 shrink-0 gap-4 relative">
                 <div className="flex-1">
                   <h2 className={`text-lg font-bold flex items-center ${activeTheme.text}`}>
                     <HardDrive size={18} className={`mr-2 ${activeTheme.text}`} /> {chartTitle}
                   </h2>
-                  <p className="text-xs text-textMuted mt-1">Série temporal agrupada com base nos filtros selecionados.</p>
+                  <p className="text-xs text-textMuted mt-1">{t('dashboard.chart.subtitle')}</p>
                 </div>
 
                 <div className="hidden xl:flex absolute left-1/2 -translate-x-1/2 top-0 items-center justify-center">
                   <span className="text-sm font-bold text-primary px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 transition-all print:border-black print:text-black print:bg-gray-200">
-                    {chartTitleLabel} {selectedBarDate && <span className="ml-2 text-xs font-medium text-textMuted">(Foco: {selectedBarDate})</span>}
+                    {t(chartTitleLabel)} {selectedBarDate && <span className="ml-2 text-xs font-medium text-textMuted">({t('dashboard.chart.focus', { date: selectedBarDate })})</span>}
                   </span>
                 </div>
                 
                 <div className="flex items-center space-x-4 bg-background/50 px-4 py-2.5 rounded-lg border border-border/60 text-xs font-medium text-textMuted relative print:border-transparent print:bg-transparent print:p-0">
-                  <div className="flex items-center"><span className={`w-3 h-3 rounded ${activeTheme.main} mr-2.5`}></span> Atual</div>
-                  <div className="flex items-center"><span className={`w-3 h-3 rounded border mr-2.5 ${activeTheme.past}`}></span> Histórico</div>
+                  <div className="flex items-center"><span className={`w-3 h-3 rounded ${activeTheme.main} mr-2.5`}></span> {t('dashboard.chart.current')}</div>
+                  <div className="flex items-center"><span className={`w-3 h-3 rounded border mr-2.5 ${activeTheme.past}`}></span> {t('dashboard.chart.history')}</div>
                   
                   <div ref={menuRef} className="relative ml-2 pl-4 border-l border-border/60 print:hidden">
                     <button onClick={() => setShowViewMenu(!showViewMenu)} className={`hover:text-primary transition-colors flex items-center font-bold cursor-pointer ${showViewMenu ? 'text-primary' : ''}`}>
-                      <SlidersHorizontal size={14} className="mr-1.5" /> Visões
+                      <SlidersHorizontal size={14} className="mr-1.5" aria-hidden="true" /> {t('dashboard.chart.views')}
                     </button>
                     {showViewMenu && (
                       <div className="absolute right-0 top-full mt-3 w-56 bg-surface border border-border rounded-xl shadow-2xl z-50 overflow-hidden animate-in slide-in-from-top-2 fade-in">
-                        <div className="px-3 py-2 text-[10px] font-bold text-textMuted uppercase tracking-wider bg-background/50 border-b border-border/50">Detalhado</div>
-                        <button onClick={() => applyPreset('week', 'Últimos 7 Dias')} className="w-full text-left px-4 py-3 text-sm flex items-center text-textMain hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"><CalendarDays size={16} className="mr-2" /> Últimos 7 Dias</button>
-                        <button onClick={() => applyPreset('month', 'Este Mês')} className="w-full text-left px-4 py-3 text-sm flex items-center text-textMain hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer border-t border-border/50"><CalendarDays size={16} className="mr-2" /> Este Mês</button>
+                        <div className="px-3 py-2 text-[10px] font-bold text-textMuted uppercase tracking-wider bg-background/50 border-b border-border/50">{t('dashboard.views.detailed')}</div>
+                        <button onClick={() => applyPreset('week', 'dashboard.views.week')} className="w-full text-left px-4 py-3 text-sm flex items-center text-textMain hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"><CalendarDays size={16} className="mr-2" /> {t('dashboard.views.week')}</button>
+                        <button onClick={() => applyPreset('month', 'dashboard.views.month')} className="w-full text-left px-4 py-3 text-sm flex items-center text-textMain hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer border-t border-border/50"><CalendarDays size={16} className="mr-2" /> {t('dashboard.views.month')}</button>
                         
-                        <div className="px-3 py-2 text-[10px] font-bold text-textMuted uppercase tracking-wider bg-background/50 border-y border-border/50 mt-1">Diretoria (Mensal)</div>
-                        <button onClick={() => applyPreset('sem1', '1º Semestre')} className="w-full text-left px-4 py-3 text-sm flex items-center text-textMain hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"><CalendarRange size={16} className="mr-2" /> 1º Semestre (Jan-Jun)</button>
-                        <button onClick={() => applyPreset('sem2', '2º Semestre')} className="w-full text-left px-4 py-3 text-sm flex items-center text-textMain hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer border-t border-border/50"><CalendarRange size={16} className="mr-2" /> 2º Semestre (Jul-Dez)</button>
-                        <button onClick={() => applyPreset('year', 'Ano Vigente')} className="w-full text-left px-4 py-3 text-sm flex items-center text-textMain hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer border-t border-border/50"><Calendar size={16} className="mr-2" /> Este Ano (Jan-Dez)</button>
+                        <div className="px-3 py-2 text-[10px] font-bold text-textMuted uppercase tracking-wider bg-background/50 border-y border-border/50 mt-1">{t('dashboard.views.board')}</div>
+                        <button onClick={() => applyPreset('sem1', 'dashboard.views.sem1')} className="w-full text-left px-4 py-3 text-sm flex items-center text-textMain hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"><CalendarRange size={16} className="mr-2" /> {t('dashboard.views.sem1')}</button>
+                        <button onClick={() => applyPreset('sem2', 'dashboard.views.sem2')} className="w-full text-left px-4 py-3 text-sm flex items-center text-textMain hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer border-t border-border/50"><CalendarRange size={16} className="mr-2" /> {t('dashboard.views.sem2')}</button>
+                        <button onClick={() => applyPreset('year', 'dashboard.views.year')} className="w-full text-left px-4 py-3 text-sm flex items-center text-textMain hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer border-t border-border/50"><Calendar size={16} className="mr-2" /> {t('dashboard.views.year')}</button>
                         
-                        <div className="px-3 py-2 text-[10px] font-bold text-textMuted uppercase tracking-wider bg-background/50 border-y border-border/50 mt-1">Estratégico (Anual)</div>
-                        <button onClick={() => applyPreset('5years', 'Últimos 5 Anos')} className="w-full text-left px-4 py-3 text-sm flex items-center text-textMain hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"><History size={16} className="mr-2" /> Últimos 5 Anos</button>
+                        <div className="px-3 py-2 text-[10px] font-bold text-textMuted uppercase tracking-wider bg-background/50 border-y border-border/50 mt-1">{t('dashboard.views.strategic')}</div>
+                        <button onClick={() => applyPreset('5years', 'dashboard.views.y5')} className="w-full text-left px-4 py-3 text-sm flex items-center text-textMain hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"><History size={16} className="mr-2" /> {t('dashboard.views.y5')}</button>
                       </div>
                     )}
                   </div>
@@ -589,19 +577,19 @@ export default function Dashboard() {
 
               <div className="flex xl:hidden w-full mb-4 items-center justify-center print:hidden">
                   <span className="text-sm font-bold text-primary px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20">
-                    {chartTitleLabel}
+                    {t(chartTitleLabel)}
                   </span>
               </div>
               
-              <div className="flex-1 min-h-[160px] flex items-end justify-between pt-4 pb-0 relative pl-12 pr-4 overflow-x-auto overflow-y-hidden">
+              <div className="flex-1 min-h-[240px] flex items-end justify-between pt-4 pb-0 relative pl-12 pr-4 overflow-x-auto overflow-y-hidden">
                 
                 <div className="absolute left-0 -translate-x-3 top-1/2 -translate-y-1/2 -rotate-90 text-[9px] font-bold text-textMuted uppercase tracking-[0.2em] opacity-50 whitespace-nowrap">
-                  Volume
+                  {t('dashboard.chart.volume')}
                 </div>
 
                 <div className="absolute left-0 top-2 bottom-0 flex flex-col justify-between text-[10px] text-textMuted font-bold text-right w-10">
-                  <span>{maxValue.toLocaleString('pt-BR')}</span>
-                  <span>{Math.floor(maxValue / 2).toLocaleString('pt-BR')}</span>
+                  <span>{maxValue.toLocaleString(lang)}</span>
+                  <span>{Math.floor(maxValue / 2).toLocaleString(lang)}</span>
                   <span>0</span>
                 </div>
 
@@ -624,14 +612,14 @@ export default function Dashboard() {
                       {data.value > 0 && !data.isFuture && (
                         <div className="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-50 flex flex-col items-center -translate-y-2 group-hover:-translate-y-4 print:hidden">
                           <div className={`px-3 py-1.5 rounded text-xs font-bold whitespace-nowrap shadow-xl bg-surface border ${activeTheme.border} ${activeTheme.text}`}>
-                            {data.value.toLocaleString('pt-BR')} {data.unit}
+                            {data.value.toLocaleString(lang)} {data.unit}
                           </div>
                           <div className={`w-2 h-2 rotate-45 border-r border-b ${activeTheme.border} bg-surface -mt-1.5`}></div>
                         </div>
                       )}
 
                       <div className={`mb-1.5 text-[11px] font-bold ${data.isToday || data.dateKey === selectedBarDate ? activeTheme.text : 'text-textMuted'} transition-all ${data.height === 0 ? 'opacity-0' : 'opacity-100 group-hover:scale-110 group-hover:-translate-y-1'} print:opacity-100 print:text-black`}>
-                        {chartData.length > 20 && data.height > 0 ? '' : data.value > 0 ? data.value.toLocaleString('pt-BR') : ''}
+                        {chartData.length > 20 && data.height > 0 ? '' : data.value > 0 ? data.value.toLocaleString(lang) : ''}
                       </div>
                       
                       {(data.isToday || data.dateKey === selectedBarDate) && data.height > 0 && (
@@ -670,27 +658,27 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="print:col-span-1 bg-surface border border-border rounded-xl p-6 flex flex-col shadow-sm min-h-0 print:border-border/50">
+            <div className="print:col-span-1 bg-surface border border-border rounded-xl p-6 flex flex-col shadow-sm print:border-border/50">
               <div className="flex justify-between items-center mb-6 shrink-0">
-                 <h2 className="text-lg font-bold flex items-center text-textMain"><Activity size={18} className="mr-2 text-blue-400 print:text-black" /> Auditoria Recente</h2>
+                 <h2 className="text-lg font-bold flex items-center text-textMain"><Activity size={18} className="mr-2 text-amber-500 print:text-black" /> {t('dashboard.recent')}</h2>
                  {selectedBarDate && (
                    <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded border border-primary/20 font-bold animate-pulse print:hidden">
-                     Foco: {selectedBarDate}
+                     {t('dashboard.chart.focus', { date: selectedBarDate })}
                    </span>
                  )}
               </div>
-              <div id="audit-scroll-area" className="flex-1 overflow-y-auto pr-2 space-y-5 print:overflow-visible print:max-h-none">
+              <div id="audit-scroll-area" className="flex-1 max-h-[420px] overflow-y-auto pr-2 space-y-5 print:overflow-visible print:max-h-none">
                 {displayAudits.length === 0 ? (
-                  <div className="text-center text-textMuted text-sm mt-10">Nenhum evento no período selecionado.</div>
+                  <div className="text-center text-textMuted text-sm mt-10">{t('dashboard.noEvents')}</div>
                 ) : (
                   displayAudits.map((log, index) => {
-                    let Icon = Info; let colorClass = "bg-blue-500/20 text-blue-500 border-blue-500/30 print:border-gray-400 print:text-black";
+                    let Icon = Info; let colorClass = "bg-slate-500/20 text-slate-400 border-slate-500/30 print:border-gray-400 print:text-black";
                     if (log.level === 'SUCCESS') { Icon = CheckCircle2; colorClass = "bg-green-500/20 text-green-500 border-green-500/30 print:border-gray-400 print:text-black"; }
                     if (log.level === 'WARNING') { Icon = AlertTriangle; colorClass = "bg-amber-500/20 text-amber-500 border-amber-500/30 print:border-gray-400 print:text-black"; }
                     if (log.level === 'ERROR') { Icon = ShieldAlert; colorClass = "bg-red-500/20 text-red-500 border-red-500/30 print:border-gray-400 print:text-black"; }
 
                     const routineNameMatch = log.message.match(/'([^']+)'/);
-                    const highlightText = routineNameMatch ? routineNameMatch[1] : "Sistema";
+                    const highlightText = routineNameMatch ? routineNameMatch[1] : t('dashboard.system');
 
                     return (
                       <div key={index} className="flex relative print:break-inside-avoid">
@@ -700,7 +688,7 @@ export default function Dashboard() {
                           <span className="text-sm font-bold text-textMain truncate">{highlightText}</span>
                           <span className="text-xs text-textMuted mt-0.5 leading-snug line-clamp-2">{log.message}</span>
                           <span className="text-[10px] uppercase font-bold tracking-wider text-textMuted mt-1.5 flex items-center">
-                            <Clock size={10} className="mr-1" /> {log.timestamp.split(' ')[0] === new Date().toISOString().slice(0,10) ? `Hoje, ${log.timestamp.split(' ')[1]}` : log.timestamp}
+                            <Clock size={10} className="mr-1" /> {log.timestamp.split(' ')[0] === new Date().toISOString().slice(0,10) ? t('dashboard.today', { time: log.timestamp.split(' ')[1] }) : log.timestamp}
                           </span>
                         </div>
                       </div>
@@ -717,27 +705,27 @@ export default function Dashboard() {
           <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 animate-in fade-in duration-200 print:hidden">
             <div className="bg-surface border border-border rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden">
               <div className="flex justify-between items-center p-5 border-b border-border/50">
-                <h2 className="text-lg font-bold text-textMain flex items-center"><Printer size={18} className="mr-2 text-primary" /> Exportar Visão Geral</h2>
-                <button onClick={() => setIsExportModalOpen(false)} className="text-textMuted hover:text-textMain transition-colors p-1.5 rounded-md hover:bg-surface/50 cursor-pointer"><X size={18} /></button>
+                <h2 className="text-lg font-bold text-textMain flex items-center"><Printer size={18} className="mr-2 text-primary" /> {t('dashboard.exportModal.title')}</h2>
+                <button aria-label={t('dashboard.exportModal.cancel')} onClick={() => setIsExportModalOpen(false)} className="text-textMuted hover:text-textMain transition-colors p-1.5 rounded-md hover:bg-surface/50 cursor-pointer"><X size={18} /></button>
               </div>
               
               <div className="p-5 space-y-3">
                 <button onClick={() => handleExport('print')} className="w-full bg-background border border-border hover:border-primary/50 hover:bg-primary/5 p-4 rounded-xl flex items-center transition-all cursor-pointer group shadow-sm hover:shadow-md">
-                  <div className="bg-blue-500/10 p-3 rounded-lg text-blue-500 mr-4 group-hover:scale-110 transition-transform"><Printer size={24} /></div>
-                  <div className="text-left"><h3 className="text-sm font-bold text-textMain">Imprimir (Papel)</h3><p className="text-xs text-textMuted mt-0.5">Enviar direto para a impressora local</p></div>
+                  <div className="bg-amber-500/10 p-3 rounded-lg text-amber-500 mr-4 group-hover:scale-110 transition-transform"><Printer size={24} /></div>
+                  <div className="text-left"><h3 className="text-sm font-bold text-textMain">{t('dashboard.exportModal.print')}</h3><p className="text-xs text-textMuted mt-0.5">{t('dashboard.exportModal.printDesc')}</p></div>
                 </button>
                 <button onClick={() => handleExport('pdf')} className="w-full bg-background border border-border hover:border-primary/50 hover:bg-primary/5 p-4 rounded-xl flex items-center transition-all cursor-pointer group shadow-sm hover:shadow-md">
                   <div className="bg-red-500/10 p-3 rounded-lg text-red-500 mr-4 group-hover:scale-110 transition-transform"><FileText size={24} /></div>
-                  <div className="text-left"><h3 className="text-sm font-bold text-textMain">Documento PDF</h3><p className="text-xs text-textMuted mt-0.5">Relatório formatado para arquivo</p></div>
+                  <div className="text-left"><h3 className="text-sm font-bold text-textMain">{t('dashboard.exportModal.pdf')}</h3><p className="text-xs text-textMuted mt-0.5">{t('dashboard.exportModal.pdfDesc')}</p></div>
                 </button>
                 <button onClick={() => handleExport('png')} className="w-full bg-background border border-border hover:border-primary/50 hover:bg-primary/5 p-4 rounded-xl flex items-center transition-all cursor-pointer group shadow-sm hover:shadow-md">
-                  <div className="bg-green-500/10 p-3 rounded-lg text-green-500 mr-4 group-hover:scale-110 transition-transform"><ImageIcon size={24} /></div>
-                  <div className="text-left"><h3 className="text-sm font-bold text-textMain">Imagem Alta Resolução</h3><p className="text-xs text-textMuted mt-0.5">Arquivo PNG ideal para apresentações</p></div>
+                  <div className="bg-amber-500/10 p-3 rounded-lg text-amber-500 mr-4 group-hover:scale-110 transition-transform"><ImageIcon size={24} /></div>
+                  <div className="text-left"><h3 className="text-sm font-bold text-textMain">{t('dashboard.exportModal.png')}</h3><p className="text-xs text-textMuted mt-0.5">{t('dashboard.exportModal.pngDesc')}</p></div>
                 </button>
               </div>
               
               <div className="p-4 border-t border-border/50 bg-background/50 flex justify-end">
-                <button onClick={() => setIsExportModalOpen(false)} className="px-4 py-2 rounded-lg font-medium text-sm text-textMuted hover:text-textMain hover:bg-surface transition-all cursor-pointer">Cancelar</button>
+                <button onClick={() => setIsExportModalOpen(false)} className="px-4 py-2 rounded-lg font-medium text-sm text-textMuted hover:text-textMain hover:bg-surface transition-all cursor-pointer">{t('dashboard.exportModal.cancel')}</button>
               </div>
             </div>
           </div>

@@ -1,6 +1,887 @@
 {
+  "app": {
+    "name": "Kopher Shield",
+    "tagline": "Protección inmutable. Recuperación confiable."
+  },
+  "common": {
+    "actions": {
+      "back": "Volver",
+      "continue": "Continuar",
+      "save": "Guardar cambios",
+      "cancel": "Cancelar",
+      "close": "Cerrar"
+    },
+    "status": {
+      "loading": "Cargando",
+      "ready": "Listo",
+      "error": "Error",
+      "success": "Éxito"
+    }
+  },
   "welcome": {
     "title": "Bienvenido(a) a Kopher Shield",
-    "subtitle": "Para comenzar, seleccione su idioma preferido."
+    "subtitle": "Para comenzar, seleccione su idioma preferido.",
+    "languageLabel": "Idioma de la interfaz",
+    "languages": {
+      "pt-BR": "Portugués (Brasil)",
+      "pt-PT": "Portugués (Portugal)",
+      "en-US": "Inglés (Estados Unidos)",
+      "es-ES": "Español",
+      "fr-FR": "Francés"
+    },
+    "hero": {
+      "title": "Bienvenido a su Fortaleza Digital",
+      "subtitle": "Copias inmutables, auditoría y soberanía de datos. Elija idioma y tema para comenzar."
+    },
+    "theme": {
+      "label": "Tema de la interfaz",
+      "dark": "Oscuro",
+      "light": "Claro",
+      "system": "Sistema"
+    },
+    "setup": "Configuración inicial",
+    "auth": {
+      "title": "Activación Híbrida",
+      "subtitle": "Inicie sesión con su cuenta BINAVER. La licencia se vinculará automáticamente.",
+      "email": "Correo de la cuenta BINAVER",
+      "password": "Contraseña",
+      "manualKey": "Tengo una clave de producto manual (opcional)",
+      "keyPh": "Ej: HCTNAW-ZV28YO...",
+      "keyLabel": "Clave de producto",
+      "twoFaTitle": "Verificación en Dos Pasos",
+      "twoFaSubtitle": "Por seguridad, confirme su identidad.",
+      "emailMethod": "Correo",
+      "tokenSent": "Enviamos un token temporal a {{email}}.",
+      "tokenLabel": "Token de verificación",
+      "doneTitle": "¡Todo Listo!",
+      "doneText": "Kopher Shield se autenticó correctamente y quedó vinculado a su cuenta BINAVER.",
+      "back": "Volver",
+      "authenticate": "Autenticar Cuenta",
+      "validate": "Validar Token",
+      "enter": "Acceder al Panel de Control",
+      "errFill": "Por favor, complete el correo y la contraseña.",
+      "errKey": "La clave está incompleta.",
+      "errToken": "El token debe tener 6 dígitos.",
+      "errFatal": "Error fatal al guardar la configuración."
+    }
+  },
+  "settings": {
+    "language": {
+      "title": "Idioma de la aplicación",
+      "description": "Elija el idioma utilizado en los menús y mensajes de Kopher Shield.",
+      "saveError": "No se pudo guardar el idioma."
+    },
+    "loading": "CARGANDO...",
+    "hardwareFail": "FALLO-AL-LEER-HARDWARE",
+    "localDevice": "Dispositivo local",
+    "noKey": "NINGUNA CLAVE REGISTRADA",
+    "imagesFilter": "Imágenes",
+    "cancel": "Cancelar",
+    "toast": {
+      "error": "Error",
+      "success": "Éxito",
+      "successBang": "¡Éxito!",
+      "readErrorTitle": "Error de lectura",
+      "readError": "Error al cargar la configuración de SQLite.",
+      "iconLoaded": "Icono cargado",
+      "iconReady": "La imagen está lista para guardarse.",
+      "selectError": "Error de selección",
+      "imageLoadFail": "No se pudo cargar la imagen.",
+      "avatarUpdated": "Avatar actualizado",
+      "avatarUploaded": "Tu imagen de perfil (carga) se guardó correctamente.",
+      "avatarLoadFail": "No se pudo cargar el avatar.",
+      "avatarPresetSaved": "Tu avatar corporativo se guardó correctamente.",
+      "avatarSaveFail": "No se pudo guardar el avatar.",
+      "avatarRemoved": "Avatar eliminado",
+      "avatarRemovedMsg": "Tu imagen de perfil se eliminó y volverá a la predeterminada.",
+      "avatarRemoveFail": "No se pudo eliminar el avatar.",
+      "profileUpdated": "Datos actualizados",
+      "profileUpdatedMsg": "Información del responsable técnico guardada correctamente.",
+      "profileSaveFail": "Error al guardar los datos en la base de datos.",
+      "invalidColor": "Color no válido",
+      "invalidColorMsg": "Introduce un color hexadecimal válido con el formato #RRGGBB.",
+      "saved": "¡Configuración corporativa actualizada correctamente!",
+      "saveFail": "Error al guardar en SQLite",
+      "incompleteFields": "Campos incompletos",
+      "incompleteFieldsMsg": "Completa todos los campos del servidor SMTP personalizado.",
+      "smtpError": "Error SMTP",
+      "comingSoon": "Próximamente",
+      "comingSoonMsg": "La integración nativa se incorporará al motor Rust.",
+      "resent": "Reenviado",
+      "resentMsg": "Se envió un nuevo token de seguridad a tu correo electrónico.",
+      "unlinking": "Desvinculando",
+      "unlinkingMsg": "Eliminando la licencia del dispositivo..."
+    },
+    "license": {
+      "qrFail": "Error al generar el código QR sin conexión.",
+      "fillCredentials": "Introduce el correo y la contraseña corporativos.",
+      "keyIncomplete": "La clave de licencia está incompleta.",
+      "tokenDigits": "El token debe contener 6 dígitos.",
+      "unlinkConfirm": "Atención: ¿Seguro que deseas desvincular esta máquina? Se bloqueará el acceso.",
+      "tokenSent": "Token enviado a {{email}}",
+      "noOwner": "Licencia local no asociada",
+      "holderAlt": "Avatar del titular",
+      "edit": "Editar",
+      "activeVerified": "Cuenta activa y verificada",
+      "technicalOwner": "Responsable técnico",
+      "manageAccount": "Gestionar cuenta",
+      "resetMfa": "Restablecer MFA",
+      "endSession": "Cerrar sesión",
+      "editOwnerTitle": "Editar datos del responsable técnico",
+      "adminName": "Nombre del administrador",
+      "adminNamePlaceholder": "Ej.: Juan Pérez",
+      "role": "Cargo / departamento",
+      "rolePlaceholder": "Ej.: Analista de infraestructura",
+      "saveChanges": "Guardar cambios",
+      "linkedDevice": "Dispositivo vinculado",
+      "hostName": "Nombre del host (SO)",
+      "machineId": "Firma de hardware (Machine ID)",
+      "activeKey": "Clave de licencia activa",
+      "encryptedKey": "Clave de producto cifrada",
+      "encryption": "Cifrado",
+      "resetMfaTitle": "Restablecimiento del autenticador (MFA)",
+      "authTitle": "Autenticación y vinculación",
+      "resetMfaDesc": "Escanea el nuevo código QR con tu aplicación de autenticación.",
+      "authDesc": "Introduce las credenciales de la nueva cuenta que asumirá esta máquina.",
+      "enterKeyManually": "Introducir clave manualmente",
+      "keyPlaceholder": "Ej.: HCTNAW-ZV28YO...",
+      "continue": "Continuar",
+      "appMethod": "App autenticadora",
+      "emailMethod": "Correo",
+      "scanQr": "Escanea el nuevo código QR",
+      "qrAlt": "Código QR 2FA",
+      "enterAppCode": "Introduce el código generado por tu móvil.",
+      "validateSave": "Validar y guardar"
+    },
+    "avatar": {
+      "title": "Cambiar imagen de perfil",
+      "gallery": "Avatares corporativos (galería)",
+      "preset": "Avatar predefinido {{n}}",
+      "upload": "Subir imagen",
+      "remove": "Eliminar imagen actual"
+    },
+    "page": {
+      "title": "Configuración del sistema",
+      "subtitle": "Personaliza la apariencia, la accesibilidad, las alertas y las licencias."
+    },
+    "tabs": {
+      "appearance": "Apariencia y accesibilidad",
+      "alerts": "Centro de alertas",
+      "license": "Licencias"
+    },
+    "appearance": {
+      "title": "Identidad visual y diseño",
+      "subtitle": "Adapta Kopher Shield a la identidad de tu empresa y a tus necesidades visuales.",
+      "workspace": "Workspace de la empresa (marca blanca)",
+      "workspaceDesc": "Sustituye el logotipo principal configurando el icono cuadrado y el nombre de tu entorno.",
+      "squareIcon": "Icono cuadrado (1:1)",
+      "logoAlt": "Logo del cliente",
+      "workspaceName": "Nombre del workspace / empresa",
+      "workspaceNamePlaceholder": "Ej.: Nombre de la empresa",
+      "interfaceMode": "Modo de interfaz",
+      "dark": "Oscuro",
+      "light": "Claro",
+      "scale": "Escala (accesibilidad)",
+      "scaleSmall": "Pequeña",
+      "scaleNormal": "Normal",
+      "scaleLarge": "Grande",
+      "accent": "Color de acento principal",
+      "useAccent": "Usar acento {{label}}",
+      "custom": "Personalizado:",
+      "pickColor": "Seleccionar color personalizado",
+      "hexCode": "Código hexadecimal del color de acento"
+    },
+    "accent": {
+      "amber": "Ámbar",
+      "cobalt": "Azul cobalto",
+      "emerald": "Esmeralda",
+      "violet": "Morado profundo"
+    },
+    "alerts": {
+      "title": "Centro de alertas y notificaciones",
+      "smtpServer": "Servidor de correo (SMTP)",
+      "smtpHost": "Host SMTP",
+      "smtpPort": "Puerto",
+      "smtpSecurity": "Seguridad",
+      "smtpSender": "Correo remitente (envío)",
+      "smtpPassword": "Contraseña de aplicación",
+      "managedByCloud": "Los correos de alerta e informes los gestiona automáticamente el <strong>Motor de notificaciones Cloud</strong>. No se necesita ninguna configuración adicional.",
+      "copies": "Copias silenciosas y auditoría (CC/CCO)",
+      "cc": "Con copia (Cc)",
+      "ccPlaceholder": "Ej.: gestion@dominio.com",
+      "bcc": "Copia oculta (CCO)",
+      "bccPlaceholder": "Ej.: logs@dominio.com",
+      "testEmail": "Enviar correo de prueba",
+      "teamsDesc": "Recibe informes y fallos directamente en un canal de Teams.",
+      "teamsUrl": "URL del webhook (canal de Teams)",
+      "teamsPlaceholder": "https://tu-empresa.webhook.office.com/...",
+      "teamsTest": "Probar ping en Teams",
+      "prefsTitle": "Preferencias de notificación",
+      "prefsDesc": "Elige qué eventos del sistema activan alertas sonoras y correos para el equipo.",
+      "backupStart": "Inicio de rutina de backup",
+      "backupStartDesc": "Avisa cuando se inicia una copia de seguridad.",
+      "backupEnd": "Finalización e informes de backup",
+      "backupEndDesc": "Envía el informe final cuando termina el backup (éxito o fallo).",
+      "restore": "Procedimientos de restauración",
+      "restoreDesc": "Alerta al equipo cada vez que se restauran datos sensibles.",
+      "systemErrors": "Avisos críticos del sistema",
+      "systemErrorsDesc": "Errores del motor, pérdida de conexión y fallos de programación.",
+      "historyNote": "Todas las notificaciones quedan siempre registradas en el historial del sistema (campana superior)."
+    },
+    "actions": {
+      "saving": "Guardando...",
+      "save": "Guardar configuración"
+    }
+  },
+  "nav": {
+    "dashboard": "Panel",
+    "routines": "Rutinas de Copia",
+    "cloud": "Bóvedas Cloud",
+    "restore": "Restaurar Copia",
+    "audit": "Auditoría del Sistema",
+    "support": "Soporte",
+    "settings": "Configuración"
+  },
+  "sidebar": {
+    "ariaLabel": "Barra lateral",
+    "mainNavigation": "Navegación principal",
+    "collapse": "Contraer barra lateral",
+    "expand": "Expandir barra lateral",
+    "workspaceLocal": "Workspace Local",
+    "consoleLocal": "Consola Local",
+    "poweredBy": "Powered by Kopher Shield"
+  },
+  "header": {
+    "managementPanel": "Panel de Gestión - {{name}}",
+    "localConsole": "Consola de Gestión Local",
+    "backgroundProcesses": "{{count}} proceso(s) en segundo plano"
+  },
+  "notifications": {
+    "center": "Centro de Notificaciones",
+    "title": "Notificaciones",
+    "unread": "No leídas",
+    "all": "Todas",
+    "empty": "No hay notificaciones.",
+    "markAllRead": "Marcar todas como leídas"
+  },
+  "audit": {
+    "subtitle": "Registro inmutable de eventos para auditoría y cumplimiento legal.",
+    "searchPlaceholder": "Buscar por rutina, avisos u origen...",
+    "refresh": "Actualizar",
+    "loading": "Analizando el rastro de auditoría...",
+    "empty": "Ningún registro coincide con los parámetros.",
+    "shown": "{{count}} eventos mostrados",
+    "toast": {
+      "loadFailed": "Error al cargar los registros.",
+      "csvOk": "Hoja de cálculo exportada correctamente.",
+      "pdfOk": "Informe PDF exportado correctamente.",
+      "saveFailed": "Error al guardar: {{error}}",
+      "exportError": "Error de exportación"
+    },
+    "export": {
+      "csv": "Exportar (Excel)",
+      "pdf": "Informe PDF",
+      "generating": "Generando PDF...",
+      "csvFilter": "Hoja de Excel (CSV)",
+      "pdfFilter": "Informe de auditoría (PDF)",
+      "csvHeader": "Fecha y hora,Nivel,Descripción"
+    },
+    "pdf": {
+      "title": "INFORME OFICIAL DE AUDITORÍA Y SEGURIDAD",
+      "issued": "Emitido el: {{date}} | Eventos: {{count}}"
+    },
+    "columns": {
+      "timestamp": "Fecha y hora",
+      "level": "Nivel",
+      "message": "Descripción"
+    },
+    "filter": {
+      "label": "Filtrar por nivel",
+      "all": "Todos los eventos",
+      "info": "Información",
+      "success": "Éxitos",
+      "warning": "Avisos",
+      "error": "Fallos críticos"
+    }
+  },
+  "cloud": {
+    "title": "Bóvedas Cloud",
+    "subtitle": "Administre los destinos de almacenamiento seguros de sus copias.",
+    "connectNew": "Conectar nueva bóveda",
+    "connected": "Conectado",
+    "bucket": "Bucket",
+    "crypto": "Cifrado",
+    "cryptoReady": "AES-256 listo",
+    "edit": "Editar bóveda",
+    "delete": "Eliminar conexión",
+    "addTitle": "Añadir bóveda cloud",
+    "addDesc": "Conecte AWS S3, Cloudflare R2, Google Cloud, Azure o Backblaze B2.",
+    "actions": {
+      "connect": "Conectar nube",
+      "testing": "Probando nube..."
+    },
+    "confirm": {
+      "deleteMessage": "¿Seguro que quieres eliminar esta conexión de bóveda? Los archivos en la nube NO se borrarán."
+    },
+    "modal": {
+      "createTitle": "Autenticar bóveda cloud",
+      "editTitle": "Editar conexión",
+      "validationHint": "La conexión se validará al guardar."
+    },
+    "form": {
+      "nameLabel": "Nombre de identificación",
+      "namePlaceholder": "Ej.: Backup AWS São Paulo",
+      "providerLabel": "Proveedor",
+      "bucketLabel": "Nombre del bucket (contenedor)",
+      "bucketPlaceholder": "kopher-shield-production",
+      "credentialsTitle": "Credenciales de seguridad IAM",
+      "endpointLabel": "URL del endpoint de la API (si es Cloudflare R2 / Backblaze)",
+      "endpointPlaceholder": "https://<ID>.r2.cloudflarestorage.com",
+      "accessKeyLabel": "Access Key ID",
+      "accessKeyPlaceholder": "AKIA...",
+      "secretKeyLabel": "Secret Access Key",
+      "secretKeyPlaceholder": "••••••••••••",
+      "providers": {
+        "aws": "Amazon Web Services (S3)",
+        "cloudflareR2": "Cloudflare R2 (compatible con S3)",
+        "backblazeB2": "Backblaze B2 (compatible con S3)",
+        "otherS3Compatible": "Otro (compatible con S3)"
+      }
+    },
+    "toast": {
+      "requiredFields": "Las claves de seguridad y el nombre del bucket son obligatorios.",
+      "deleteFailed": "Error al eliminar: {{error}}",
+      "invalidCredentials": "El servidor rechazó las credenciales:\n\n{{error}}"
+    }
+  },
+  "routines": {
+    "nextRun": "Próxima ejecución",
+    "runningNow": "Ejecutándose ahora",
+    "manualOnly": "Solo manual",
+    "running": "En ejecución",
+    "active": "Activo",
+    "schedule": {
+      "manual": "Ejecución manual",
+      "daily": "Diariamente a las {{time}}",
+      "weekdays": "Días laborables a las {{time}}",
+      "weekly": "Semanalmente a las {{time}}",
+      "interval": "Cada {{hours}} h (base {{time}})"
+    },
+    "form": {
+      "frequency": "Frecuencia",
+      "custom": "Personalizado...",
+      "model": "Modelo",
+      "daily": "Diario",
+      "weekdays": "Días laborables",
+      "weekly": "Semanal",
+      "repeat": "Repetir cada",
+      "hours_one": "{{count}} hora",
+      "hours_other": "{{count}} horas",
+      "baseTime": "Hora base",
+      "name": "Nombre de la rutina",
+      "namePlaceholder": "Ej.: Servidor de archivos Sicoob",
+      "source": "Carpeta de origen",
+      "browse": "Examinar",
+      "vault": "Bóveda de destino",
+      "vaultLocal": "Servidor local / NAS (Sicoob)",
+      "vaultCloud": "Nube: {{name}} ({{provider}})",
+      "localFolder": "Seleccione la carpeta del servidor/NAS",
+      "browseNas": "Examinar NAS",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "saving": "Guardando..."
+    },
+    "failed": "Fallido",
+    "title": "Rutinas de copia de seguridad",
+    "subtitle": "Gestión de políticas de protección multihilo.",
+    "newRoutine": "Nueva rutina",
+    "selectBatch": "Seleccionar lote",
+    "deselectAll": "Deseleccionar todo",
+    "search": "Buscar rutina...",
+    "viewGrid": "Vista en cuadrícula",
+    "viewCompact": "Vista compacta",
+    "emptyNone": "No hay rutinas de copia de seguridad configuradas en el motor.",
+    "emptyNoMatch": "No se encontró ninguna rutina con ese nombre.",
+    "processing": "Procesando",
+    "source": "Origen",
+    "destination": "Destino",
+    "scheduleLabel": "Programación",
+    "runNow": "Ejecutar ahora",
+    "run": "Ejecutar",
+    "edit": "Editar rutina",
+    "delete": "Eliminar rutina",
+    "selected_one": "Rutina seleccionada",
+    "selected_other": "Rutinas seleccionadas",
+    "runFleet": "Ejecutar flota",
+    "confirmDelete": "¿Desea eliminar esta rutina?",
+    "modal": {
+      "create": "Nueva rutina de copia de seguridad",
+      "edit": "Editar rutina",
+      "close": "Cerrar"
+    },
+    "toast": {
+      "error": "Error",
+      "loadFailed": "No se pudieron cargar los datos.",
+      "deleted": "Eliminada",
+      "deletedMsg": "La rutina fue eliminada.",
+      "deleteFailed": "Error al eliminar: {{error}}",
+      "warning": "Aviso",
+      "required": "Complete todos los campos obligatorios.",
+      "destRequired": "Defina la carpeta de destino o elija una bóveda en la nube.",
+      "success": "Éxito",
+      "saved": "Rutina guardada en el motor.",
+      "starting": "Iniciando motor",
+      "startingMsg": "La rutina fue enviada a los hilos de procesamiento.",
+      "engineFail": "Fallo del motor",
+      "engineFailMsg": "Error al activar Rust: {{error}}",
+      "fleet": "Flota despachada",
+      "fleetMsg_one": "Iniciando {{count}} rutina...",
+      "fleetMsg_other": "Iniciando {{count}} rutinas simultáneamente...",
+      "batchError": "Error de lote",
+      "batchErrorMsg": "Error al iniciar la rutina {{name}}: {{error}}"
+    }
+  },
+  "noc": {
+    "title": "Centro de Operaciones",
+    "filtersLabel": "Filtros de estado",
+    "filters": {
+      "all": "Todos",
+      "success": "Éxito",
+      "warning": "Alertas",
+      "error": "Fallos"
+    },
+    "traffic": {
+      "title": "Tráfico de Eventos",
+      "range": "Últimos {{days}} días",
+      "events": "Eventos",
+      "errors": "Fallos"
+    },
+    "sqlite": {
+      "title": "Base de datos SQLite",
+      "checking": "Verificando…",
+      "online": "En línea",
+      "offline": "Sin conexión",
+      "events": "Eventos",
+      "successRate": "Tasa de éxito"
+    },
+    "heatmap": {
+      "title": "Mapa de calor de ejecuciones",
+      "less": "Menos",
+      "more": "Más",
+      "cell_one": "{{day}} {{hour}}:00 — {{count}} evento",
+      "cell_other": "{{day}} {{hour}}:00 — {{count}} eventos"
+    }
+  },
+  "dashboard": {
+    "title": "Visión General",
+    "subtitle": "Panel de gestión de telemetría, integridad de las cajas fuertes y métricas de protección.",
+    "export": "Exportar Informe",
+    "exporting": "Generando archivo...",
+    "loading": "Cargando telemetría del motor...",
+    "kpi_blocks": "Bloques Protegidos",
+    "kpi_routines": "Rutinas Activas",
+    "kpi_vaults": "Cajas Fuertes Activas",
+    "kpi_last": "Último Éxito",
+    "active": "Activo",
+    "today": "Hoy, {{time}}",
+    "system": "Sistema",
+    "filters": "Filtros:",
+    "search": "Buscar rutina...",
+    "clear": "Limpiar",
+    "until": "Hasta",
+    "dateStart": "Fecha de inicio",
+    "dateEnd": "Fecha de fin",
+    "status": {
+      "ALL": "Todos los Estados",
+      "SUCCESS": "Éxito",
+      "WARNING": "Alertas",
+      "ERROR": "Fallos",
+      "INFO": "Información"
+    },
+    "group": {
+      "day": "Agrupar por Día",
+      "month": "Agrupar por Mes",
+      "year": "Agrupar por Año"
+    },
+    "chart": {
+      "ERROR": "Picos de Fallos Críticos",
+      "WARNING": "Alertas de Integridad",
+      "INFO": "Volumen de Eventos (Informativos)",
+      "SUCCESS": "Volumen de Bloques Procesados",
+      "ALL": "Historial de Actividad (Extracto)",
+      "subtitle": "Serie temporal agrupada según los filtros seleccionados.",
+      "volume": "Volumen",
+      "current": "Actual",
+      "history": "Historial",
+      "views": "Vistas",
+      "focus": "Foco: {{date}}"
+    },
+    "views": {
+      "detailed": "Detallado",
+      "board": "Dirección (Mensual)",
+      "strategic": "Estratégico (Anual)",
+      "week": "Últimos 7 Días",
+      "month": "Este Mes",
+      "sem1": "1.er Semestre (Ene-Jun)",
+      "sem2": "2.º Semestre (Jul-Dic)",
+      "year": "Este Año (Ene-Dic)",
+      "y5": "Últimos 5 Años",
+      "custom": "Vista Personalizada"
+    },
+    "unit": {
+      "ALL": "eventos",
+      "SUCCESS": "archivos cifrados",
+      "ERROR": "fallos críticos",
+      "WARNING": "alertas",
+      "INFO": "eventos"
+    },
+    "recent": "Auditoría Reciente",
+    "noEvents": "Ningún evento en el período seleccionado.",
+    "exportModal": {
+      "title": "Exportar Visión General",
+      "print": "Imprimir (Papel)",
+      "printDesc": "Enviar directamente a la impresora local",
+      "pdf": "Documento PDF",
+      "pdfDesc": "Informe formateado como archivo",
+      "png": "Imagen de Alta Resolución",
+      "pngDesc": "Archivo PNG ideal para presentaciones",
+      "cancel": "Cancelar",
+      "pdfName": "Informe PDF",
+      "pngName": "Imagen PNG"
+    },
+    "exportOk": "¡Exportación completada con éxito!",
+    "exportFail": "Error al generar el archivo. Revise los registros.",
+    "pdfTitle": "KOPHER SHIELD - INFORME DE AUDITORÍA",
+    "pdfIssued": "Emitido el: {{date}}  |  Vista: {{view}}"
+  },
+  "tour": {
+    "stepOf": "Paso {{current}} de {{total}}",
+    "skip": "Omitir tour",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "finish": "Finalizar",
+    "steps": {
+      "welcome": {
+        "body": "Este es el panel NOC de Kopher Shield: integridad, tráfico e historial de sus copias de seguridad en tiempo real. Hagamos un recorrido rápido por las áreas principales.",
+        "title": "Bienvenido a su Fortaleza Digital"
+      },
+      "sidebar": {
+        "body": "Todo Kopher Shield está a un clic. Al continuar, abriremos la pantalla de Rutinas.",
+        "title": "Menú de navegación"
+      },
+      "routines": {
+        "body": "Aquí programa copias de seguridad y define políticas de ejecución paralela (multihilo), compresión y retención. Cada rutina muestra su estado, progreso y próxima ejecución.",
+        "title": "Rutinas y políticas multihilo"
+      },
+      "cloud": {
+        "body": "Gestione sus proveedores de almacenamiento (Amazon S3, Cloudflare R2 y otros). Cada cofre muestra su estado de conexión en tiempo real.",
+        "title": "Cofres Cloud"
+      },
+      "audit": {
+        "body": "Cada acción queda registrada en logs inmutables e inviolables, listos para cumplimiento e investigación forense. ¡Con esto termina el tour!",
+        "title": "Auditoría inmutable"
+      }
+    }
+  },
+  "manual": {
+    "title": "Manual del Usuario",
+    "subtitle": "Guía operativa de Kopher Shield",
+    "nav": "Secciones del manual",
+    "on_page": "En esta página",
+    "multithread": {
+      "nav": "Políticas Multihilo",
+      "title": "Políticas Multihilo de Copia de Seguridad",
+      "intro": "El motor de Kopher Shield procesa archivos en paralelo, repartiendo el trabajo entre varios hilos para reducir la ventana de copia sin saturar el equipo.",
+      "blocks": [
+        {
+          "h": "Crear una rutina",
+          "p": "En Rutinas, haga clic en Nueva Rutina, indique la carpeta de origen, la bóveda de destino (local o nube) y la programación (manual, diaria, semanal o mensual)."
+        },
+        {
+          "h": "Ejecución paralela",
+          "p": "Cada archivo se divide en bloques, se cifra con AES-256 y se envía en paralelo. Puede ejecutar varias rutinas a la vez con Seleccionar Lote."
+        },
+        {
+          "h": "Seguimiento",
+          "p": "El progreso se muestra en tiempo real en cada rutina. Si falla, la etiqueta roja Fallido muestra el motivo al pasar el cursor."
+        }
+      ],
+      "tip": "Programe copias pesadas fuera del horario laboral para preservar el rendimiento de los servidores."
+    },
+    "cloud": {
+      "nav": "Bóvedas Cloud y Claves S3",
+      "title": "Bóvedas Cloud y Claves S3",
+      "intro": "Una Bóveda Cloud es un bucket compatible con S3 (AWS S3, Cloudflare R2, MinIO, Backblaze) donde se almacenan los bloques cifrados fuera de su red.",
+      "blocks": [
+        {
+          "h": "Registrar una bóveda",
+          "p": "En Bóvedas Cloud, indique nombre, endpoint, bucket, Access Key y Secret Key. Las claves se guardan solo en el backend y nunca se exponen en la interfaz."
+        },
+        {
+          "h": "Buenas prácticas de claves",
+          "p": "Cree una clave exclusiva para Kopher Shield con permiso de lectura y escritura solo en el bucket y rótela periódicamente."
+        },
+        {
+          "h": "Inmutabilidad",
+          "p": "Active Object Lock (WORM) en el bucket para impedir el borrado o la alteración de las copias, incluso ante ransomware."
+        }
+      ],
+      "tip": "Nunca reutilice claves administrativas de la cuenta cloud en una bóveda."
+    },
+    "restore": {
+      "nav": "Restauración",
+      "title": "Proceso de Restauración",
+      "intro": "La restauración reconstruye los archivos desde un manifiesto .kophershield, validando la integridad de cada bloque antes de escribir.",
+      "blocks": [
+        {
+          "h": "Elegir la bóveda",
+          "p": "En Restauración, seleccione la bóveda local o cloud y espere la lista de manifiestos disponibles."
+        },
+        {
+          "h": "Seleccionar el punto",
+          "p": "Cada manifiesto es un punto en el tiempo. Elija el deseado y defina la carpeta de destino."
+        },
+        {
+          "h": "Validación",
+          "p": "Los bloques se descifran y verifican por hash. Restaure primero en una carpeta alternativa para comprobar los datos antes de reemplazar los originales."
+        }
+      ],
+      "tip": "Pruebe las restauraciones con regularidad: una copia solo es fiable si se ha restaurado con éxito."
+    },
+    "audit": {
+      "nav": "Auditoría y Cumplimiento",
+      "title": "Auditoría y Cumplimiento",
+      "intro": "Toda acción relevante se registra en un log inmutable, apoyando requisitos como RGPD e ISO 27001.",
+      "blocks": [
+        {
+          "h": "Qué se registra",
+          "p": "Ejecuciones de rutinas, fallos, restauraciones, cambios de configuración y accesos administrativos, siempre con fecha y hora."
+        },
+        {
+          "h": "Consulta y filtros",
+          "p": "En Auditoría, filtre por nivel y busque por texto. La tabla está virtualizada y soporta decenas de miles de registros sin pérdida de rendimiento."
+        },
+        {
+          "h": "Retención",
+          "p": "Los registros son append-only, no editables por el usuario, y pueden exportarse como evidencia para auditorías externas."
+        }
+      ],
+      "tip": "Exporte los logs con regularidad y guárdelos según su política de retención."
+    }
+  },
+  "support": {
+    "tab_ticket": "Ticket",
+    "tab_manual": "Manual",
+    "tabs_label": "Secciones de soporte",
+    "title": "Service Desk y Soporte Corporativo",
+    "subtitle": "Centro de atención avanzado, base de conocimiento y gestión de incidentes BINAVER.",
+    "dbConnected": "Base SQLite Conectada",
+    "sla": "SLA: 4 h laborables",
+    "filePickerName": "Multimedia y Documentos",
+    "form": {
+      "title": "Apertura de Ticket Prioritario",
+      "subtitle": "Envío seguro al equipo BINAVER con registro local y soporte de adjuntos.",
+      "badge": "Puente Seguro",
+      "subject": "Asunto del Incidente",
+      "subjectPh": "Ej: Error al sincronizar la bóveda cloud",
+      "priority": "Prioridad / SLA",
+      "category": "Categoría de la Solicitud",
+      "description": "Descripción Detallada del Escenario",
+      "descriptionPh": "Describa los pasos para reproducir el problema, los mensajes de error o los detalles de su necesidad...",
+      "attachments": "Adjuntos de Diagnóstico (Capturas, Vídeos, Logs)",
+      "attachmentsHint": "Añada capturas de pantalla o grabaciones breves para facilitar el análisis técnico.",
+      "addFiles": "Añadir Archivos",
+      "copyDiag": "Copiar Diagnóstico del Sistema",
+      "diagCopied": "¡Diagnóstico Copiado!",
+      "sending": "Enviando ticket...",
+      "submit": "Enviar Ticket"
+    },
+    "priority": {
+      "low": "Baja",
+      "medium": "Media",
+      "urgent": "Urgente / Crítica"
+    },
+    "category": {
+      "c0": "Duda Técnica",
+      "c1": "Fallo / Bug",
+      "c2": "Nueva Función",
+      "c3": "Licenciamiento"
+    },
+    "guide": {
+      "title": "Guía Interactiva de Operación",
+      "text": "¿Necesita recordar cómo configurar rutinas o navegar por el panel?",
+      "button": "Repetir el Tour de Presentación"
+    },
+    "faq": {
+      "title": "Preguntas Frecuentes (FAQ)",
+      "q0": "¿Cómo restaurar archivos desde una bóveda local?",
+      "a0": "Vaya al menú \"Restauración\", seleccione la carpeta de la bóveda, elija el manifiesto correspondiente y haga clic en \"Ejecutar Restauración\".",
+      "q1": "¿Qué hacer si una rutina programada falla?",
+      "a1": "Revise la pantalla de Auditoría para ver el log detallado del error y compruebe que el origen de datos tiene permiso de lectura.",
+      "q2": "¿Cómo renovar o cambiar la clave de licencia corporativa?",
+      "a2": "Acceda a \"Configuración\" > \"Licenciamiento\" para actualizar su clave de activación o gestionar los tokens de autenticación en dos pasos (2FA)."
+    },
+    "info": {
+      "engine": "Versión del Motor",
+      "developer": "Desarrolladora",
+      "direct": "Soporte Directo"
+    },
+    "toast": {
+      "filesAdded": "Archivos Añadidos",
+      "filesAddedMsg_one": "{{count}} adjunto seleccionado correctamente.",
+      "filesAddedMsg_other": "{{count}} adjuntos seleccionados correctamente.",
+      "error": "Error",
+      "filesError": "No se pudieron cargar los archivos.",
+      "required": "Campos Obligatorios",
+      "requiredMsg": "Complete el asunto y la descripción detallada del ticket.",
+      "sent": "Ticket Enviado",
+      "sentMsg": "Su ticket fue registrado y enviado al equipo de soporte de BINAVER.",
+      "sendError": "Error al Enviar",
+      "sendErrorMsg": "No se pudo enviar el ticket: {{error}}",
+      "diagCopied": "Diagnóstico Copiado",
+      "diagCopiedMsg": "Pegue esta información en su ticket si es necesario."
+    },
+    "diag": {
+      "version": "Versión",
+      "engine": "Motor",
+      "workspace": "Workspace",
+      "active": "Activo",
+      "dbStatus": "Estado BD",
+      "healthy": "Saludable",
+      "category": "Categoría",
+      "priority": "Prioridad",
+      "subject": "Asunto",
+      "description": "Descripción del Problema"
+    }
+  },
+  "restore": {
+    "title": "Restauración de Backup",
+    "subtitle": "Recuperación ante desastres y auditoría de integridad de cofres.",
+    "sourceType": {
+      "local": "Cofre Local / NAS",
+      "cloud": "Cofre en la Nube (S3 / Cloudflare)"
+    },
+    "localVault": {
+      "label": "Localizar cofre de seguridad local",
+      "placeholder": "Seleccione la carpeta raíz del cofre local...",
+      "open": "Abrir cofre"
+    },
+    "cloudVault": {
+      "label": "Seleccione el cofre cloud registrado",
+      "emptyOption": "No hay ningún cofre cloud configurado en el sistema",
+      "optionLabel": "☁️ {{name}} ({{provider}})",
+      "scan": "Escanear nube"
+    },
+    "filters": {
+      "searchPlaceholder": "Buscar por nombre o ruta...",
+      "searchAriaLabel": "Buscar backups por nombre o ruta",
+      "startDate": "Fecha inicial",
+      "endDate": "Fecha final",
+      "until": "Hasta"
+    },
+    "selection": {
+      "selected_one": "seleccionado",
+      "selected_other": "seleccionados",
+      "bulkRestore": "Restaurar lote",
+      "clearAllAriaLabel": "Borrar la selección de {{count}} backups",
+      "selectAllAriaLabel": "Seleccionar {{count}} backups",
+      "selectAll": "Seleccionar todos ({{count}})"
+    },
+    "empty": {
+      "filtered": "Ningún backup coincide con los filtros indicados.",
+      "initial": "No se encontró ningún punto de restauración. Seleccione el origen de arriba para cargar los cofres."
+    },
+    "manifest": {
+      "source": "Origen: {{source}}",
+      "sourceTitle": "Origen: {{source}}",
+      "date": "Fecha: {{date}}",
+      "encryptedBlocks": "Bloques cifrados: {{count}}",
+      "restore": "Restaurar",
+      "restoring": "Restaurando...",
+      "restoreAriaLabel": "Restaurar el cofre {{name}}",
+      "selection": {
+        "select": "Seleccionar el cofre {{name}}",
+        "unselect": "Deseleccionar el cofre {{name}}"
+      },
+      "status": {
+        "localIntact": "Íntegro (ZSTD+AES256)",
+        "cloudIntact": "Íntegro en la nube (S3)"
+      }
+    },
+    "progress": {
+      "starting": "Iniciando motores de restauración...",
+      "downloading": "Descargando: {{path}}",
+      "extracting": "Descomprimiendo: {{path}}",
+      "completeCloud": "¡Restauración en la nube completada!",
+      "complete": "¡Completado!"
+    },
+    "modal": {
+      "singleRestoreMessage": "¿Desea restaurar el cofre '{{name}}' en la carpeta seleccionada?",
+      "singleRestoreTitle": "Kopher Shield Recovery",
+      "bulkRestoreMessage_one": "Atención: está a punto de restaurar {{count}} cofre en lote en la misma carpeta. El proceso se ejecutará en cola. ¿Desea continuar?",
+      "bulkRestoreMessage_other": "Atención: está a punto de restaurar {{count}} cofres en lote en la misma carpeta. El proceso se ejecutará en cola. ¿Desea continuar?",
+      "bulkRestoreTitle": "Operación por lotes - Kopher Shield"
+    },
+    "batch": {
+      "processing": "Procesando lote: {{name}}..."
+    },
+    "toast": {
+      "restoreFinishedTitle": "Restauración finalizada",
+      "restoreFinishedMessage": "El informe de auditoría se envió por correo electrónico.",
+      "restoreAttentionTitle": "Atención durante la restauración",
+      "warningTitle": "Aviso",
+      "errorTitle": "Error",
+      "localVaultEmpty": "No se encontró ningún cofre Kopher Shield (.kophershield o legado .coopshield) en esta carpeta.",
+      "scanLocalFailed": "No se pudo escanear el cofre local: {{error}}",
+      "invalidCloudVault": "Seleccione un cofre en la nube válido.",
+      "cloudEmpty": "No se encontró ningún backup en este cofre cloud.",
+      "cloudFound_one": "Se encontró {{count}} punto de restauración en la nube.",
+      "cloudFound_other": "Se encontraron {{count}} puntos de restauración en la nube.",
+      "cloudConnectFailed": "No se pudo conectar a la nube: {{error}}",
+      "criticalErrorTitle": "Error crítico",
+      "confirmRestoreFailed": "No se pudo iniciar la restauración: {{error}}",
+      "batchFailureTitle": "Fallo en el lote",
+      "batchFailedItem": "Error al restaurar {{name}}. El sistema continuará con el siguiente.",
+      "batchFinishedTitle": "Lote finalizado",
+      "batchFinishedMessage": "Operación completada. Se procesaron {{successCount}} de {{totalCount}}. Los informes se enviaron por correo electrónico."
+    }
+  },
+  "lock": {
+    "badge": "La licencia requiere validación",
+    "title": "Acceso restringido",
+    "description": "El terminal vinculado a <strong>{{name}}</strong> está bloqueado. Verifique las credenciales administrativas o el estado de la suscripción.",
+    "email": "Correo administrativo",
+    "password": "Contraseña",
+    "manualKey": "Introducir clave manualmente",
+    "continue": "Continuar autenticación",
+    "methodApp": "App autenticadora",
+    "methodEmail": "Correo",
+    "codeHintApp": "Introduzca el código de 6 dígitos de su autenticador.",
+    "codeHintEmail": "Hemos enviado un token temporal a {{email}}.",
+    "resending": "Reenviando...",
+    "resent": "¡Código reenviado!",
+    "wait": "Espere {{seconds}}s para reenviar",
+    "resend": "Reenviar código por correo",
+    "back": "Volver",
+    "unlock": "Desbloquear sistema",
+    "machineId": "ID de la máquina:",
+    "copyTitle": "Copiar ID de máquina para soporte",
+    "copied": "¡Copiado!",
+    "copyId": "Copiar ID",
+    "subscriptionHelp": "¿Dudas con la suscripción?",
+    "contact": "Contactar",
+    "errFill": "Complete el correo y la contraseña.",
+    "errKey": "La clave está incompleta.",
+    "errToken": "El token debe tener 6 dígitos.",
+    "unavailable": "NO DISPONIBLE"
+  },
+  "splash": {
+    "company": "BINAVER Soluciones Tecnológicas",
+    "tagline": "Protección inmutable. Recuperación fiable.",
+    "failed": "No se pudo confirmar el inicio seguro.",
+    "retry": "Reintentar",
+    "ariaFailed": "Error al iniciar Kopher Shield",
+    "ariaStarting": "Iniciando Kopher Shield",
+    "timeout": "El servicio seguro no confirmó el inicio en 30 segundos."
   }
 }

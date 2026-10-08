@@ -1,5 +1,5 @@
 {
-  "productName": "CoopShield",
+  "productName": "Kopher Shield",
   "version": "1.0.0",
   "identifier": "com.sicoob.coopshield",
   "build": {
@@ -11,24 +11,12 @@
   "app": {
     "windows": [
       {
-        "title": "CoopShield",
+        "title": "Kopher Shield",
         "width": 1280,
         "height": 720,
         "maximized": true,
-        "visible": false,
+        "visible": true,
         "label": "main"
-      },
-      {
-        "title": "Iniciando...",
-        "width": 400,
-        "height": 280,
-        "decorations": false,
-        "transparent": true,
-        "alwaysOnTop": true,
-        "center": true,
-        "resizable": false,
-        "label": "splashscreen",
-        "url": "/splash.html"
       }
     ],
     "security": {

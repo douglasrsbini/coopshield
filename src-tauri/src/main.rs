@@ -9,6 +9,7 @@ pub mod commands {
     pub mod backup;
     pub mod settings;
     pub mod system;
+    pub mod support;
 }
 
 pub mod engine {
@@ -18,19 +19,20 @@ pub mod engine {
 
 use std::sync::{Arc, Mutex};
 use std::collections::HashSet;
+use std::sync::atomic::Ordering;
 
-use tauri::{Manager, menu::{Menu, MenuItem}, tray::{TrayIconBuilder, MouseButton, TrayIconEvent}};
+use tauri::{Emitter, Manager, menu::{Menu, MenuItem}, tray::{TrayIconBuilder, MouseButton, TrayIconEvent}};
 use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
 
-#[tauri::command]
-fn close_splashscreen(app: tauri::AppHandle) {
-    if let Some(main) = app.get_webview_window("main") {
-        let _ = main.show();
-        let _ = main.set_focus(); 
-    }
+mod startup {
+    use std::sync::atomic::{AtomicBool, Ordering};
 
-    if let Some(splash) = app.get_webview_window("splashscreen") {
-        let _ = splash.close();
+    #[derive(Default)]
+    pub struct StartupStatus(pub AtomicBool);
+
+    #[tauri::command]
+    pub fn get_system_ready(status: tauri::State<'_, StartupStatus>) -> bool {
+        status.0.load(Ordering::Acquire)
     }
 }
 
@@ -39,11 +41,12 @@ fn main() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_notification::init()) 
         .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec!["--silent"])))
+        .manage(startup::StartupStatus::default())
         .setup(|app| {
             let app_handle = app.handle().clone();
             let _ = app.autolaunch().enable();
 
-            let show_i = MenuItem::with_id(app, "show", "Abrir Painel do CoopShield", true, None::<&str>)?;
+            let show_i = MenuItem::with_id(app, "show", "Abrir Painel do Kopher Shield", true, None::<&str>)?;
             let quit_i = MenuItem::with_id(app, "quit", "Encerrar Serviço de Proteção", true, None::<&str>)?;
             let menu = Menu::with_items(app, &[&show_i, &quit_i])?;
 
@@ -71,7 +74,9 @@ fn main() {
                 })
                 .build(app)?;
 
-            crate::database::sqlite::init_db(&app_handle).expect("Falha ao inicializar a base de dados do CoopShield");
+            crate::database::sqlite::init_db(&app_handle).expect("Falha ao inicializar a base de dados do Kopher Shield");
+            app.state::<startup::StartupStatus>().0.store(true, Ordering::Release);
+            app.emit("system-ready", ())?;
 
             std::thread::spawn(move || {
                 let executed_slots: Arc<Mutex<HashSet<String>>> = Arc::new(Mutex::new(HashSet::new()));
@@ -98,7 +103,7 @@ fn main() {
                             for routine_result in routine_iter {
                                 if let Ok((id, name, schedule, source, dest, status)) = routine_result {
                                     let is_active = status.to_uppercase() == "ATIVO";
-                                    let time_matches = schedule.contains(&current_time_str);
+                                    let time_matches = crate::commands::backup::schedule_is_due(&schedule, &now);
 
                                     if is_active && time_matches {
                                         let slot_key = format!("{}_{}_{}", id, current_date_str, current_time_str);
@@ -135,6 +140,7 @@ fn main() {
             _ => {}
         })
         .invoke_handler(tauri::generate_handler![
+            startup::get_system_ready,
             crate::commands::storage::add_cloud_vault,
             crate::commands::storage::get_cloud_vaults,
             crate::commands::backup::run_test_backup,
@@ -148,7 +154,6 @@ fn main() {
             crate::commands::backup::execute_restore,
             crate::commands::backup::scan_cloud_vault,
             crate::commands::backup::execute_cloud_restore,
-            close_splashscreen,
             crate::commands::storage::update_cloud_vault,
             crate::commands::storage::delete_cloud_vault,
             crate::commands::settings::get_all_settings,
@@ -167,8 +172,10 @@ fn main() {
             crate::engine::licensing::verify_totp_code,
             crate::commands::system::get_system_notifications,
             crate::commands::system::mark_notifications_as_read,
+            crate::commands::system::submit_support_ticket,
+            crate::commands::support::send_support_ticket,
             crate::commands::system::get_os_hostname
         ])
         .run(tauri::generate_context!())
-        .expect("Erro fatal: Falha ao iniciar a engine do CoopShield");
+        .expect("Erro fatal: Falha ao iniciar a engine do Kopher Shield");
 }

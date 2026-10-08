@@ -1,7 +1,10 @@
-import { useState, useEffect, useMemo } from 'react';
-import { Terminal, RefreshCw, Search, ShieldAlert, CheckCircle2, Info, AlertTriangle, Filter, Database, Download, Printer, Clock, FileText, ArrowUpDown, ChevronUp, ChevronDown, X } from 'lucide-react';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { Terminal, AlertCircle, RefreshCw, Search, ShieldAlert, CheckCircle2, Info, AlertTriangle, Filter, Database, Download, Printer, Clock, FileText, ArrowUpDown, ChevronUp, ChevronDown, X } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 import { save } from '@tauri-apps/plugin-dialog';
+import { useTranslation } from 'react-i18next';
+import { BTN_SECONDARY, BTN_PRIMARY, INPUT_BASE, FOCUS_RING } from '../ui/tokens';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -9,10 +12,11 @@ interface AuditLog { timestamp: string; level: string; message: string; }
 interface Toast { id: number; title: string; message: string; type: 'success' | 'error' | 'info'; }
 
 export default function AuditLogs() {
+  const { t, i18n } = useTranslation();
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [levelFilter, setLevelFilter] = useState('Todos');
+  const [levelFilter, setLevelFilter] = useState('ALL');
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [sortConfig, setSortConfig] = useState<{ key: keyof AuditLog, direction: 'asc' | 'desc' }>({ key: 'timestamp', direction: 'desc' });
   const [isExporting, setIsExporting] = useState(false);
@@ -20,7 +24,7 @@ export default function AuditLogs() {
   const showToast = (title: string, message: string, type: 'success' | 'error' | 'info' = 'info') => {
     const id = Date.now() + Math.random(); 
     setToasts(prev => [...prev, { id, title, message, type }]);
-    setTimeout(() => { setToasts(prev => prev.filter(t => t.id !== id)); }, 4000);
+    setTimeout(() => { setToasts(prev => prev.filter(x => x.id !== id)); }, 4000);
   };
 
   const fetchLogs = async () => {
@@ -29,7 +33,7 @@ export default function AuditLogs() {
       const data = await invoke<AuditLog[]>('read_audit_logs');
       setLogs(data);
     } catch (error) {
-      showToast("Erro", "Falha ao carregar logs.", "error");
+      showToast(t('common.status.error'), t('audit.toast.loadFailed'), 'error');
     } finally {
       setIsLoading(false);
     }
@@ -46,7 +50,7 @@ export default function AuditLogs() {
   const processedLogs = useMemo(() => {
     const filtered = logs.filter(log => {
       const matchesSearch = log.message.toLowerCase().includes(searchTerm.toLowerCase()) || log.timestamp.includes(searchTerm);
-      const matchesLevel = levelFilter === 'Todos' || log.level === levelFilter;
+      const matchesLevel = levelFilter === 'ALL' || log.level === levelFilter;
       return matchesSearch && matchesLevel;
     });
 
@@ -57,12 +61,20 @@ export default function AuditLogs() {
     });
   }, [logs, searchTerm, levelFilter, sortConfig]);
 
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const rowVirtualizer = useVirtualizer({
+    count: processedLogs.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => 36,
+    overscan: 12,
+  });
+
   const getLevelIcon = (level: string) => {
     switch (level) {
       case 'SUCCESS': return <CheckCircle2 size={16} className="text-green-500" />;
       case 'ERROR': return <ShieldAlert size={16} className="text-red-500" />;
       case 'WARNING': return <AlertTriangle size={16} className="text-amber-500" />;
-      default: return <Info size={16} className="text-blue-500" />;
+      default: return <Info size={16} className="text-slate-400" />;
     }
   };
 
@@ -71,7 +83,7 @@ export default function AuditLogs() {
       case 'SUCCESS': return 'bg-green-500/10 text-green-500 border-green-500/20';
       case 'ERROR': return 'bg-red-500/10 text-red-500 border-red-500/20';
       case 'WARNING': return 'bg-amber-500/10 text-amber-500 border-amber-500/20';
-      default: return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+      default: return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
     }
   };
 
@@ -79,16 +91,16 @@ export default function AuditLogs() {
     if (processedLogs.length === 0) return;
     try {
       const filePath = await save({
-        filters: [{ name: 'Planilha Excel (CSV)', extensions: ['csv'] }],
-        defaultPath: `coopshield_auditoria_${new Date().toISOString().slice(0,10)}.csv`
+        filters: [{ name: t('audit.export.csvFilter'), extensions: ['csv'] }],
+        defaultPath: `kopher_shield_auditoria_${new Date().toISOString().slice(0,10)}.csv`
       });
       if (!filePath) return; 
 
-      const csvContent = ["Data e Hora,Nível,Descrição", ...processedLogs.map(log => `"${log.timestamp}","${log.level}","${log.message.replace(/"/g, '""')}"`)].join("\n");
+      const csvContent = [t('audit.export.csvHeader'), ...processedLogs.map(log => `"${log.timestamp}","${log.level}","${log.message.replace(/"/g, '""')}"`)].join("\n");
       await invoke('save_report_file', { path: filePath, content: csvContent, isBase64: false });
-      showToast("Sucesso", "Planilha exportada com sucesso.", "success");
+      showToast(t('common.status.success'), t('audit.toast.csvOk'), 'success');
     } catch (e) {
-      showToast("Erro", `Falha ao salvar: ${e}`, "error");
+      showToast(t('common.status.error'), t('audit.toast.saveFailed', { error: String(e) }), 'error');
     }
   };
 
@@ -98,8 +110,8 @@ export default function AuditLogs() {
     
     try {
       const filePath = await save({
-        filters: [{ name: 'Relatório de Auditoria (PDF)', extensions: ['pdf'] }],
-        defaultPath: `relatorio_auditoria_coopshield_${new Date().toISOString().slice(0,10)}.pdf`
+        filters: [{ name: t('audit.export.pdfFilter'), extensions: ['pdf'] }],
+        defaultPath: `relatorio_auditoria_kopher_shield_${new Date().toISOString().slice(0,10)}.pdf`
       });
 
       if (!filePath) {
@@ -111,14 +123,14 @@ export default function AuditLogs() {
       
       doc.setFontSize(22);
       doc.setTextColor(15, 23, 42); 
-      doc.text('COOPSHIELD', 105, 20, { align: 'center' });
+      doc.text('KOPHER SHIELD', 105, 20, { align: 'center' });
       
       doc.setFontSize(12);
       doc.setTextColor(100, 116, 139); 
-      doc.text('RELATÓRIO OFICIAL DE AUDITORIA E SEGURANÇA', 105, 28, { align: 'center' });
+      doc.text(t('audit.pdf.title'), 105, 28, { align: 'center' });
       
       doc.setFontSize(10);
-      doc.text(`Emitido em: ${new Date().toLocaleString('pt-BR')} | Ocorrências: ${processedLogs.length}`, 105, 34, { align: 'center' });
+      doc.text(t('audit.pdf.issued', { date: new Date().toLocaleString(i18n.resolvedLanguage), count: processedLogs.length }), 105, 34, { align: 'center' });
 
       doc.setDrawColor(203, 213, 225);
       doc.line(14, 40, 196, 40);
@@ -132,7 +144,7 @@ export default function AuditLogs() {
       // A mesma técnica segura: invocando a função solta, sem acoplamento implícito
       autoTable(doc, {
         startY: 45,
-        head: [['Data / Hora', 'Severidade', 'Descrição da Ocorrência']],
+        head: [[t('audit.columns.timestamp'), t('audit.columns.level'), t('audit.columns.message')]],
         body: tableData,
         theme: 'striped',
         headStyles: { fillColor: [241, 245, 249], textColor: [51, 65, 85], fontStyle: 'bold' },
@@ -160,10 +172,10 @@ export default function AuditLogs() {
         isBase64: true // <-- Usando o snake_case auto-convertido do Tauri para true
       });
 
-      showToast("Sucesso", "Relatório PDF exportado com sucesso no seu computador.", "success");
+      showToast(t('common.status.success'), t('audit.toast.pdfOk'), 'success');
 
     } catch(e) {
-      showToast("Erro na Exportação", `Falha ao salvar o PDF: ${e}`, "error");
+      showToast(t('audit.toast.exportError'), t('audit.toast.saveFailed', { error: String(e) }), 'error');
     } finally {
       setIsExporting(false);
     }
@@ -179,48 +191,48 @@ export default function AuditLogs() {
       
       <div className="fixed bottom-6 right-6 z-[100] flex flex-col space-y-3 pointer-events-none">
         {toasts.map(toast => (
-          <div key={toast.id} className={`w-80 p-4 rounded-xl shadow-2xl border flex items-start space-x-3 pointer-events-auto animate-in slide-in-from-right-8 fade-in duration-300 ${toast.type === 'success' ? 'bg-surface/95 border-green-500/40' : toast.type === 'error' ? 'bg-surface/95 border-red-500/40' : 'bg-surface/95 border-blue-500/40'}`}>
+          <div key={toast.id} className={`w-80 p-4 rounded-xl shadow-2xl border flex items-start space-x-3 pointer-events-auto animate-in slide-in-from-right-8 fade-in duration-300 ${toast.type === 'success' ? 'bg-surface/95 border-green-500/40' : toast.type === 'error' ? 'bg-surface/95 border-red-500/40' : 'bg-surface/95 border-amber-500/40'}`}>
             <div className="shrink-0 mt-0.5">
               {toast.type === 'success' && <CheckCircle2 size={18} className="text-green-500" />}
               {toast.type === 'error' && <AlertCircle size={18} className="text-red-500" />}
-              {toast.type === 'info' && <Info size={18} className="text-blue-500" />}
+              {toast.type === 'info' && <Info size={18} className="text-amber-500" />}
             </div>
             <div className="flex flex-col flex-1">
-              <h4 className={`text-sm font-bold ${toast.type === 'success' ? 'text-green-500' : toast.type === 'error' ? 'text-red-500' : 'text-blue-500'}`}>{toast.title}</h4>
+              <h4 className={`text-sm font-bold ${toast.type === 'success' ? 'text-green-500' : toast.type === 'error' ? 'text-red-500' : 'text-amber-500'}`}>{toast.title}</h4>
               <p className="text-xs text-textMuted mt-1 leading-relaxed">{toast.message}</p>
             </div>
-            <button onClick={() => setToasts(prev => prev.filter(t => t.id !== toast.id))} className="text-textMuted hover:text-textMain transition-colors cursor-pointer shrink-0"><X size={16} /></button>
+            <button onClick={() => setToasts(prev => prev.filter(x => x.id !== toast.id))} aria-label={t('common.actions.close')} className={`text-textMuted hover:text-textMain transition-all duration-300 cursor-pointer shrink-0 rounded-md ${FOCUS_RING}`}><X className="w-4 h-4" aria-hidden="true" /></button>
           </div>
         ))}
       </div>
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-border/50 pb-6 gap-4 shrink-0">
         <div>
-          <h1 className="text-3xl font-bold mb-2 tracking-tight flex items-center text-textMain"><Terminal size={28} className="mr-3 text-primary" /> Auditoria de Sistema</h1>
-          <p className="text-sm text-textMuted">Registo imutável de eventos e auditoria conformidade legal.</p>
+          <h1 className="text-3xl font-bold mb-2 tracking-tight flex items-center gap-3 text-textMain"><Terminal className="w-6 h-6 shrink-0 text-primary" aria-hidden="true" /> {t('nav.audit')}</h1>
+          <p className="text-sm text-textMuted">{t('audit.subtitle')}</p>
         </div>
-        <div className="flex space-x-3 w-full md:w-auto">
-          <button onClick={handleExportCSV} disabled={processedLogs.length === 0} className="bg-surface hover:bg-background border border-border text-textMain px-4 py-2 rounded-lg font-medium text-sm flex items-center transition-all cursor-pointer disabled:opacity-50">
-            <Download size={16} className="mr-2 text-green-500" /> Exportar (Excel)
+        <div className="flex flex-wrap gap-3 w-full md:w-auto">
+          <button onClick={handleExportCSV} disabled={processedLogs.length === 0} className={BTN_SECONDARY}>
+            <Download className="w-4 h-4 text-green-500" aria-hidden="true" /> {t('audit.export.csv')}
           </button>
-          <button onClick={handlePrintPDF} disabled={processedLogs.length === 0 || isExporting} className="bg-surface hover:bg-background border border-border text-textMain px-4 py-2 rounded-lg font-medium text-sm flex items-center transition-all cursor-pointer disabled:opacity-50">
-            <Printer size={16} className={`mr-2 ${isExporting ? 'animate-pulse text-textMuted' : 'text-blue-500'}`} /> {isExporting ? 'Gerando PDF...' : 'Relatório PDF'}
+          <button onClick={handlePrintPDF} disabled={processedLogs.length === 0 || isExporting} className={BTN_SECONDARY}>
+            <Printer className={`w-4 h-4 ${isExporting ? 'animate-pulse text-textMuted' : 'text-amber-500'}`} aria-hidden="true" /> {isExporting ? t('audit.export.generating') : t('audit.export.pdf')}
           </button>
-          <button onClick={fetchLogs} disabled={isLoading} className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center shadow-lg shadow-primary/20 transition-all cursor-pointer disabled:opacity-50">
-            <RefreshCw size={16} className={`mr-2 ${isLoading ? 'animate-spin' : ''}`} /> Atualizar
+          <button onClick={fetchLogs} disabled={isLoading} className={BTN_PRIMARY}>
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} aria-hidden="true" /> {t('audit.refresh')}
           </button>
         </div>
       </div>
 
       <div className="bg-surface border border-border rounded-xl p-5 shadow-sm flex flex-col md:flex-row gap-4 shrink-0">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted" size={18} />
-          <input type="text" placeholder="Pesquisar por rotina, avisos ou origem..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full bg-background border border-border rounded-lg pl-10 pr-4 py-2.5 text-sm text-textMain focus:border-primary outline-none transition-all" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-textMuted" aria-hidden="true" />
+          <input type="text" placeholder={t('audit.searchPlaceholder')} aria-label={t('audit.searchPlaceholder')} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={`${INPUT_BASE} pl-10`} />
         </div>
-        <div className="flex items-center space-x-2 shrink-0">
-          <Filter size={18} className="text-textMuted" />
-          <select value={levelFilter} onChange={(e) => setLevelFilter(e.target.value)} className="bg-background border border-border rounded-lg px-4 py-2.5 text-sm text-textMain focus:border-primary outline-none cursor-pointer appearance-none min-w-[160px]">
-            <option value="Todos">Todos os Eventos</option><option value="INFO">Informação</option><option value="SUCCESS">Sucessos</option><option value="WARNING">Avisos</option><option value="ERROR">Falhas Críticas</option>
+        <div className="flex items-center gap-2 shrink-0">
+          <Filter className="w-5 h-5 text-textMuted" aria-hidden="true" />
+          <select aria-label={t('audit.filter.label')} value={levelFilter} onChange={(e) => setLevelFilter(e.target.value)} className={`${INPUT_BASE} cursor-pointer min-w-[200px]`}>
+            <option value="ALL">{t('audit.filter.all')}</option><option value="INFO">{t('audit.filter.info')}</option><option value="SUCCESS">{t('audit.filter.success')}</option><option value="WARNING">{t('audit.filter.warning')}</option><option value="ERROR">{t('audit.filter.error')}</option>
           </select>
         </div>
       </div>
@@ -232,41 +244,62 @@ export default function AuditLogs() {
             <div className="flex space-x-1.5 mr-4">
               <div className="w-3 h-3 rounded-full bg-red-500/80"></div><div className="w-3 h-3 rounded-full bg-amber-500/80"></div><div className="w-3 h-3 rounded-full bg-green-500/80"></div>
             </div>
-            <span className="text-xs font-mono text-textMuted flex items-center"><Database size={12} className="mr-1.5" /> root@coopshield:/var/log/audit.log</span>
+            <span className="text-xs font-mono text-textMuted flex items-center"><Database size={12} className="mr-1.5" /> root@kopher-shield:/var/log/audit.log</span>
           </div>
-          <span className="text-[10px] text-textMuted font-mono uppercase tracking-wider">{processedLogs.length} ocorrencias exibidas</span>
+          <span className="text-[10px] text-textMuted font-mono uppercase tracking-wider">{t('audit.shown', { count: processedLogs.length })}</span>
         </div>
 
-        <div className="flex items-center space-x-4 px-6 py-2.5 border-b border-border/50 bg-background/50 shrink-0 font-sans shadow-sm z-10 select-none">
-          <div onClick={() => handleSort('timestamp')} className={`w-[150px] text-[11px] font-bold uppercase tracking-widest flex items-center cursor-pointer transition-colors ${sortConfig.key === 'timestamp' ? 'text-primary' : 'text-textMuted hover:text-textMain'}`}>
-            <Clock size={13} className="mr-1.5 opacity-70"/> Data e Hora {getSortIcon('timestamp')}
+        <div
+          ref={scrollRef}
+          role="table"
+          aria-label={t('nav.audit')}
+          aria-rowcount={processedLogs.length}
+          className="overflow-auto flex-1 min-h-0 font-mono text-[13px] selection:bg-primary/30"
+        >
+          <div className="min-w-[780px]">
+            <div role="row" className="sticky top-0 z-10 grid grid-cols-[170px_150px_minmax(300px,1fr)] gap-4 items-center px-6 py-2.5 border-b border-border/50 bg-background/95 backdrop-blur font-sans shadow-sm select-none">
+<div onClick={() => handleSort('timestamp')} role="button" tabIndex={0} onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleSort('timestamp')} className={`min-w-0 whitespace-nowrap overflow-hidden text-[11px] font-bold uppercase tracking-widest flex items-center cursor-pointer transition-colors rounded ${FOCUS_RING} ${sortConfig.key === 'timestamp' ? 'text-primary' : 'text-textMuted hover:text-textMain'}`}>
+            <Clock className="w-4 h-4 mr-1.5 opacity-70" aria-hidden="true"/> {t('audit.columns.timestamp')} {getSortIcon('timestamp')}
           </div>
-          <div onClick={() => handleSort('level')} className={`w-[100px] text-[11px] font-bold uppercase tracking-widest flex items-center cursor-pointer transition-colors ${sortConfig.key === 'level' ? 'text-primary' : 'text-textMuted hover:text-textMain'}`}>
-            <ShieldAlert size={13} className="mr-1.5 opacity-70"/> Nível {getSortIcon('level')}
+          <div onClick={() => handleSort('level')} role="button" tabIndex={0} onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleSort('level')} className={`min-w-0 whitespace-nowrap overflow-hidden text-[11px] font-bold uppercase tracking-widest flex items-center cursor-pointer transition-colors rounded ${FOCUS_RING} ${sortConfig.key === 'level' ? 'text-primary' : 'text-textMuted hover:text-textMain'}`}>
+            <ShieldAlert className="w-4 h-4 mr-1.5 opacity-70" aria-hidden="true"/> {t('audit.columns.level')} {getSortIcon('level')}
           </div>
-          <div onClick={() => handleSort('message')} className={`flex-1 text-[11px] font-bold uppercase tracking-widest flex items-center cursor-pointer transition-colors ${sortConfig.key === 'message' ? 'text-primary' : 'text-textMuted hover:text-textMain'}`}>
-            <FileText size={13} className="mr-1.5 opacity-70"/> Descrição {getSortIcon('message')}
+          <div onClick={() => handleSort('message')} role="button" tabIndex={0} onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleSort('message')} className={`min-w-0 whitespace-nowrap overflow-hidden text-[11px] font-bold uppercase tracking-widest flex items-center cursor-pointer transition-colors rounded ${FOCUS_RING} ${sortConfig.key === 'message' ? 'text-primary' : 'text-textMuted hover:text-textMain'}`}>
+            <FileText className="w-4 h-4 mr-1.5 opacity-70" aria-hidden="true"/> {t('audit.columns.message')} {getSortIcon('message')}
           </div>
-        </div>
+            </div>
 
-        <div className="p-4 overflow-y-auto flex-1 font-mono text-[13px] space-y-1.5 selection:bg-primary/30">
-          {isLoading ? (
-            <div className="flex items-center justify-center h-40 text-textMuted"><RefreshCw size={24} className="animate-spin mr-3 text-primary" /> Analisando trilha de auditoria...</div>
-          ) : processedLogs.length === 0 ? (
-            <div className="flex items-center justify-center h-40 text-textMuted opacity-50">Nenhum registo corresponde aos parâmetros.</div>
-          ) : (
-            processedLogs.map((log, index) => (
-              <div key={index} className="flex items-start space-x-4 p-2 hover:bg-textMain/5 rounded transition-colors group">
-                <div className="shrink-0 text-textMuted w-[150px] pt-0.5">{log.timestamp}</div>
-                <div className="shrink-0 pt-0.5 w-[100px]">
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${getLevelBadge(log.level)}`}><span className="mr-1.5">{getLevelIcon(log.level)}</span> {log.level}</span>
-                </div>
-                <div className="flex-1 leading-relaxed text-textMain/90">
-                  {log.message.split(/'([^']+)'/).map((part, i) => i % 2 === 1 ? <span key={i} className="text-amber-500 dark:text-amber-300 font-bold bg-amber-500/10 px-1 rounded">'{part}'</span> : part)}
-                </div>
+            {isLoading ? (
+              <div className="flex items-center justify-center h-40 text-textMuted"><RefreshCw size={24} className="animate-spin mr-3 text-primary" /> {t('audit.loading')}</div>
+            ) : processedLogs.length === 0 ? (
+              <div className="flex items-center justify-center h-40 text-textMuted opacity-50">{t('audit.empty')}</div>
+            ) : (
+              <div role="rowgroup" className="relative px-4" style={{ height: rowVirtualizer.getTotalSize() }}>
+                {rowVirtualizer.getVirtualItems().map(vRow => {
+                  const log = processedLogs[vRow.index];
+                  return (
+                    <div
+                      key={vRow.key}
+                      role="row"
+                      aria-rowindex={vRow.index + 2}
+                      className="absolute left-4 right-4 top-0 grid grid-cols-[170px_150px_minmax(300px,1fr)] gap-4 items-center px-2 hover:bg-textMain/5 rounded transition-colors"
+                      style={{ height: vRow.size, transform: `translateY(${vRow.start}px)` }}
+                    >
+                      <div role="cell" className="min-w-0"><span className="block truncate whitespace-nowrap text-textMuted" title={log.timestamp}>{log.timestamp}</span></div>
+                      <div role="cell" className="min-w-0">
+                        <span className={`inline-flex max-w-full items-center whitespace-nowrap px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${getLevelBadge(log.level)}`}><span className="mr-1.5">{getLevelIcon(log.level)}</span> {log.level}</span>
+                      </div>
+                      <div role="cell" className="min-w-0">
+                        <span className="block truncate whitespace-nowrap text-textMain/90" title={log.message}>
+                          {log.message.split(/'([^']+)'/).map((part, i) => i % 2 === 1 ? <span key={i} className="text-amber-500 dark:text-amber-300 font-bold bg-amber-500/10 px-1 rounded">'{part}'</span> : part)}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            ))
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>

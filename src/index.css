@@ -5,22 +5,22 @@
 @layer base {
   /* MODO CLARO (Default) */
   :root {
-    --primary: 59 130 246;     /* Azul da marca preservado */
-    --background: 248 250 252; /* slate-50 - Fundo principal claro */
-    --surface: 255 255 255;    /* white - Fundo dos cards (branco puro) */
-    --border: 226 232 240;     /* slate-200 - Bordas sutis */
-    --text-main: 15 23 42;     /* slate-900 - Texto principal escuro */
-    --text-muted: 100 116 139; /* slate-500 - Texto secundário */
+    --primary: 245 158 11;     /* amber-500 */
+    --background: 248 250 252; /* slate-50 */
+    --surface: 255 255 255;
+    --border: 226 232 240;     /* slate-200 */
+    --text-main: 15 23 42;     /* slate-900 */
+    --text-muted: 100 116 139; /* slate-500 */
   }
 
-  /* MODO ESCURO (Deep Tech Black) */
+  /* MODO ESCURO (Midnight) */
   .dark {
-    --primary: 59 130 246;     /* Azul da marca preservado */
-    --background: 15 17 21;    /* Fundo original */
-    --surface: 22 25 32;       /* Fundo dos cards original */
-    --border: 30 41 59;        /* Bordas originais */
-    --text-main: 248 250 252;  /* Texto claro original */
-    --text-muted: 148 163 184; /* Texto secundário original */
+    --primary: 245 158 11;     /* amber-500 */
+    --background: 2 6 23;      /* slate-950 */
+    --surface: 15 23 42;       /* slate-900 */
+    --border: 30 41 59;        /* slate-800 */
+    --text-main: 248 250 252;  /* slate-50 */
+    --text-muted: 148 163 184; /* slate-400 */
   }
 }
 
@@ -28,6 +28,52 @@
 body {
   background-color: rgb(var(--background));
   color: rgb(var(--text-main));
+}
+
+::selection {
+  background-color: rgb(245 158 11 / 25%);
+  color: rgb(var(--text-main));
+}
+
+:focus-visible {
+  outline: 2px solid #F59E0B;
+  outline-offset: 2px;
+}
+
+.splash-beam {
+  transform-origin: 0 50%;
+  animation: lighthouse-beam 7s ease-in-out infinite alternate;
+}
+
+.splash-wave {
+  animation: ocean-drift 14s ease-in-out infinite alternate;
+}
+
+.splash-progress {
+  animation: splash-loading 1.6s ease-in-out infinite;
+}
+
+@keyframes lighthouse-beam {
+  from { transform: rotate(-11deg); opacity: 0.35; }
+  to { transform: rotate(11deg); opacity: 0.75; }
+}
+
+@keyframes ocean-drift {
+  from { transform: translateX(-2%) scaleY(0.96); }
+  to { transform: translateX(2%) scaleY(1.04); }
+}
+
+@keyframes splash-loading {
+  from { transform: translateX(-130%); }
+  to { transform: translateX(320%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-beam,
+  .splash-wave,
+  .splash-progress {
+    animation: none;
+  }
 }
 
 /* =========================================================

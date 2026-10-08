@@ -1,6 +1,887 @@
 {
+  "app": {
+    "name": "Kopher Shield",
+    "tagline": "Protection immuable. Récupération fiable."
+  },
+  "common": {
+    "actions": {
+      "back": "Retour",
+      "continue": "Continuer",
+      "save": "Enregistrer les modifications",
+      "cancel": "Annuler",
+      "close": "Fermer"
+    },
+    "status": {
+      "loading": "Chargement",
+      "ready": "Prêt",
+      "error": "Erreur",
+      "success": "Succès"
+    }
+  },
   "welcome": {
     "title": "Bienvenue sur Kopher Shield",
-    "subtitle": "Pour commencer, veuillez sélectionner votre langue préférée."
+    "subtitle": "Pour commencer, veuillez sélectionner votre langue préférée.",
+    "languageLabel": "Langue de l’interface",
+    "languages": {
+      "pt-BR": "Portugais (Brésil)",
+      "pt-PT": "Portugais (Portugal)",
+      "en-US": "Anglais (États-Unis)",
+      "es-ES": "Espagnol",
+      "fr-FR": "Français"
+    },
+    "hero": {
+      "title": "Bienvenue dans votre Forteresse Numérique",
+      "subtitle": "Sauvegarde immuable, audit et souveraineté des données. Choisissez la langue et le thème pour commencer."
+    },
+    "theme": {
+      "label": "Thème de l'interface",
+      "dark": "Sombre",
+      "light": "Clair",
+      "system": "Système"
+    },
+    "setup": "Configuration initiale",
+    "auth": {
+      "title": "Activation hybride",
+      "subtitle": "Connectez-vous avec votre compte BINAVER. La licence sera liée automatiquement.",
+      "email": "E-mail du compte BINAVER",
+      "password": "Mot de passe",
+      "manualKey": "J’ai une clé de produit manuelle (facultatif)",
+      "keyPh": "Ex : HCTNAW-ZV28YO...",
+      "keyLabel": "Clé de produit",
+      "twoFaTitle": "Vérification en deux étapes",
+      "twoFaSubtitle": "Par sécurité, confirmez votre identité.",
+      "emailMethod": "E-mail",
+      "tokenSent": "Nous avons envoyé un jeton temporaire à {{email}}.",
+      "tokenLabel": "Jeton de vérification",
+      "doneTitle": "Tout est prêt !",
+      "doneText": "Kopher Shield a été authentifié avec succès et lié à votre compte BINAVER.",
+      "back": "Retour",
+      "authenticate": "Authentifier le compte",
+      "validate": "Valider le jeton",
+      "enter": "Accéder au panneau de contrôle",
+      "errFill": "Veuillez renseigner l’e-mail et le mot de passe.",
+      "errKey": "La clé est incomplète.",
+      "errToken": "Le jeton doit comporter 6 chiffres.",
+      "errFatal": "Erreur fatale lors de l’enregistrement des paramètres."
+    }
+  },
+  "settings": {
+    "language": {
+      "title": "Langue de l’application",
+      "description": "Choisissez la langue des menus et des messages de Kopher Shield.",
+      "saveError": "Impossible d'enregistrer la langue."
+    },
+    "loading": "CHARGEMENT...",
+    "hardwareFail": "ECHEC-LECTURE-MATERIEL",
+    "localDevice": "Appareil local",
+    "noKey": "AUCUNE CLÉ ENREGISTRÉE",
+    "imagesFilter": "Images",
+    "cancel": "Annuler",
+    "toast": {
+      "error": "Erreur",
+      "success": "Succès",
+      "successBang": "Succès !",
+      "readErrorTitle": "Erreur de lecture",
+      "readError": "Échec du chargement des paramètres SQLite.",
+      "iconLoaded": "Icône chargée",
+      "iconReady": "L'image est prête à être enregistrée.",
+      "selectError": "Erreur de sélection",
+      "imageLoadFail": "Impossible de charger l'image.",
+      "avatarUpdated": "Avatar mis à jour",
+      "avatarUploaded": "Votre image de profil (téléversement) a été enregistrée avec succès.",
+      "avatarLoadFail": "Impossible de charger l'avatar.",
+      "avatarPresetSaved": "Votre avatar professionnel a été enregistré avec succès.",
+      "avatarSaveFail": "Impossible d'enregistrer l'avatar.",
+      "avatarRemoved": "Avatar supprimé",
+      "avatarRemovedMsg": "Votre image de profil a été supprimée et reviendra à celle par défaut.",
+      "avatarRemoveFail": "Impossible de supprimer l'avatar.",
+      "profileUpdated": "Données mises à jour",
+      "profileUpdatedMsg": "Informations du responsable technique enregistrées avec succès.",
+      "profileSaveFail": "Échec de l'enregistrement des données dans la base de données.",
+      "invalidColor": "Couleur invalide",
+      "invalidColorMsg": "Saisissez une couleur hexadécimale valide au format #RRGGBB.",
+      "saved": "Paramètres professionnels mis à jour avec succès !",
+      "saveFail": "Échec de l'enregistrement dans SQLite",
+      "incompleteFields": "Champs incomplets",
+      "incompleteFieldsMsg": "Renseignez tous les champs du serveur SMTP personnalisé.",
+      "smtpError": "Erreur SMTP",
+      "comingSoon": "Bientôt disponible",
+      "comingSoonMsg": "L'intégration native sera ajoutée au moteur Rust.",
+      "resent": "Renvoyé",
+      "resentMsg": "Un nouveau jeton de sécurité a été envoyé à votre adresse e-mail.",
+      "unlinking": "Dissociation",
+      "unlinkingMsg": "Suppression de la licence de l'appareil..."
+    },
+    "license": {
+      "qrFail": "Échec de la génération du code QR hors ligne.",
+      "fillCredentials": "Saisissez l'e-mail et le mot de passe professionnels.",
+      "keyIncomplete": "La clé de licence est incomplète.",
+      "tokenDigits": "Le jeton doit contenir 6 chiffres.",
+      "unlinkConfirm": "Attention : voulez-vous vraiment dissocier cette machine ? L'accès sera bloqué.",
+      "tokenSent": "Jeton envoyé à {{email}}",
+      "noOwner": "Licence locale non associée",
+      "holderAlt": "Avatar du titulaire",
+      "edit": "Modifier",
+      "activeVerified": "Compte actif et vérifié",
+      "technicalOwner": "Responsable technique",
+      "manageAccount": "Gérer le compte",
+      "resetMfa": "Réinitialiser la MFA",
+      "endSession": "Fermer la session",
+      "editOwnerTitle": "Modifier les données du responsable technique",
+      "adminName": "Nom de l'administrateur",
+      "adminNamePlaceholder": "Ex. : Jean Dupont",
+      "role": "Poste / service",
+      "rolePlaceholder": "Ex. : Analyste infrastructure",
+      "saveChanges": "Enregistrer les modifications",
+      "linkedDevice": "Appareil associé",
+      "hostName": "Nom d'hôte (SE)",
+      "machineId": "Signature matérielle (Machine ID)",
+      "activeKey": "Clé de licence active",
+      "encryptedKey": "Clé de produit chiffrée",
+      "encryption": "Chiffrement",
+      "resetMfaTitle": "Réinitialisation de l'authentificateur (MFA)",
+      "authTitle": "Authentification et association",
+      "resetMfaDesc": "Scannez le nouveau code QR avec votre application d'authentification.",
+      "authDesc": "Saisissez les identifiants du nouveau compte qui prendra en charge cette machine.",
+      "enterKeyManually": "Saisir la clé manuellement",
+      "keyPlaceholder": "Ex. : HCTNAW-ZV28YO...",
+      "continue": "Continuer",
+      "appMethod": "App d'authentification",
+      "emailMethod": "E-mail",
+      "scanQr": "Scannez le nouveau code QR",
+      "qrAlt": "Code QR 2FA",
+      "enterAppCode": "Saisissez le code généré par votre téléphone.",
+      "validateSave": "Valider et enregistrer"
+    },
+    "avatar": {
+      "title": "Modifier l'image de profil",
+      "gallery": "Avatars professionnels (galerie)",
+      "preset": "Avatar prédéfini {{n}}",
+      "upload": "Téléverser une image",
+      "remove": "Supprimer l'image actuelle"
+    },
+    "page": {
+      "title": "Paramètres du système",
+      "subtitle": "Personnalisez l'apparence, l'accessibilité, les alertes et la licence."
+    },
+    "tabs": {
+      "appearance": "Apparence et accessibilité",
+      "alerts": "Centre d'alertes",
+      "license": "Licence"
+    },
+    "appearance": {
+      "title": "Identité visuelle et mise en page",
+      "subtitle": "Adaptez Kopher Shield à l'identité de votre entreprise et à vos besoins visuels.",
+      "workspace": "Espace de travail de l'entreprise (marque blanche)",
+      "workspaceDesc": "Remplacez le logo principal en définissant l'icône carrée et le nom de votre environnement.",
+      "squareIcon": "Icône carrée (1:1)",
+      "logoAlt": "Logo du client",
+      "workspaceName": "Nom de l'espace de travail / entreprise",
+      "workspaceNamePlaceholder": "Ex. : Nom de l'entreprise",
+      "interfaceMode": "Mode d'interface",
+      "dark": "Sombre",
+      "light": "Clair",
+      "scale": "Échelle (accessibilité)",
+      "scaleSmall": "Petite",
+      "scaleNormal": "Normale",
+      "scaleLarge": "Grande",
+      "accent": "Couleur d'accent principale",
+      "useAccent": "Utiliser l'accent {{label}}",
+      "custom": "Personnalisée :",
+      "pickColor": "Sélectionner une couleur personnalisée",
+      "hexCode": "Code hexadécimal de la couleur d'accent"
+    },
+    "accent": {
+      "amber": "Ambre",
+      "cobalt": "Bleu cobalt",
+      "emerald": "Émeraude",
+      "violet": "Violet profond"
+    },
+    "alerts": {
+      "title": "Centre d'alertes et de notifications",
+      "smtpServer": "Serveur e-mail (SMTP)",
+      "smtpHost": "Hôte SMTP",
+      "smtpPort": "Port",
+      "smtpSecurity": "Sécurité",
+      "smtpSender": "E-mail expéditeur (envoi)",
+      "smtpPassword": "Mot de passe d'application",
+      "managedByCloud": "Les e-mails d'alerte et de rapport sont gérés automatiquement par le <strong>moteur de notifications Cloud</strong>. Aucune configuration supplémentaire n'est nécessaire.",
+      "copies": "Copies silencieuses et audit (CC/CCI)",
+      "cc": "Copie (Cc)",
+      "ccPlaceholder": "Ex. : direction@domaine.com",
+      "bcc": "Copie cachée (Cci)",
+      "bccPlaceholder": "Ex. : logs@domaine.com",
+      "testEmail": "Envoyer un e-mail de test",
+      "teamsDesc": "Recevez les rapports et les échecs directement dans un canal Teams.",
+      "teamsUrl": "URL du webhook (canal Teams)",
+      "teamsPlaceholder": "https://votre-entreprise.webhook.office.com/...",
+      "teamsTest": "Tester le ping Teams",
+      "prefsTitle": "Préférences de notification",
+      "prefsDesc": "Choisissez les événements système qui déclenchent des alertes sonores et des e-mails pour l'équipe.",
+      "backupStart": "Début de la routine de sauvegarde",
+      "backupStartDesc": "Avertit lorsqu'une sauvegarde démarre.",
+      "backupEnd": "Fin de sauvegarde et rapports",
+      "backupEndDesc": "Envoie le rapport final à la fin de la sauvegarde (succès ou échec).",
+      "restore": "Procédures de restauration",
+      "restoreDesc": "Alerte l'équipe chaque fois que des données sensibles sont restaurées.",
+      "systemErrors": "Alertes système critiques",
+      "systemErrorsDesc": "Erreurs du moteur, perte de connexion et échecs de planification.",
+      "historyNote": "Toutes les notifications sont toujours enregistrées dans l'historique du système (cloche supérieure)."
+    },
+    "actions": {
+      "saving": "Enregistrement...",
+      "save": "Enregistrer les paramètres"
+    }
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "routines": "Routines de sauvegarde",
+    "cloud": "Coffres Cloud",
+    "restore": "Restaurer une sauvegarde",
+    "audit": "Audit système",
+    "support": "Support",
+    "settings": "Paramètres"
+  },
+  "sidebar": {
+    "ariaLabel": "Barre latérale",
+    "mainNavigation": "Navigation principale",
+    "collapse": "Réduire la barre latérale",
+    "expand": "Développer la barre latérale",
+    "workspaceLocal": "Workspace local",
+    "consoleLocal": "Console locale",
+    "poweredBy": "Powered by Kopher Shield"
+  },
+  "header": {
+    "managementPanel": "Panneau de gestion - {{name}}",
+    "localConsole": "Console de gestion locale",
+    "backgroundProcesses": "{{count}} processus en arrière-plan"
+  },
+  "notifications": {
+    "center": "Centre de notifications",
+    "title": "Notifications",
+    "unread": "Non lues",
+    "all": "Toutes",
+    "empty": "Aucune notification.",
+    "markAllRead": "Tout marquer comme lu"
+  },
+  "audit": {
+    "subtitle": "Journal immuable des événements pour l'audit et la conformité légale.",
+    "searchPlaceholder": "Rechercher par routine, alertes ou source...",
+    "refresh": "Actualiser",
+    "loading": "Analyse de la piste d'audit...",
+    "empty": "Aucun enregistrement ne correspond aux paramètres.",
+    "shown": "{{count}} événements affichés",
+    "toast": {
+      "loadFailed": "Échec du chargement des journaux.",
+      "csvOk": "Feuille de calcul exportée avec succès.",
+      "pdfOk": "Rapport PDF exporté avec succès.",
+      "saveFailed": "Échec de l'enregistrement : {{error}}",
+      "exportError": "Erreur d'exportation"
+    },
+    "export": {
+      "csv": "Exporter (Excel)",
+      "pdf": "Rapport PDF",
+      "generating": "Génération du PDF...",
+      "csvFilter": "Feuille Excel (CSV)",
+      "pdfFilter": "Rapport d'audit (PDF)",
+      "csvHeader": "Date et heure,Niveau,Description"
+    },
+    "pdf": {
+      "title": "RAPPORT OFFICIEL D'AUDIT ET DE SÉCURITÉ",
+      "issued": "Émis le : {{date}} | Événements : {{count}}"
+    },
+    "columns": {
+      "timestamp": "Date et heure",
+      "level": "Niveau",
+      "message": "Description"
+    },
+    "filter": {
+      "label": "Filtrer par niveau",
+      "all": "Tous les événements",
+      "info": "Information",
+      "success": "Succès",
+      "warning": "Alertes",
+      "error": "Échecs critiques"
+    }
+  },
+  "cloud": {
+    "title": "Coffres Cloud",
+    "subtitle": "Gérez les destinations de stockage sécurisées de vos sauvegardes.",
+    "connectNew": "Connecter un coffre",
+    "connected": "Connecté",
+    "bucket": "Bucket",
+    "crypto": "Chiffrement",
+    "cryptoReady": "AES-256 prêt",
+    "edit": "Modifier le coffre",
+    "delete": "Supprimer la connexion",
+    "addTitle": "Ajouter un coffre cloud",
+    "addDesc": "Connectez AWS S3, Cloudflare R2, Google Cloud, Azure ou Backblaze B2.",
+    "actions": {
+      "connect": "Connecter le cloud",
+      "testing": "Test du cloud..."
+    },
+    "confirm": {
+      "deleteMessage": "Voulez-vous vraiment supprimer cette connexion au coffre ? Les fichiers dans le cloud ne seront PAS supprimés."
+    },
+    "modal": {
+      "createTitle": "Authentifier le coffre cloud",
+      "editTitle": "Modifier la connexion",
+      "validationHint": "La connexion sera validée lors de l’enregistrement."
+    },
+    "form": {
+      "nameLabel": "Nom d’identification",
+      "namePlaceholder": "Ex. : Sauvegarde AWS São Paulo",
+      "providerLabel": "Fournisseur",
+      "bucketLabel": "Nom du bucket (conteneur)",
+      "bucketPlaceholder": "kopher-shield-production",
+      "credentialsTitle": "Identifiants de sécurité IAM",
+      "endpointLabel": "URL du point de terminaison de l’API (pour Cloudflare R2 / Backblaze)",
+      "endpointPlaceholder": "https://<ID>.r2.cloudflarestorage.com",
+      "accessKeyLabel": "Access Key ID",
+      "accessKeyPlaceholder": "AKIA...",
+      "secretKeyLabel": "Secret Access Key",
+      "secretKeyPlaceholder": "••••••••••••",
+      "providers": {
+        "aws": "Amazon Web Services (S3)",
+        "cloudflareR2": "Cloudflare R2 (compatible S3)",
+        "backblazeB2": "Backblaze B2 (compatible S3)",
+        "otherS3Compatible": "Autre (compatible S3)"
+      }
+    },
+    "toast": {
+      "requiredFields": "Les clés de sécurité et le nom du bucket sont obligatoires.",
+      "deleteFailed": "Échec de la suppression : {{error}}",
+      "invalidCredentials": "Le serveur a rejeté les identifiants :\n\n{{error}}"
+    }
+  },
+  "routines": {
+    "nextRun": "Prochaine exécution",
+    "runningNow": "En cours",
+    "manualOnly": "Manuel uniquement",
+    "running": "En cours",
+    "active": "Actif",
+    "schedule": {
+      "manual": "Exécution manuelle",
+      "daily": "Tous les jours à {{time}}",
+      "weekdays": "Jours ouvrés à {{time}}",
+      "weekly": "Chaque semaine à {{time}}",
+      "interval": "Toutes les {{hours}} h (base {{time}})"
+    },
+    "form": {
+      "frequency": "Fréquence",
+      "custom": "Personnalisé...",
+      "model": "Modèle",
+      "daily": "Quotidien",
+      "weekdays": "Jours ouvrés",
+      "weekly": "Hebdomadaire",
+      "repeat": "Répéter toutes les",
+      "hours_one": "{{count}} heure",
+      "hours_other": "{{count}} heures",
+      "baseTime": "Heure de base",
+      "name": "Nom de la routine",
+      "namePlaceholder": "Ex. : Serveur de fichiers Sicoob",
+      "source": "Dossier source",
+      "browse": "Parcourir",
+      "vault": "Coffre de destination",
+      "vaultLocal": "Serveur local / NAS (Sicoob)",
+      "vaultCloud": "Cloud : {{name}} ({{provider}})",
+      "localFolder": "Sélectionnez le dossier du serveur/NAS",
+      "browseNas": "Parcourir le NAS",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "saving": "Enregistrement..."
+    },
+    "failed": "Échec",
+    "title": "Routines de sauvegarde",
+    "subtitle": "Gestion des politiques de protection multithread.",
+    "newRoutine": "Nouvelle routine",
+    "selectBatch": "Sélectionner le lot",
+    "deselectAll": "Tout désélectionner",
+    "search": "Rechercher une routine...",
+    "viewGrid": "Vue en grille",
+    "viewCompact": "Vue compacte",
+    "emptyNone": "Aucune routine de sauvegarde configurée dans le moteur.",
+    "emptyNoMatch": "Aucune routine trouvée avec ce nom.",
+    "processing": "Traitement",
+    "source": "Source",
+    "destination": "Destination",
+    "scheduleLabel": "Planification",
+    "runNow": "Exécuter maintenant",
+    "run": "Exécuter",
+    "edit": "Modifier la routine",
+    "delete": "Supprimer la routine",
+    "selected_one": "Routine sélectionnée",
+    "selected_other": "Routines sélectionnées",
+    "runFleet": "Exécuter la flotte",
+    "confirmDelete": "Voulez-vous supprimer cette routine ?",
+    "modal": {
+      "create": "Nouvelle routine de sauvegarde",
+      "edit": "Modifier la routine",
+      "close": "Fermer"
+    },
+    "toast": {
+      "error": "Erreur",
+      "loadFailed": "Impossible de charger les données.",
+      "deleted": "Supprimée",
+      "deletedMsg": "La routine a été supprimée.",
+      "deleteFailed": "Échec de la suppression : {{error}}",
+      "warning": "Avertissement",
+      "required": "Renseignez tous les champs obligatoires.",
+      "destRequired": "Définissez le dossier de destination ou choisissez un coffre Cloud.",
+      "success": "Succès",
+      "saved": "Routine enregistrée dans le moteur.",
+      "starting": "Démarrage du moteur",
+      "startingMsg": "La routine a été envoyée aux threads de traitement.",
+      "engineFail": "Échec du moteur",
+      "engineFailMsg": "Erreur lors du déclenchement de Rust : {{error}}",
+      "fleet": "Flotte déployée",
+      "fleetMsg_one": "Démarrage de {{count}} routine...",
+      "fleetMsg_other": "Démarrage simultané de {{count}} routines...",
+      "batchError": "Erreur de lot",
+      "batchErrorMsg": "Échec du démarrage de la routine {{name}} : {{error}}"
+    }
+  },
+  "noc": {
+    "title": "Centre d'Opérations",
+    "filtersLabel": "Filtres de statut",
+    "filters": {
+      "all": "Tous",
+      "success": "Succès",
+      "warning": "Alertes",
+      "error": "Échecs"
+    },
+    "traffic": {
+      "title": "Trafic d'événements",
+      "range": "{{days}} derniers jours",
+      "events": "Événements",
+      "errors": "Échecs"
+    },
+    "sqlite": {
+      "title": "Base SQLite",
+      "checking": "Vérification…",
+      "online": "En ligne",
+      "offline": "Hors ligne",
+      "events": "Événements",
+      "successRate": "Taux de réussite"
+    },
+    "heatmap": {
+      "title": "Carte de chaleur des exécutions",
+      "less": "Moins",
+      "more": "Plus",
+      "cell_one": "{{day}} {{hour}}:00 — {{count}} événement",
+      "cell_other": "{{day}} {{hour}}:00 — {{count}} événements"
+    }
+  },
+  "dashboard": {
+    "title": "Vue d'ensemble",
+    "subtitle": "Tableau de bord de télémétrie, d'intégrité des coffres et de métriques de protection.",
+    "export": "Exporter le rapport",
+    "exporting": "Génération du fichier...",
+    "loading": "Chargement de la télémétrie du moteur...",
+    "kpi_blocks": "Blocs protégés",
+    "kpi_routines": "Routines actives",
+    "kpi_vaults": "Coffres actifs",
+    "kpi_last": "Dernier succès",
+    "active": "Actif",
+    "today": "Aujourd'hui, {{time}}",
+    "system": "Système",
+    "filters": "Filtres :",
+    "search": "Rechercher une routine...",
+    "clear": "Effacer",
+    "until": "Au",
+    "dateStart": "Date de début",
+    "dateEnd": "Date de fin",
+    "status": {
+      "ALL": "Tous les statuts",
+      "SUCCESS": "Succès",
+      "WARNING": "Alertes",
+      "ERROR": "Échecs",
+      "INFO": "Information"
+    },
+    "group": {
+      "day": "Grouper par jour",
+      "month": "Grouper par mois",
+      "year": "Grouper par année"
+    },
+    "chart": {
+      "ERROR": "Pics d'échecs critiques",
+      "WARNING": "Alertes d'intégrité",
+      "INFO": "Volume d'événements (informatifs)",
+      "SUCCESS": "Volume de blocs traités",
+      "ALL": "Historique d'activité (relevé)",
+      "subtitle": "Série temporelle groupée selon les filtres sélectionnés.",
+      "volume": "Volume",
+      "current": "Actuel",
+      "history": "Historique",
+      "views": "Vues",
+      "focus": "Focus : {{date}}"
+    },
+    "views": {
+      "detailed": "Détaillé",
+      "board": "Direction (mensuel)",
+      "strategic": "Stratégique (annuel)",
+      "week": "7 derniers jours",
+      "month": "Ce mois",
+      "sem1": "1er semestre (janv.-juin)",
+      "sem2": "2e semestre (juil.-déc.)",
+      "year": "Cette année (janv.-déc.)",
+      "y5": "5 dernières années",
+      "custom": "Vue personnalisée"
+    },
+    "unit": {
+      "ALL": "événements",
+      "SUCCESS": "fichiers chiffrés",
+      "ERROR": "échecs critiques",
+      "WARNING": "alertes",
+      "INFO": "événements"
+    },
+    "recent": "Audit récent",
+    "noEvents": "Aucun événement sur la période sélectionnée.",
+    "exportModal": {
+      "title": "Exporter la vue d'ensemble",
+      "print": "Imprimer (papier)",
+      "printDesc": "Envoyer directement à l'imprimante locale",
+      "pdf": "Document PDF",
+      "pdfDesc": "Rapport mis en forme sous forme de fichier",
+      "png": "Image haute résolution",
+      "pngDesc": "Fichier PNG idéal pour les présentations",
+      "cancel": "Annuler",
+      "pdfName": "Rapport PDF",
+      "pngName": "Image PNG"
+    },
+    "exportOk": "Exportation terminée avec succès !",
+    "exportFail": "Échec de la génération du fichier. Vérifiez les journaux.",
+    "pdfTitle": "KOPHER SHIELD - RAPPORT D'AUDIT",
+    "pdfIssued": "Émis le : {{date}}  |  Vue : {{view}}"
+  },
+  "tour": {
+    "stepOf": "Étape {{current}} sur {{total}}",
+    "skip": "Ignorer la visite",
+    "back": "Retour",
+    "next": "Suivant",
+    "finish": "Terminer",
+    "steps": {
+      "welcome": {
+        "body": "Voici le panneau NOC de Kopher Shield : intégrité, trafic et historique de vos sauvegardes en temps réel. Faisons un tour rapide des principales zones.",
+        "title": "Bienvenue dans votre Forteresse Numérique"
+      },
+      "sidebar": {
+        "body": "Tout Kopher Shield est à un clic. En continuant, nous ouvrirons l'écran des Routines.",
+        "title": "Menu de navigation"
+      },
+      "routines": {
+        "body": "Planifiez vos sauvegardes et définissez l'exécution parallèle (multithread), la compression et la rétention. Chaque routine affiche son statut, sa progression et sa prochaine exécution.",
+        "title": "Routines et politiques multithread"
+      },
+      "cloud": {
+        "body": "Gérez vos fournisseurs de stockage (Amazon S3, Cloudflare R2 et autres). Chaque coffre affiche son état de connexion en direct.",
+        "title": "Coffres Cloud"
+      },
+      "audit": {
+        "body": "Chaque action est consignée dans des journaux immuables et inviolables, prêts pour la conformité et l'investigation forensique. La visite est terminée !",
+        "title": "Audit immuable"
+      }
+    }
+  },
+  "manual": {
+    "title": "Manuel utilisateur",
+    "subtitle": "Guide opérationnel de Kopher Shield",
+    "nav": "Sections du manuel",
+    "on_page": "Sur cette page",
+    "multithread": {
+      "nav": "Politiques multithread",
+      "title": "Politiques de sauvegarde multithread",
+      "intro": "Le moteur de Kopher Shield traite les fichiers en parallèle, répartissant la charge sur plusieurs threads pour réduire la fenêtre de sauvegarde sans saturer la machine.",
+      "blocks": [
+        {
+          "h": "Créer une routine",
+          "p": "Dans Routines, cliquez sur Nouvelle routine, indiquez le dossier source, le coffre de destination (local ou cloud) et la planification (manuelle, quotidienne, hebdomadaire ou mensuelle)."
+        },
+        {
+          "h": "Exécution parallèle",
+          "p": "Chaque fichier est découpé en blocs, chiffré en AES-256 et envoyé en parallèle. Vous pouvez lancer plusieurs routines à la fois avec Sélection par lot."
+        },
+        {
+          "h": "Suivi",
+          "p": "La progression s’affiche en temps réel sur chaque routine. En cas d’échec, l’étiquette rouge Échec indique la cause au survol."
+        }
+      ],
+      "tip": "Planifiez les sauvegardes lourdes en dehors des heures ouvrées pour préserver les performances des serveurs."
+    },
+    "cloud": {
+      "nav": "Coffres cloud et clés S3",
+      "title": "Coffres cloud et clés S3",
+      "intro": "Un coffre cloud est un bucket compatible S3 (AWS S3, Cloudflare R2, MinIO, Backblaze) où les blocs chiffrés sont stockés hors de votre réseau.",
+      "blocks": [
+        {
+          "h": "Ajouter un coffre",
+          "p": "Dans Coffres cloud, saisissez le nom, l’endpoint, le bucket, l’Access Key et la Secret Key. Les clés restent uniquement dans le backend et ne sont jamais exposées dans l’interface."
+        },
+        {
+          "h": "Bonnes pratiques",
+          "p": "Créez une clé dédiée à Kopher Shield avec uniquement les droits de lecture/écriture sur le bucket et faites-la tourner régulièrement."
+        },
+        {
+          "h": "Immuabilité",
+          "p": "Activez Object Lock (WORM) sur le bucket pour empêcher la suppression ou la modification des sauvegardes, même en cas de ransomware."
+        }
+      ],
+      "tip": "Ne réutilisez jamais les clés d’administration du compte cloud dans un coffre."
+    },
+    "restore": {
+      "nav": "Restauration",
+      "title": "Processus de restauration",
+      "intro": "La restauration reconstitue les fichiers à partir d’un manifeste .kophershield, en vérifiant l’intégrité de chaque bloc avant l’écriture.",
+      "blocks": [
+        {
+          "h": "Choisir le coffre",
+          "p": "Dans Restauration, sélectionnez le coffre local ou cloud et attendez le chargement des manifestes disponibles."
+        },
+        {
+          "h": "Sélectionner le point",
+          "p": "Chaque manifeste correspond à un instant donné. Choisissez-le et définissez le dossier de destination."
+        },
+        {
+          "h": "Validation",
+          "p": "Les blocs sont déchiffrés et vérifiés par hash. Restaurez d’abord dans un dossier alternatif pour contrôler les données avant de remplacer les originaux."
+        }
+      ],
+      "tip": "Testez régulièrement vos restaurations : une sauvegarde n’est fiable que si elle a été restaurée avec succès."
+    },
+    "audit": {
+      "nav": "Audit et conformité",
+      "title": "Audit et conformité",
+      "intro": "Chaque action pertinente est consignée dans un journal immuable, répondant aux exigences du RGPD et de l’ISO 27001.",
+      "blocks": [
+        {
+          "h": "Ce qui est enregistré",
+          "p": "Exécutions de routines, échecs, restaurations, modifications de configuration et accès administrateur, toujours horodatés."
+        },
+        {
+          "h": "Recherche et filtres",
+          "p": "Dans Audit, filtrez par niveau et recherchez par texte. Le tableau est virtualisé et gère des dizaines de milliers d’entrées sans ralentissement."
+        },
+        {
+          "h": "Conservation",
+          "p": "Les entrées sont en ajout seul, non modifiables par l’utilisateur, et exportables comme preuve pour des audits externes."
+        }
+      ],
+      "tip": "Exportez régulièrement les journaux et conservez-les selon votre politique de rétention."
+    }
+  },
+  "support": {
+    "tab_ticket": "Ticket",
+    "tab_manual": "Manuel",
+    "tabs_label": "Sections du support",
+    "title": "Service Desk et Support Entreprise",
+    "subtitle": "Centre d’assistance avancé, base de connaissances et gestion des incidents BINAVER.",
+    "dbConnected": "Base SQLite connectée",
+    "sla": "SLA : 4 h ouvrées",
+    "filePickerName": "Médias et documents",
+    "form": {
+      "title": "Ouvrir un ticket prioritaire",
+      "subtitle": "Envoi sécurisé à l’équipe BINAVER avec enregistrement local et pièces jointes.",
+      "badge": "Pont sécurisé",
+      "subject": "Objet de l’incident",
+      "subjectPh": "Ex : Erreur de synchronisation du coffre cloud",
+      "priority": "Priorité / SLA",
+      "category": "Catégorie de la demande",
+      "description": "Description détaillée du scénario",
+      "descriptionPh": "Décrivez les étapes pour reproduire le problème, les messages d’erreur affichés ou le détail de votre besoin...",
+      "attachments": "Pièces jointes de diagnostic (captures, vidéos, logs)",
+      "attachmentsHint": "Ajoutez des captures d’écran ou de courts enregistrements pour faciliter l’analyse technique.",
+      "addFiles": "Ajouter des fichiers",
+      "copyDiag": "Copier le diagnostic système",
+      "diagCopied": "Diagnostic copié !",
+      "sending": "Envoi du ticket...",
+      "submit": "Envoyer le ticket"
+    },
+    "priority": {
+      "low": "Basse",
+      "medium": "Moyenne",
+      "urgent": "Urgente / Critique"
+    },
+    "category": {
+      "c0": "Question technique",
+      "c1": "Panne / Bug",
+      "c2": "Nouvelle fonctionnalité",
+      "c3": "Licence"
+    },
+    "guide": {
+      "title": "Guide d’utilisation interactif",
+      "text": "Besoin de revoir la configuration des routines ou la navigation ?",
+      "button": "Relancer la visite guidée"
+    },
+    "faq": {
+      "title": "Questions fréquentes (FAQ)",
+      "q0": "Comment restaurer des fichiers depuis un coffre local ?",
+      "a0": "Ouvrez le menu « Restauration », sélectionnez le dossier du coffre, choisissez le manifeste correspondant et cliquez sur « Lancer la restauration ».",
+      "q1": "Que faire si une routine planifiée échoue ?",
+      "a1": "Consultez l’écran Audit pour voir le journal détaillé de l’erreur et vérifiez que la source de données est accessible en lecture.",
+      "q2": "Comment renouveler ou modifier la clé de licence entreprise ?",
+      "a2": "Rendez-vous dans « Paramètres » > « Licence » pour mettre à jour votre clé d’activation ou gérer les jetons d’authentification à deux facteurs (2FA)."
+    },
+    "info": {
+      "engine": "Version du moteur",
+      "developer": "Éditeur",
+      "direct": "Support direct"
+    },
+    "toast": {
+      "filesAdded": "Fichiers ajoutés",
+      "filesAddedMsg_one": "{{count}} pièce jointe sélectionnée avec succès.",
+      "filesAddedMsg_other": "{{count}} pièces jointes sélectionnées avec succès.",
+      "error": "Erreur",
+      "filesError": "Impossible de charger les fichiers.",
+      "required": "Champs obligatoires",
+      "requiredMsg": "Renseignez l’objet et la description détaillée du ticket.",
+      "sent": "Ticket envoyé",
+      "sentMsg": "Votre ticket a été enregistré et transmis à l’équipe support BINAVER.",
+      "sendError": "Échec de l’envoi",
+      "sendErrorMsg": "Impossible d’envoyer le ticket : {{error}}",
+      "diagCopied": "Diagnostic copié",
+      "diagCopiedMsg": "Collez ces informations dans votre ticket si nécessaire."
+    },
+    "diag": {
+      "version": "Version",
+      "engine": "Moteur",
+      "workspace": "Espace de travail",
+      "active": "Actif",
+      "dbStatus": "État BD",
+      "healthy": "Sain",
+      "category": "Catégorie",
+      "priority": "Priorité",
+      "subject": "Objet",
+      "description": "Description du problème"
+    }
+  },
+  "restore": {
+    "title": "Restauration de sauvegarde",
+    "subtitle": "Reprise après sinistre et audit d’intégrité des coffres.",
+    "sourceType": {
+      "local": "Coffre local / NAS",
+      "cloud": "Coffre cloud (S3 / Cloudflare)"
+    },
+    "localVault": {
+      "label": "Localiser le coffre de sécurité local",
+      "placeholder": "Sélectionnez le dossier racine du coffre local...",
+      "open": "Ouvrir le coffre"
+    },
+    "cloudVault": {
+      "label": "Sélectionnez le coffre cloud enregistré",
+      "emptyOption": "Aucun coffre cloud n’est configuré dans le système",
+      "optionLabel": "☁️ {{name}} ({{provider}})",
+      "scan": "Analyser le cloud"
+    },
+    "filters": {
+      "searchPlaceholder": "Rechercher par nom ou chemin...",
+      "searchAriaLabel": "Rechercher des sauvegardes par nom ou chemin",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "until": "Jusqu’à"
+    },
+    "selection": {
+      "selected_one": "sélectionné",
+      "selected_other": "sélectionnés",
+      "bulkRestore": "Restaurer le lot",
+      "clearAllAriaLabel": "Effacer la sélection de {{count}} sauvegardes",
+      "selectAllAriaLabel": "Sélectionner {{count}} sauvegardes",
+      "selectAll": "Tout sélectionner ({{count}})"
+    },
+    "empty": {
+      "filtered": "Aucune sauvegarde ne correspond aux filtres indiqués.",
+      "initial": "Aucun point de restauration n’a été trouvé. Sélectionnez la source ci-dessus pour charger les coffres."
+    },
+    "manifest": {
+      "source": "Source : {{source}}",
+      "sourceTitle": "Source : {{source}}",
+      "date": "Date : {{date}}",
+      "encryptedBlocks": "Blocs chiffrés : {{count}}",
+      "restore": "Restaurer",
+      "restoring": "Restauration...",
+      "restoreAriaLabel": "Restaurer le coffre {{name}}",
+      "selection": {
+        "select": "Sélectionner le coffre {{name}}",
+        "unselect": "Désélectionner le coffre {{name}}"
+      },
+      "status": {
+        "localIntact": "Intègre (ZSTD+AES256)",
+        "cloudIntact": "Intègre dans le cloud (S3)"
+      }
+    },
+    "progress": {
+      "starting": "Démarrage des moteurs de restauration...",
+      "downloading": "Téléchargement : {{path}}",
+      "extracting": "Extraction : {{path}}",
+      "completeCloud": "Restauration cloud terminée !",
+      "complete": "Terminé !"
+    },
+    "modal": {
+      "singleRestoreMessage": "Voulez-vous restaurer le coffre '{{name}}' dans le dossier sélectionné ?",
+      "singleRestoreTitle": "Kopher Shield Recovery",
+      "bulkRestoreMessage_one": "Attention : vous êtes sur le point de restaurer {{count}} coffre par lot dans le même dossier. Le processus s’exécutera en file d’attente. Voulez-vous continuer ?",
+      "bulkRestoreMessage_other": "Attention : vous êtes sur le point de restaurer {{count}} coffres par lot dans le même dossier. Le processus s’exécutera en file d’attente. Voulez-vous continuer ?",
+      "bulkRestoreTitle": "Opération par lot - Kopher Shield"
+    },
+    "batch": {
+      "processing": "Traitement du lot : {{name}}..."
+    },
+    "toast": {
+      "restoreFinishedTitle": "Restauration terminée",
+      "restoreFinishedMessage": "Le rapport d’audit a été envoyé par e-mail.",
+      "restoreAttentionTitle": "Attention pendant la restauration",
+      "warningTitle": "Avertissement",
+      "errorTitle": "Erreur",
+      "localVaultEmpty": "Aucun coffre Kopher Shield (.kophershield ou ancien .coopshield) n’a été trouvé dans ce dossier.",
+      "scanLocalFailed": "Échec de l’analyse du coffre local : {{error}}",
+      "invalidCloudVault": "Sélectionnez un coffre cloud valide.",
+      "cloudEmpty": "Aucune sauvegarde n’a été trouvée dans ce coffre cloud.",
+      "cloudFound_one": "{{count}} point de restauration trouvé dans le cloud.",
+      "cloudFound_other": "{{count}} points de restauration trouvés dans le cloud.",
+      "cloudConnectFailed": "Échec de la connexion au cloud : {{error}}",
+      "criticalErrorTitle": "Erreur critique",
+      "confirmRestoreFailed": "Échec du déclenchement de la restauration : {{error}}",
+      "batchFailureTitle": "Échec du lot",
+      "batchFailedItem": "Erreur lors de la restauration de {{name}}. Le système passera au suivant.",
+      "batchFinishedTitle": "Lot terminé",
+      "batchFinishedMessage": "Opération terminée. {{successCount}} sur {{totalCount}} ont été traités. Les rapports ont été envoyés par e-mail."
+    }
+  },
+  "lock": {
+    "badge": "La licence requiert une validation",
+    "title": "Accès restreint",
+    "description": "Le terminal associé à <strong>{{name}}</strong> est verrouillé. Vérifiez les identifiants administrateur ou l'état de l'abonnement.",
+    "email": "E-mail administrateur",
+    "password": "Mot de passe",
+    "manualKey": "Saisir la clé manuellement",
+    "continue": "Poursuivre l'authentification",
+    "methodApp": "App d'authentification",
+    "methodEmail": "E-mail",
+    "codeHintApp": "Saisissez le code à 6 chiffres de votre application d'authentification.",
+    "codeHintEmail": "Nous avons envoyé un jeton temporaire à {{email}}.",
+    "resending": "Renvoi en cours...",
+    "resent": "Code renvoyé !",
+    "wait": "Patientez {{seconds}}s avant de renvoyer",
+    "resend": "Renvoyer le code par e-mail",
+    "back": "Retour",
+    "unlock": "Déverrouiller le système",
+    "machineId": "ID de la machine :",
+    "copyTitle": "Copier l'ID machine pour le support",
+    "copied": "Copié !",
+    "copyId": "Copier l'ID",
+    "subscriptionHelp": "Des questions sur l'abonnement ?",
+    "contact": "Nous contacter",
+    "errFill": "Renseignez l'e-mail et le mot de passe.",
+    "errKey": "La clé est incomplète.",
+    "errToken": "Le jeton doit comporter 6 chiffres.",
+    "unavailable": "INDISPONIBLE"
+  },
+  "splash": {
+    "company": "BINAVER Solutions Technologiques",
+    "tagline": "Protection immuable. Récupération fiable.",
+    "failed": "Impossible de confirmer le démarrage sécurisé.",
+    "retry": "Réessayer",
+    "ariaFailed": "Échec du démarrage de Kopher Shield",
+    "ariaStarting": "Démarrage de Kopher Shield",
+    "timeout": "Le service sécurisé n'a pas confirmé le démarrage en 30 secondes."
   }
 }
