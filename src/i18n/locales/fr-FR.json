@@ -167,7 +167,8 @@
     "tabs": {
       "appearance": "Apparence et accessibilité",
       "alerts": "Centre d'alertes",
-      "license": "Licence"
+      "license": "Licence",
+      "network": "Réseau et performances"
     },
     "appearance": {
       "title": "Identité visuelle et mise en page",
@@ -231,6 +232,45 @@
     "actions": {
       "saving": "Enregistrement...",
       "save": "Enregistrer les paramètres"
+    },
+    "network": {
+      "title": "Réseau et performances",
+      "subtitle": "Contrôlez la bande passante utilisée par les envois de sauvegarde pour ne pas perturber l'activité de l'entreprise.",
+      "throttleTitle": "Limite de bande passante",
+      "enable": "Activer la limite de bande passante",
+      "enableDesc": "Réduit la vitesse d'envoi vers le cloud pendant les heures de bureau.",
+      "maxSpeed": "Vitesse maximale (Mo/s)",
+      "maxSpeedHint": "Appliquée uniquement pendant la plage des heures de bureau.",
+      "window": "Plage des heures de bureau",
+      "from": "De",
+      "to": "À",
+      "windowHint": "En dehors de cette plage, l'envoi utilise toute la vitesse disponible. Les plages passant minuit sont acceptées.",
+      "summaryOn": "Limite de {{speed}} Mo/s actif de {{start}} à {{end}}.",
+      "summaryOff": "Aucune limite : les sauvegardes utilisent toute la bande passante disponible.",
+      "invalidSpeed": "Vitesse invalide",
+      "invalidSpeedMsg": "Indiquez une vitesse supérieure à zéro (Mo/s).",
+      "invalidWindow": "Plage invalide",
+      "invalidWindowMsg": "L'heure de début et de fin ne peuvent pas être identiques."
+    },
+    "webhooks": {
+      "title": "Intégrations d'entreprise (Webhooks)",
+      "desc": "Recevez des alertes en temps réel dans Slack, Microsoft Teams ou Discord.",
+      "url": "URL du Webhook",
+      "placeholder": "https://hooks.slack.com/services/... | https://outlook.office.com/webhook/... | https://discord.com/api/webhooks/...",
+      "events": "Événements déclenchant des notifications",
+      "success": "Succès",
+      "successDesc": "Sauvegardes et restaurations terminées",
+      "failure": "Échecs",
+      "failureDesc": "Erreurs critiques et sauvegardes interrompues",
+      "warning": "Avertissements",
+      "warningDesc": "Alertes non critiques nécessitant une attention",
+      "test": "Tester la connexion",
+      "testing": "Test en cours...",
+      "emptyUrl": "URL manquante",
+      "emptyUrlMsg": "Collez l'URL du Webhook avant de tester.",
+      "ok": "Webhook connecté",
+      "okMsg": "Message de test envoyé avec succès.",
+      "fail": "Échec du webhook"
     }
   },
   "nav": {

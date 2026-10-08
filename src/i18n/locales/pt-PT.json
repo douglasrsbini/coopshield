@@ -167,7 +167,8 @@
     "tabs": {
       "appearance": "Aparência e Acessibilidade",
       "alerts": "Central de Alertas",
-      "license": "Licenciamento"
+      "license": "Licenciamento",
+      "network": "Rede e Desempenho"
     },
     "appearance": {
       "title": "Identidade Visual e Layout",
@@ -231,6 +232,45 @@
     "actions": {
       "saving": "A guardar...",
       "save": "Guardar Configurações"
+    },
+    "network": {
+      "title": "Rede e Desempenho",
+      "subtitle": "Controle o consumo de largura de banda dos uploads de backup para não afetar a operação da empresa.",
+      "throttleTitle": "Limite de Largura de Banda",
+      "enable": "Ativar Limite de Largura de Banda",
+      "enableDesc": "Reduz a velocidade de envio para a nuvem durante o horário laboral.",
+      "maxSpeed": "Velocidade máxima (MB/s)",
+      "maxSpeedHint": "Aplicada apenas dentro da janela de horário laboral.",
+      "window": "Janela de Horário Laboral",
+      "from": "Das",
+      "to": "Até",
+      "windowHint": "Fora desta janela o envio ocorre à velocidade máxima disponível. São aceites janelas que atravessam a meia-noite.",
+      "summaryOn": "Limite de {{speed}} MB/s ativo das {{start}} às {{end}}.",
+      "summaryOff": "Sem limite: os backups usam toda a largura de banda disponível.",
+      "invalidSpeed": "Velocidade inválida",
+      "invalidSpeedMsg": "Indique uma velocidade superior a zero (MB/s).",
+      "invalidWindow": "Janela inválida",
+      "invalidWindowMsg": "A hora inicial e final não podem ser iguais."
+    },
+    "webhooks": {
+      "title": "Integrações Empresariais (Webhooks)",
+      "desc": "Receba alertas em tempo real no Slack, Microsoft Teams ou Discord.",
+      "url": "URL do Webhook",
+      "placeholder": "https://hooks.slack.com/services/... | https://outlook.office.com/webhook/... | https://discord.com/api/webhooks/...",
+      "events": "Eventos que disparam notificações",
+      "success": "Sucesso",
+      "successDesc": "Cópias de segurança e restauros concluídos",
+      "failure": "Falhas",
+      "failureDesc": "Erros críticos e cópias interrompidas",
+      "warning": "Avisos",
+      "warningDesc": "Alertas não críticos e situações que requerem atenção",
+      "test": "Testar Ligação",
+      "testing": "A testar...",
+      "emptyUrl": "URL em falta",
+      "emptyUrlMsg": "Cole o URL do Webhook antes de testar.",
+      "ok": "Webhook ligado",
+      "okMsg": "Mensagem de teste enviada com sucesso.",
+      "fail": "Falha no webhook"
     }
   },
   "nav": {

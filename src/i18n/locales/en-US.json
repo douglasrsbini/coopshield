@@ -167,7 +167,8 @@
     "tabs": {
       "appearance": "Appearance & Accessibility",
       "alerts": "Alert Center",
-      "license": "Licensing"
+      "license": "Licensing",
+      "network": "Network & Performance"
     },
     "appearance": {
       "title": "Visual Identity & Layout",
@@ -231,6 +232,45 @@
     "actions": {
       "saving": "Saving...",
       "save": "Save Settings"
+    },
+    "network": {
+      "title": "Network & Performance",
+      "subtitle": "Control the bandwidth used by backup uploads so business operations are not affected.",
+      "throttleTitle": "Bandwidth Limit",
+      "enable": "Enable Bandwidth Limit",
+      "enableDesc": "Throttles the upload speed to the cloud during business hours.",
+      "maxSpeed": "Maximum speed (MB/s)",
+      "maxSpeedHint": "Applied only inside the business hours window.",
+      "window": "Business Hours Window",
+      "from": "From",
+      "to": "To",
+      "windowHint": "Outside this window uploads run at the full available speed. Windows that cross midnight are supported.",
+      "summaryOn": "{{speed}} MB/s limit active from {{start}} to {{end}}.",
+      "summaryOff": "No limit: backups use all available bandwidth.",
+      "invalidSpeed": "Invalid speed",
+      "invalidSpeedMsg": "Enter a speed greater than zero (MB/s).",
+      "invalidWindow": "Invalid window",
+      "invalidWindowMsg": "Start and end times cannot be the same."
+    },
+    "webhooks": {
+      "title": "Enterprise Integrations (Webhooks)",
+      "desc": "Get real-time alerts in Slack, Microsoft Teams or Discord.",
+      "url": "Webhook URL",
+      "placeholder": "https://hooks.slack.com/services/... | https://outlook.office.com/webhook/... | https://discord.com/api/webhooks/...",
+      "events": "Events that trigger notifications",
+      "success": "Success",
+      "successDesc": "Completed backups and restores",
+      "failure": "Failures",
+      "failureDesc": "Critical errors and interrupted backups",
+      "warning": "Warnings",
+      "warningDesc": "Non-critical alerts that need attention",
+      "test": "Test Connection",
+      "testing": "Testing...",
+      "emptyUrl": "Missing URL",
+      "emptyUrlMsg": "Paste the Webhook URL before testing.",
+      "ok": "Webhook connected",
+      "okMsg": "Test message sent successfully.",
+      "fail": "Webhook failure"
     }
   },
   "nav": {

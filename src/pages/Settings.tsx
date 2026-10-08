@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Palette, Bell, Key, Mail, MessageSquare, Save, ShieldCheck, CheckCircle2, AlertCircle, Info, Moon, Sun, X, Type, Trash2, UploadCloud, Building2, Send, RefreshCcw, Cpu, Edit2, Loader2, AlertTriangle, ShieldOff, Lock, ChevronDown, ChevronUp, Smartphone, ArrowRight, BellRing, Settings2, RefreshCw, UserCheck, Briefcase, User, Monitor, Camera, Laptop, Award } from 'lucide-react';
+import { Palette, Bell, Key, Mail, MessageSquare, Save, ShieldCheck, CheckCircle2, AlertCircle, Info, Moon, Sun, X, Type, Trash2, UploadCloud, Building2, Send, RefreshCcw, Cpu, Edit2, Loader2, AlertTriangle, ShieldOff, Lock, ChevronDown, ChevronUp, Smartphone, ArrowRight, BellRing, Settings2, RefreshCw, Gauge, Clock, UserCheck, Briefcase, User, Monitor, Camera, Laptop, Award } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 import { open } from '@tauri-apps/plugin-dialog';
 import { ACCENT_PRESETS, DEFAULT_ACCENT_COLOR, hexToRgbChannels, normalizeAccentColor } from '../theme';
@@ -47,7 +47,11 @@ export default function Settings() {
   const [smtpPass, setSmtpPass] = useState('');
   const [smtpCc, setSmtpCc] = useState(''); 
   const [smtpBcc, setSmtpBcc] = useState(''); 
-  const [teamsWebhook, setTeamsWebhook] = useState(''); 
+  const [teamsWebhook, setTeamsWebhook] = useState('');
+  const [webhookOnSuccess, setWebhookOnSuccess] = useState(true);
+  const [webhookOnFailure, setWebhookOnFailure] = useState(true);
+  const [webhookOnWarning, setWebhookOnWarning] = useState(false);
+  const [isTestingWebhook, setIsTestingWebhook] = useState(false); 
 
   // Preferências Granulares de Notificação
   const [notifyBackupStart, setNotifyBackupStart] = useState(true);
@@ -55,6 +59,12 @@ export default function Settings() {
   const [notifyRestore, setNotifyRestore] = useState(true);
   const [notifySystemErrors, setNotifySystemErrors] = useState(true);
   
+  // Estados: Rede e Performance (Bandwidth Throttling)
+  const [bwLimitEnabled, setBwLimitEnabled] = useState(false);
+  const [bwLimitMbps, setBwLimitMbps] = useState('10');
+  const [bwStart, setBwStart] = useState('08:00');
+  const [bwEnd, setBwEnd] = useState('18:00');
+
   // Estados: DRM, Licenciamento Híbrido, Avatar e Hostname do SO
   const [machineId, setMachineId] = useState(t('settings.loading'));
   const [deviceName, setDeviceName] = useState(t('settings.loading')); 
@@ -81,6 +91,18 @@ export default function Settings() {
   const [isValidatingLicense, setIsValidatingLicense] = useState(false);
   const [isUnlinking, setIsUnlinking] = useState(false);
   const [licenseMessage, setLicenseMessage] = useState<{type: 'error' | 'success', text: string} | null>(null);
+
+  const handleTestWebhook = async () => {
+    const url = teamsWebhook.trim();
+    if (!url) { showToast(t('settings.webhooks.emptyUrl'), t('settings.webhooks.emptyUrlMsg'), 'error'); return; }
+    setIsTestingWebhook(true);
+    try {
+      await invoke('test_webhook_integration', { url });
+      showToast(t('settings.webhooks.ok'), t('settings.webhooks.okMsg'), 'success');
+    } catch (e) {
+      showToast(t('settings.webhooks.fail'), String(e), 'error');
+    } finally { setIsTestingWebhook(false); }
+  };
 
   const showToast = (title: string, msg: string, type: 'success' | 'error' | 'info' = 'info') => {
     const id = Date.now();
@@ -122,11 +144,19 @@ export default function Settings() {
           if (data.smtp_cc) setSmtpCc(data.smtp_cc);
           if (data.smtp_bcc) setSmtpBcc(data.smtp_bcc);
           if (data.teams_webhook) setTeamsWebhook(data.teams_webhook);
+          if (data.webhook_on_success) setWebhookOnSuccess(data.webhook_on_success === 'true');
+          if (data.webhook_on_failure) setWebhookOnFailure(data.webhook_on_failure === 'true');
+          if (data.webhook_on_warning) setWebhookOnWarning(data.webhook_on_warning === 'true');
           
           if (data.pref_notify_backup_start) setNotifyBackupStart(data.pref_notify_backup_start === 'true');
           if (data.pref_notify_backup_end) setNotifyBackupEnd(data.pref_notify_backup_end !== 'false');
           if (data.pref_notify_restore) setNotifyRestore(data.pref_notify_restore !== 'false');
           if (data.pref_notify_system_errors) setNotifySystemErrors(data.pref_notify_system_errors !== 'false');
+
+          if (data.bw_limit_enabled) setBwLimitEnabled(data.bw_limit_enabled === 'true');
+          if (data.bw_limit_mbps) setBwLimitMbps(data.bw_limit_mbps);
+          if (data.bw_business_start) setBwStart(data.bw_business_start);
+          if (data.bw_business_end) setBwEnd(data.bw_business_end);
 
           if (data.license_key) setCurrentLicense(data.license_key);
           if (data.license_email) setLicenseEmail(data.license_email);
@@ -235,16 +265,31 @@ export default function Settings() {
       return;
     }
 
+    const mbps = Number(bwLimitMbps.replace(',', '.'));
+    if (bwLimitEnabled && (!Number.isFinite(mbps) || mbps <= 0)) {
+      showToast(t('settings.network.invalidSpeed'), t('settings.network.invalidSpeedMsg'), 'error');
+      return;
+    }
+    if (bwLimitEnabled && bwStart === bwEnd) {
+      showToast(t('settings.network.invalidWindow'), t('settings.network.invalidWindowMsg'), 'error');
+      return;
+    }
+
     setIsSaving(true);
     const payload = {
       theme, language: normalizeLanguage(i18n.resolvedLanguage), accent_color: accentColor, ui_scale: uiScale, client_logo: clientLogo, client_name: clientName,
       use_custom_smtp: useCustomSmtp.toString(),
       smtp_host: smtpHost, smtp_port: smtpPort, smtp_security: smtpSecurity, smtp_user: smtpUser, smtp_pass: smtpPass, 
-      smtp_cc: smtpCc, smtp_bcc: smtpBcc, teams_webhook: teamsWebhook,
+      smtp_cc: smtpCc, smtp_bcc: smtpBcc, teams_webhook: teamsWebhook.trim(),
+      webhook_on_success: webhookOnSuccess.toString(), webhook_on_failure: webhookOnFailure.toString(), webhook_on_warning: webhookOnWarning.toString(),
       pref_notify_backup_start: notifyBackupStart.toString(),
       pref_notify_backup_end: notifyBackupEnd.toString(),
       pref_notify_restore: notifyRestore.toString(),
-      pref_notify_system_errors: notifySystemErrors.toString()
+      pref_notify_system_errors: notifySystemErrors.toString(),
+      bw_limit_enabled: bwLimitEnabled.toString(),
+      bw_limit_mbps: String(Number.isFinite(mbps) && mbps > 0 ? mbps : 10),
+      bw_business_start: bwStart,
+      bw_business_end: bwEnd
     };
     try {
       await invoke('update_settings', { payload });
@@ -426,6 +471,7 @@ export default function Settings() {
         <div className="w-full lg:w-64 flex flex-col space-y-2 shrink-0">
           <button onClick={() => setActiveTab('appearance')} className={`flex items-center px-4 py-3 rounded-xl font-medium text-sm transition-all cursor-pointer ${activeTab === 'appearance' ? 'bg-primary/10 text-primary border border-primary/20' : 'text-textMuted hover:bg-surface hover:text-textMain border border-transparent'}`}><Palette size={18} className="mr-3" /> {t('settings.tabs.appearance')}</button>
           <button onClick={() => setActiveTab('notifications')} className={`flex items-center px-4 py-3 rounded-xl font-medium text-sm transition-all cursor-pointer ${activeTab === 'notifications' ? 'bg-primary/10 text-primary border border-primary/20' : 'text-textMuted hover:bg-surface hover:text-textMain border border-transparent'}`}><Bell size={18} className="mr-3" /> {t('settings.tabs.alerts')}</button>
+          <button onClick={() => setActiveTab('network')} className={`flex items-center px-4 py-3 rounded-xl font-medium text-sm transition-all cursor-pointer ${activeTab === 'network' ? 'bg-primary/10 text-primary border border-primary/20' : 'text-textMuted hover:bg-surface hover:text-textMain border border-transparent'}`}><Gauge size={18} className="mr-3" /> {t('settings.tabs.network')}</button>
           <button onClick={() => setActiveTab('license')} className={`flex items-center px-4 py-3 rounded-xl font-medium text-sm transition-all cursor-pointer ${activeTab === 'license' ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' : 'text-textMuted hover:bg-surface hover:text-textMain border border-transparent'}`}><Key size={18} className="mr-3" /> {t('settings.tabs.license')}</button>
         </div>
 
@@ -577,16 +623,34 @@ export default function Settings() {
                       </div>
                     </div>
 
-                    <div className="bg-background/50 border border-border rounded-xl p-5 space-y-4">
-                      <h3 className="text-sm font-bold flex items-center text-[#5B5FC7]"><MessageSquare size={16} className="mr-2" /> Microsoft Teams (Webhook)</h3>
-                      <p className="text-xs text-textMuted">{t('settings.alerts.teamsDesc')}</p>
-                      <div>
-                        <label className="block text-xs font-medium text-textMuted mb-1.5">{t('settings.alerts.teamsUrl')}</label>
-                        <textarea value={teamsWebhook} onChange={e => setTeamsWebhook(e.target.value)} placeholder={t('settings.alerts.teamsPlaceholder')} className="w-full h-24 bg-surface border border-border rounded-lg px-3 py-2 text-sm text-textMain focus:border-[#5B5FC7] outline-none resize-none font-mono text-xs" />
+                    <div className="relative overflow-hidden bg-background/50 backdrop-blur-xl border border-border rounded-xl p-5 space-y-4">
+                      <div className="absolute -top-16 -right-16 w-40 h-40 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
+                      <h3 className="relative text-sm font-bold flex items-center text-amber-500 break-words"><MessageSquare size={16} className="mr-2 shrink-0" /> {t('settings.webhooks.title')}</h3>
+                      <p className="relative text-xs text-textMuted break-words whitespace-normal">{t('settings.webhooks.desc')}</p>
+                      <div className="relative">
+                        <label className="block text-xs font-medium text-textMuted mb-1.5">{t('settings.webhooks.url')}</label>
+                        <textarea value={teamsWebhook} onChange={e => setTeamsWebhook(e.target.value)} placeholder={t('settings.webhooks.placeholder')} className="w-full h-24 bg-surface border border-border rounded-lg px-3 py-2 text-xs text-textMain focus:border-amber-500 outline-none resize-none font-mono" />
                       </div>
-                      <div className="pt-2 border-t border-border/50">
-                        <button onClick={() => showToast(t('settings.toast.comingSoon'), t('settings.toast.comingSoonMsg'), 'info')} className="w-full bg-surface border border-[#5B5FC7] text-[#5B5FC7] hover:bg-[#5B5FC7] hover:text-white px-4 py-2.5 rounded-lg font-medium text-sm transition-all flex items-center justify-center cursor-pointer">
-                          <Send className="mr-2" size={16} /> {t('settings.alerts.teamsTest')}
+                      <div className="relative">
+                        <label className="block text-xs font-medium text-textMuted mb-2">{t('settings.webhooks.events')}</label>
+                        <div className="grid grid-cols-1 gap-2">
+                        <label className="flex items-start gap-3 p-3 rounded-lg border border-border/60 bg-surface/50 hover:border-primary/40 cursor-pointer transition-all">
+                          <input type="checkbox" checked={webhookOnSuccess} onChange={e => setWebhookOnSuccess(e.target.checked)} className="mt-0.5 w-4 h-4 accent-amber-500 cursor-pointer shrink-0" />
+                          <span className="min-w-0"><span className="block text-sm font-medium text-textMain break-words whitespace-normal">{t('settings.webhooks.success')}</span><span className="block text-xs text-textMuted break-words whitespace-normal">{t('settings.webhooks.successDesc')}</span></span>
+                        </label>
+                        <label className="flex items-start gap-3 p-3 rounded-lg border border-border/60 bg-surface/50 hover:border-primary/40 cursor-pointer transition-all">
+                          <input type="checkbox" checked={webhookOnFailure} onChange={e => setWebhookOnFailure(e.target.checked)} className="mt-0.5 w-4 h-4 accent-amber-500 cursor-pointer shrink-0" />
+                          <span className="min-w-0"><span className="block text-sm font-medium text-textMain break-words whitespace-normal">{t('settings.webhooks.failure')}</span><span className="block text-xs text-textMuted break-words whitespace-normal">{t('settings.webhooks.failureDesc')}</span></span>
+                        </label>
+                        <label className="flex items-start gap-3 p-3 rounded-lg border border-border/60 bg-surface/50 hover:border-primary/40 cursor-pointer transition-all">
+                          <input type="checkbox" checked={webhookOnWarning} onChange={e => setWebhookOnWarning(e.target.checked)} className="mt-0.5 w-4 h-4 accent-amber-500 cursor-pointer shrink-0" />
+                          <span className="min-w-0"><span className="block text-sm font-medium text-textMain break-words whitespace-normal">{t('settings.webhooks.warning')}</span><span className="block text-xs text-textMuted break-words whitespace-normal">{t('settings.webhooks.warningDesc')}</span></span>
+                        </label>
+                        </div>
+                      </div>
+                      <div className="relative pt-2 border-t border-border/50">
+                        <button onClick={handleTestWebhook} disabled={isTestingWebhook} className="w-full bg-surface border border-amber-500 text-amber-500 hover:bg-amber-500 hover:text-white px-4 py-2.5 rounded-lg font-medium text-sm transition-all flex items-center justify-center cursor-pointer disabled:opacity-50 shadow-sm">
+                          {isTestingWebhook ? <RefreshCcw className="animate-spin mr-2" size={16} /> : <Send className="mr-2" size={16} />} {isTestingWebhook ? t('settings.webhooks.testing') : t('settings.webhooks.test')}
                         </button>
                       </div>
                     </div>
@@ -615,6 +679,57 @@ export default function Settings() {
             )}
 
             {/* ABA DE LICENCIAMENTO TOTALMENTE REESTRUTURADA E MODERNA */}
+            {activeTab === 'network' && (
+              <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                <div>
+                  <h2 className="text-lg font-bold mb-1 break-words">{t('settings.network.title')}</h2>
+                  <p className="text-sm text-textMuted break-words">{t('settings.network.subtitle')}</p>
+                </div>
+
+                <section className="bg-background/40 backdrop-blur-xl border border-border rounded-xl p-5 space-y-5 shadow-sm">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-start gap-3 min-w-0">
+                      <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0"><Gauge size={20} /></div>
+                      <div className="min-w-0">
+                        <h3 className="text-sm font-bold break-words">{t('settings.network.enable')}</h3>
+                        <p className="text-xs text-textMuted mt-0.5 break-words whitespace-normal">{t('settings.network.enableDesc')}</p>
+                      </div>
+                    </div>
+                    <ToggleSwitch label="" description="" checked={bwLimitEnabled} onChange={setBwLimitEnabled} />
+                  </div>
+
+                  <div className={`grid grid-cols-1 xl:grid-cols-2 gap-5 pt-5 border-t border-border/50 transition-opacity duration-300 ${bwLimitEnabled ? 'opacity-100' : 'opacity-40 pointer-events-none'}`} aria-disabled={!bwLimitEnabled}>
+                    <div>
+                      <label htmlFor="bw-speed" className="block text-xs font-bold text-textMain mb-1.5 uppercase tracking-wider break-words">{t('settings.network.maxSpeed')}</label>
+                      <div className="relative max-w-xs">
+                        <input id="bw-speed" type="number" min="0.1" step="0.5" inputMode="decimal" value={bwLimitMbps} onChange={e => setBwLimitMbps(e.target.value)} disabled={!bwLimitEnabled} placeholder="10" className="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm text-textMain focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all pr-14" />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-textMuted pointer-events-none">MB/s</span>
+                      </div>
+                      <p className="text-xs text-textMuted mt-1.5 break-words whitespace-normal">{t('settings.network.maxSpeedHint')}</p>
+                    </div>
+
+                    <div>
+                      <span className="flex items-center text-xs font-bold text-textMain mb-1.5 uppercase tracking-wider break-words"><Clock size={14} className="mr-1.5 text-primary shrink-0" /> {t('settings.network.window')}</span>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <label className="flex items-center gap-2 text-xs text-textMuted">{t('settings.network.from')}
+                          <input type="time" value={bwStart} onChange={e => setBwStart(e.target.value)} disabled={!bwLimitEnabled} className="w-auto w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm text-textMain focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" />
+                        </label>
+                        <label className="flex items-center gap-2 text-xs text-textMuted">{t('settings.network.to')}
+                          <input type="time" value={bwEnd} onChange={e => setBwEnd(e.target.value)} disabled={!bwLimitEnabled} className="w-auto w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm text-textMain focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" />
+                        </label>
+                      </div>
+                      <p className="text-xs text-textMuted mt-1.5 break-words whitespace-normal">{t('settings.network.windowHint')}</p>
+                    </div>
+                  </div>
+
+                  <div className={`flex items-start gap-3 p-3 rounded-lg border text-sm ${bwLimitEnabled ? 'bg-primary/10 border-primary/20 text-textMain' : 'bg-background/50 border-border text-textMuted'}`} role="status">
+                    <Info size={16} className="shrink-0 mt-0.5 text-primary" />
+                    <span className="break-words whitespace-normal">{bwLimitEnabled ? t('settings.network.summaryOn', { speed: bwLimitMbps || '0', start: bwStart, end: bwEnd }) : t('settings.network.summaryOff')}</span>
+                  </div>
+                </section>
+              </div>
+            )}
+
             {activeTab === 'license' && (
               <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300 max-w-5xl">
                 

@@ -174,3 +174,67 @@ pub fn request_2fa_token(app_handle: AppHandle, email: String) -> Result<String,
     mailer.send(&email_msg).map_err(|e| format!("Falha de envio SMTP: {}", e))?;
     Ok("Token enviado com sucesso.".to_string())
 }
+fn build_webhook_payload(url: &str) -> serde_json::Value {
+    let msg = "Kopher Shield: Conexão de Webhook estabelecida com sucesso!";
+    if url.contains("discord.com") || url.contains("discordapp.com") {
+        serde_json::json!({
+            "username": "Kopher Shield",
+            "embeds": [{ "title": "Kopher Shield", "description": msg, "color": 16096779 }]
+        })
+    } else if url.contains("hooks.slack.com") {
+        serde_json::json!({
+            "text": msg,
+            "blocks": [
+                { "type": "header", "text": { "type": "plain_text", "text": "Kopher Shield" } },
+                { "type": "section", "text": { "type": "mrkdwn", "text": format!(":white_check_mark: {}", msg) } }
+            ]
+        })
+    } else {
+        serde_json::json!({
+            "type": "message",
+            "attachments": [{
+                "contentType": "application/vnd.microsoft.card.adaptive",
+                "contentUrl": null,
+                "content": {
+                    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                    "type": "AdaptiveCard",
+                    "version": "1.4",
+                    "body": [
+                        { "type": "TextBlock", "size": "Medium", "weight": "Bolder", "text": "Kopher Shield" },
+                        { "type": "TextBlock", "text": msg, "wrap": true }
+                    ]
+                }
+            }]
+        })
+    }
+}
+
+#[tauri::command]
+pub async fn test_webhook_integration(url: String) -> Result<(), String> {
+    let url = url.trim().to_string();
+    let parsed = reqwest::Url::parse(&url).map_err(|e| format!("URL de webhook inválida: {}", e))?;
+    if parsed.scheme() != "https" && parsed.scheme() != "http" {
+        return Err("URL de webhook inválida: use http(s)://".to_string());
+    }
+
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(15))
+        .build()
+        .map_err(|e| format!("Falha ao iniciar cliente HTTP: {}", e))?;
+
+    let response = client
+        .post(parsed)
+        .json(&build_webhook_payload(&url))
+        .send()
+        .await
+        .map_err(|e| format!("Falha ao contatar o webhook: {}", e))?;
+
+    let status = response.status();
+    if status.is_success() {
+        Ok(())
+    } else {
+        let body = response.text().await.unwrap_or_default();
+        let snippet: String = body.chars().take(200).collect();
+        Err(format!("O webhook respondeu HTTP {}: {}", status.as_u16(), snippet))
+    }
+}

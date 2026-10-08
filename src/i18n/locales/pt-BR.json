@@ -167,7 +167,8 @@
     "tabs": {
       "appearance": "Aparência e Acessibilidade",
       "alerts": "Central de Alertas",
-      "license": "Licenciamento"
+      "license": "Licenciamento",
+      "network": "Rede e Performance"
     },
     "appearance": {
       "title": "Identidade Visual e Layout",
@@ -231,6 +232,45 @@
     "actions": {
       "saving": "Salvando...",
       "save": "Salvar Configurações"
+    },
+    "network": {
+      "title": "Rede e Performance",
+      "subtitle": "Controle o consumo de banda dos uploads de backup para não impactar a operação da empresa.",
+      "throttleTitle": "Limite de Banda",
+      "enable": "Habilitar Limite de Banda",
+      "enableDesc": "Reduz a velocidade de envio para a nuvem durante o horário comercial.",
+      "maxSpeed": "Velocidade máxima (MB/s)",
+      "maxSpeedHint": "Aplicada somente dentro da janela de horário comercial.",
+      "window": "Janela de Horário Comercial",
+      "from": "Das",
+      "to": "Até",
+      "windowHint": "Fora desta janela o envio ocorre na velocidade máxima disponível. Janelas que cruzam a meia-noite são aceitas.",
+      "summaryOn": "Limite de {{speed}} MB/s ativo das {{start}} às {{end}}.",
+      "summaryOff": "Sem limite: os backups usam toda a banda disponível.",
+      "invalidSpeed": "Velocidade inválida",
+      "invalidSpeedMsg": "Informe uma velocidade maior que zero (MB/s).",
+      "invalidWindow": "Janela inválida",
+      "invalidWindowMsg": "O horário inicial e final não podem ser iguais."
+    },
+    "webhooks": {
+      "title": "Integrações Corporativas (Webhooks)",
+      "desc": "Receba alertas em tempo real no Slack, Microsoft Teams ou Discord.",
+      "url": "URL do Webhook",
+      "placeholder": "https://hooks.slack.com/services/... | https://outlook.office.com/webhook/... | https://discord.com/api/webhooks/...",
+      "events": "Eventos que disparam notificações",
+      "success": "Sucesso",
+      "successDesc": "Backups e restaurações concluídos",
+      "failure": "Falhas",
+      "failureDesc": "Erros críticos e backups interrompidos",
+      "warning": "Avisos",
+      "warningDesc": "Alertas não críticos e atenção necessária",
+      "test": "Testar Conexão",
+      "testing": "Testando...",
+      "emptyUrl": "URL ausente",
+      "emptyUrlMsg": "Cole a URL do Webhook antes de testar.",
+      "ok": "Webhook conectado",
+      "okMsg": "Mensagem de teste enviada com sucesso.",
+      "fail": "Falha no webhook"
     }
   },
   "nav": {

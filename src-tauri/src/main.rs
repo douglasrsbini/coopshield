@@ -8,6 +8,7 @@ pub mod commands {
     pub mod storage;
     pub mod backup;
     pub mod settings;
+    pub mod webhook;
     pub mod system;
     pub mod support;
 }
@@ -15,6 +16,7 @@ pub mod commands {
 pub mod engine {
     pub mod crypto;
     pub mod licensing;
+    pub mod throttle;
 }
 
 use std::sync::{Arc, Mutex};
@@ -164,6 +166,7 @@ fn main() {
             crate::commands::system::read_file_binary,
             crate::engine::licensing::get_machine_id,
             crate::commands::settings::test_smtp_connection,
+            crate::commands::settings::test_webhook_integration,
             crate::commands::settings::finish_setup,
             crate::engine::licensing::validate_license_key,
             crate::commands::settings::request_2fa_token,

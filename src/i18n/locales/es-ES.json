@@ -167,7 +167,8 @@
     "tabs": {
       "appearance": "Apariencia y accesibilidad",
       "alerts": "Centro de alertas",
-      "license": "Licencias"
+      "license": "Licencias",
+      "network": "Red y rendimiento"
     },
     "appearance": {
       "title": "Identidad visual y diseño",
@@ -231,6 +232,45 @@
     "actions": {
       "saving": "Guardando...",
       "save": "Guardar configuración"
+    },
+    "network": {
+      "title": "Red y rendimiento",
+      "subtitle": "Controle el ancho de banda de las subidas de copias de seguridad para no afectar la operación de la empresa.",
+      "throttleTitle": "Límite de ancho de banda",
+      "enable": "Habilitar límite de ancho de banda",
+      "enableDesc": "Reduce la velocidad de envío a la nube durante el horario laboral.",
+      "maxSpeed": "Velocidad máxima (MB/s)",
+      "maxSpeedHint": "Se aplica solo dentro de la ventana de horario laboral.",
+      "window": "Ventana de horario laboral",
+      "from": "Desde",
+      "to": "Hasta",
+      "windowHint": "Fuera de esta ventana el envío usa la máxima velocidad disponible. Se admiten ventanas que cruzan la medianoche.",
+      "summaryOn": "Límite de {{speed}} MB/s activo de {{start}} a {{end}}.",
+      "summaryOff": "Sin límite: las copias usan todo el ancho de banda disponible.",
+      "invalidSpeed": "Velocidad no válida",
+      "invalidSpeedMsg": "Indique una velocidad mayor que cero (MB/s).",
+      "invalidWindow": "Ventana no válida",
+      "invalidWindowMsg": "La hora de inicio y fin no pueden ser iguales."
+    },
+    "webhooks": {
+      "title": "Integraciones Corporativas (Webhooks)",
+      "desc": "Reciba alertas en tiempo real en Slack, Microsoft Teams o Discord.",
+      "url": "URL del Webhook",
+      "placeholder": "https://hooks.slack.com/services/... | https://outlook.office.com/webhook/... | https://discord.com/api/webhooks/...",
+      "events": "Eventos que activan notificaciones",
+      "success": "Éxito",
+      "successDesc": "Copias y restauraciones completadas",
+      "failure": "Fallos",
+      "failureDesc": "Errores críticos y copias interrumpidas",
+      "warning": "Avisos",
+      "warningDesc": "Alertas no críticas que requieren atención",
+      "test": "Probar Conexión",
+      "testing": "Probando...",
+      "emptyUrl": "URL ausente",
+      "emptyUrlMsg": "Pegue la URL del Webhook antes de probar.",
+      "ok": "Webhook conectado",
+      "okMsg": "Mensaje de prueba enviado correctamente.",
+      "fail": "Fallo del webhook"
     }
   },
   "nav": {
