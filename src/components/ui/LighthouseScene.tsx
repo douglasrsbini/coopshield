@@ -16,12 +16,12 @@ export default function LighthouseScene() {
 
       {/* Feixe de luz */}
       <div
-        className="splash-beam absolute left-[11%] top-[30%] w-[95vw] h-[44vh] bg-gradient-to-r from-amber-400/70 via-amber-400/15 to-transparent mix-blend-screen blur-[2px]"
+        className="splash-beam absolute left-[18%] top-[22%] z-0 w-[95vw] h-[44vh] bg-gradient-to-r from-amber-400/70 via-amber-400/15 to-transparent mix-blend-screen blur-[2px]"
         style={{ clipPath: 'polygon(0 47%, 100% 0, 100% 100%, 0 53%)' }}
       />
 
       {/* Farol */}
-      <svg className="absolute left-[7%] bottom-[16%] h-[52vh] w-auto drop-shadow-[0_0_25px_rgba(245,158,11,0.35)]" viewBox="0 0 100 220" fill="none">
+      <svg className="absolute left-[7%] bottom-[16%] z-10 h-[52vh] w-auto drop-shadow-[0_0_25px_rgba(245,158,11,0.35)]" viewBox="0 0 100 220" fill="none">
         <polygon points="30,215 70,215 62,70 38,70" className="fill-slate-700 dark:fill-slate-800" />
         <polygon points="36,150 64,150 62,120 38,120" className="fill-amber-500/80" />
         <polygon points="38,95 62,95 61,75 39,75" className="fill-amber-500/80" />

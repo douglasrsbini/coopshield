@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ShieldCheck, Key, ArrowRight, CheckCircle2, Loader2, AlertTriangle, Mail, Lock, ChevronDown, ChevronUp, Save } from 'lucide-react';
+import { Key, ArrowRight, CheckCircle2, Loader2, AlertTriangle, Mail, Lock, ChevronDown, ChevronUp, Save } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 import { useTranslation } from 'react-i18next';
 import { normalizeLanguage, type SupportedLanguage } from '../i18n/languages';
@@ -115,8 +115,8 @@ export default function Welcome({ onComplete }: WelcomeProps) {
         
         <div className="px-8 py-6 border-b border-border/50 flex items-center justify-between bg-black/5 dark:bg-white/5">
           <div className="flex items-center space-x-3">
-            <div className="bg-primary/10 p-2 rounded-lg text-primary border border-primary/20">
-              <ShieldCheck size={24} />
+            <div className="w-10 h-10 bg-slate-950 p-1 rounded-lg border border-primary/20 flex items-center justify-center">
+              <img src="/icone-kopher-dark.png" alt="" className="w-8 h-8 object-contain" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-textMain tracking-tight">Kopher Shield</h1>
@@ -173,8 +173,8 @@ export default function Welcome({ onComplete }: WelcomeProps) {
               ) : (
                 <form onSubmit={handleConfirm2FA} className="max-w-md mx-auto space-y-5 animate-in slide-in-from-right-4 duration-300">
                   <div className="text-center mb-6">
-                    <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <ShieldCheck size={28} className="text-primary" />
+                    <div className="w-14 h-14 bg-slate-950 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <img src="/icone-kopher-dark.png" alt="" className="w-8 h-8 object-contain" />
                     </div>
                     <h3 className="text-base font-bold text-textMain">{t('welcome.auth.twoFaTitle')}</h3>
                     <p className="text-xs text-textMuted mt-1">{t('welcome.auth.twoFaSubtitle')}</p>

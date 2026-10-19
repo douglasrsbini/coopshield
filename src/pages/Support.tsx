@@ -301,7 +301,11 @@ export default function Support() {
             </div>
             <div className="flex items-center justify-between pb-3 border-b border-border/50">
               <span className="text-textMuted font-medium">{t('support.info.developer')}</span>
-              <span className="font-bold text-primary">BINAVER Soluções</span>
+              <span className="flex items-center gap-2 font-bold text-primary">
+                <img src="/icon_binaver_dark.png" alt="" className="block dark:hidden h-5 max-w-20 object-contain" />
+                <img src="/icon_binaver_white.png" alt="" className="hidden dark:block h-5 max-w-20 object-contain" />
+                <span>BINAVER SOLUÇÕES TECNOLÓGICAS LTDA</span>
+              </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-textMuted font-medium">{t('support.info.direct')}</span>

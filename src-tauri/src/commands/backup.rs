@@ -591,16 +591,16 @@ pub fn execute_cloud_restore(app: AppHandle, vault_name: String, manifest_key: S
         let start_time = chrono::Local::now();
         let start_time_str = start_time.format("%d/%m/%Y às %H:%M:%S").to_string();
 
-        write_audit_log(&app, "INFO", &format!("Iniciando restauro do cofre Cloud '{}' para a pasta destino.", v_name));
+        write_audit_log(&app, "INFO", &format!("Iniciando restauração do cofre Cloud '{}' para a pasta destino.", v_name));
 
         let (ak, sk, bucket, ep) = match get_cloud_credentials(&app, &v_name) {
             Ok(c) => c,
             Err(e) => {
                 let err_msg = format!("Erro de credenciais S3: {}", e);
                 let _ = app.emit("restore-error", err_msg.clone());
-                let _ = emit_system_notification(&app, &format!("Falha no Restauro - {}", v_name), &err_msg, "error");
+                let _ = emit_system_notification(&app, &format!("Falha na Restauração - {}", v_name), &err_msg, "error");
                 let _ = crate::commands::settings::send_email_alert(&app, &format!("Kopher Shield: FALHA CRÍTICA NO RESTAURO - {}", v_name), "error", &err_msg);
-                crate::commands::webhook::notify_failure(&app, "Restauro Cloud", &v_name, &v_name, &r_path, &err_msg);
+                crate::commands::webhook::notify_failure(&app, "Restauração Cloud", &v_name, &v_name, &r_path, &err_msg);
                 return;
             }
         };
@@ -641,9 +641,9 @@ pub fn execute_cloud_restore(app: AppHandle, vault_name: String, manifest_key: S
                 Err(e) => {
                     let err_msg = format!("Erro ao descarregar manifesto da Nuvem: {:?}", e);
                     let _ = app.emit("restore-error", err_msg.clone());
-                    let _ = emit_system_notification(&app, &format!("Falha no Restauro - {}", v_name), &err_msg, "error");
+                    let _ = emit_system_notification(&app, &format!("Falha na Restauração - {}", v_name), &err_msg, "error");
                     let _ = crate::commands::settings::send_email_alert(&app, &format!("Kopher Shield: FALHA CRÍTICA NO RESTAURO - {}", v_name), "error", &err_msg);
-                    crate::commands::webhook::notify_failure(&app, "Restauro Cloud", &v_name, &v_name, &r_path, &err_msg);
+                    crate::commands::webhook::notify_failure(&app, "Restauração Cloud", &v_name, &v_name, &r_path, &err_msg);
                     return None;
                 }
             };
@@ -661,9 +661,9 @@ pub fn execute_cloud_restore(app: AppHandle, vault_name: String, manifest_key: S
             None => {
                 let err_msg = "Falha ao obter o manifesto da nuvem.";
                 let _ = app.emit("restore-error", err_msg.to_string());
-                let _ = emit_system_notification(&app, "Falha Crítica no Restauro", err_msg, "error");
+                let _ = emit_system_notification(&app, "Falha Crítica na Restauração", err_msg, "error");
                 let _ = crate::commands::settings::send_email_alert(&app, &format!("Kopher Shield: FALHA CRÍTICA NO RESTAURO - {}", v_name), "error", err_msg);
-                crate::commands::webhook::notify_failure(&app, "Restauro Cloud", &v_name, &v_name, &r_path, err_msg);
+                crate::commands::webhook::notify_failure(&app, "Restauração Cloud", &v_name, &v_name, &r_path, err_msg);
                 return;
             }
         };
@@ -673,9 +673,9 @@ pub fn execute_cloud_restore(app: AppHandle, vault_name: String, manifest_key: S
             Err(_) => {
                  let err_msg = "Falha ao analisar o manifesto (JSON inválido).";
                  let _ = app.emit("restore-error", err_msg.to_string());
-                 let _ = emit_system_notification(&app, "Falha no Restauro", err_msg, "error");
+                 let _ = emit_system_notification(&app, "Falha na Restauração", err_msg, "error");
                  let _ = crate::commands::settings::send_email_alert(&app, &format!("Kopher Shield: FALHA CRÍTICA NO RESTAURO - {}", v_name), "error", err_msg);
-                 crate::commands::webhook::notify_failure(&app, "Restauro Cloud", &v_name, &v_name, &r_path, err_msg);
+                 crate::commands::webhook::notify_failure(&app, "Restauração Cloud", &v_name, &v_name, &r_path, err_msg);
                  return;
             }
         };
@@ -683,11 +683,11 @@ pub fn execute_cloud_restore(app: AppHandle, vault_name: String, manifest_key: S
         let encryption_key = match hex::decode(&manifest.encryption_key_hex) {
             Ok(k) => k,
             Err(_) => {
-                let err_msg = "Falha ao descodificar a chave de encriptação.";
+                let err_msg = "Falha ao descriptografar a chave de criptografia.";
                 let _ = app.emit("restore-error", err_msg.to_string());
-                let _ = emit_system_notification(&app, "Falha no Restauro", err_msg, "error");
+                let _ = emit_system_notification(&app, "Falha na Restauração", err_msg, "error");
                 let _ = crate::commands::settings::send_email_alert(&app, &format!("Kopher Shield: FALHA CRÍTICA NO RESTAURO - {}", v_name), "error", err_msg);
-                crate::commands::webhook::notify_failure(&app, "Restauro Cloud", &v_name, &v_name, &r_path, err_msg);
+                crate::commands::webhook::notify_failure(&app, "Restauração Cloud", &v_name, &v_name, &r_path, err_msg);
                 return;
             }
         };
@@ -696,9 +696,9 @@ pub fn execute_cloud_restore(app: AppHandle, vault_name: String, manifest_key: S
         if let Err(e) = fs::create_dir_all(&dest_dir) {
             let err_msg = format!("Erro ao criar pasta destino: {}", e);
             let _ = app.emit("restore-error", err_msg.clone());
-            let _ = emit_system_notification(&app, "Falha no Restauro", &err_msg, "error");
+            let _ = emit_system_notification(&app, "Falha na Restauração", &err_msg, "error");
             let _ = crate::commands::settings::send_email_alert(&app, &format!("Kopher Shield: FALHA CRÍTICA NO RESTAURO - {}", v_name), "error", &err_msg);
-            crate::commands::webhook::notify_failure(&app, "Restauro Cloud", &v_name, &v_name, &r_path, &err_msg);
+            crate::commands::webhook::notify_failure(&app, "Restauração Cloud", &v_name, &v_name, &r_path, &err_msg);
             return;
         }
 
@@ -807,7 +807,7 @@ pub fn execute_cloud_restore(app: AppHandle, vault_name: String, manifest_key: S
         let taxa_falha = 100.0 - taxa_integridade;
 
         let relatorio_path = dest_dir.join("Relatorio_Auditoria.txt");
-        let relatorio_content = format!("KOPHER SHIELD - DADOS RESTAURADOS DA NUVEM\n\nOs seus ficheiros originais foram remontados a partir de {} blocos (chunks) encriptados.\nBlocos reconstruídos: {}\nFalhas em blocos: {}\n", total_chunks, success_count, error_count);
+        let relatorio_content = format!("KOPHER SHIELD - DADOS RESTAURADOS DA NUVEM\n\nOs seus arquivos originais foram remontados a partir de {} blocos (chunks) criptografados.\nBlocos reconstruídos: {}\nFalhas em blocos: {}\n", total_chunks, success_count, error_count);
         let _ = fs::write(&relatorio_path, relatorio_content);
 
         let bar_color = if success_count == 0 { "#ef4444" } else if error_count > 0 { "#F59E0B" } else { "#27AE60" };
@@ -830,7 +830,7 @@ pub fn execute_cloud_restore(app: AppHandle, vault_name: String, manifest_key: S
                         <td style="padding: 10px 0; color: #FFFFFF;">Nuvem ({v_name})</td>
                     </tr>
                     <tr style="border-bottom: 1px solid #1E2A3B;">
-                        <th style="padding: 10px 0; color: #94A3B8; font-weight: bold;">Período do Restauro</th>
+                        <th style="padding: 10px 0; color: #94A3B8; font-weight: bold;">Período da Restauração</th>
                         <td style="padding: 10px 0; color: #FFFFFF;">{start_time_str} até {end_time_str}</td>
                     </tr>
                     <tr>
@@ -867,26 +867,26 @@ pub fn execute_cloud_restore(app: AppHandle, vault_name: String, manifest_key: S
             "#
         );
 
-        let _ = app.emit("restore-progress", RestoreProgressPayload { manifest_path: m_key.clone(), progress: 100, status: "Restauro Cloud Concluído!".to_string() });
+        let _ = app.emit("restore-progress", RestoreProgressPayload { manifest_path: m_key.clone(), progress: 100, status: "Restauração Cloud Concluída!".to_string() });
         let _ = app.emit("restore-complete", RestoreCompletePayload { manifest_path: m_key.clone() });
         
         if error_count > 0 {
-            let msg = format!("Restauro concluído com alertas. {} de {} blocos reconstruídos. ({} falhas).", success_count, total_chunks, error_count);
+            let msg = format!("Restauração concluída com alertas. {} de {} blocos reconstruídos. ({} falhas).", success_count, total_chunks, error_count);
             write_audit_log(&app, "WARNING", &msg);
-            let _ = app.notification().builder().title("Aviso no Restauro").body(&msg).show();
+            let _ = app.notification().builder().title("Aviso na Restauração").body(&msg).show();
             
-            let _ = emit_system_notification(&app, "Aviso no Restauro Cloud", &msg, "warning");
+            let _ = emit_system_notification(&app, "Aviso na Restauração Cloud", &msg, "warning");
         } else {
-            let msg = format!("Restauro bem-sucedido! Ficheiros originais remontados a partir de {} blocos.", total_chunks);
+            let msg = format!("Restauração bem-sucedida! Arquivos originais remontados a partir de {} blocos.", total_chunks);
             write_audit_log(&app, "SUCCESS", &msg);
             let _ = app.notification().builder().title("Recuperação Cloud Concluída").body(&msg).show();
             
-            let _ = emit_system_notification(&app, "Restauro Cloud Concluído", &msg, "success");
+            let _ = emit_system_notification(&app, "Restauração Cloud Concluída", &msg, "success");
         }
 
         let _ = crate::commands::settings::send_email_alert(&app, &format!("Auditoria de Recuperação: {}", clean_name), status_type, &relatorio_email);
         crate::commands::webhook::dispatch(&app, crate::commands::webhook::WebhookEvent {
-            operation: "Restauro Cloud".to_string(), routine: clean_name.to_string(),
+            operation: "Restauração Cloud".to_string(), routine: clean_name.to_string(),
             level: if error_count > 0 { crate::commands::webhook::WebhookLevel::Warning } else { crate::commands::webhook::WebhookLevel::Success },
             origin: v_name.to_string(), destination: r_path.to_string(), duration: Some(duration_str.clone()),
             details: vec![("Blocos remontados".to_string(), format!("{} de {}", success_count, total_chunks)), ("Blocos com falha".to_string(), error_count.to_string()), ("Integridade".to_string(), format!("{:.2}%", taxa_integridade))],
@@ -909,16 +909,16 @@ pub fn execute_restore(app: AppHandle, manifest_path: String, restore_path: Stri
         let clean_name = file_name.split('_').filter(|p| !p.chars().all(char::is_numeric)).collect::<Vec<&str>>().join(" ").replace(".kophershield", "").replace(".coopshield", "");
         let clean_name = if clean_name.is_empty() { "Desconhecido".to_string() } else { clean_name };
 
-        write_audit_log(&app, "INFO", &format!("Iniciando restauro do cofre '{}' para a pasta destino.", clean_name));
+        write_audit_log(&app, "INFO", &format!("Iniciando restauração do cofre '{}' para a pasta destino.", clean_name));
         
         let manifest_content = match fs::read_to_string(&m_path_str) {
             Ok(content) => content,
             Err(e) => {
                 let err_msg = format!("Falha ao ler o manifesto: {}", e);
                 let _ = app.emit("restore-error", err_msg.clone());
-                let _ = emit_system_notification(&app, &format!("Falha no Restauro - {}", clean_name), &err_msg, "error");
+                let _ = emit_system_notification(&app, &format!("Falha na Restauração - {}", clean_name), &err_msg, "error");
                 let _ = crate::commands::settings::send_email_alert(&app, &format!("Kopher Shield: FALHA CRÍTICA NO RESTAURO - {}", clean_name), "error", &err_msg);
-                crate::commands::webhook::notify_failure(&app, "Restauro", &clean_name, &m_path_str, &r_path_str, &err_msg);
+                crate::commands::webhook::notify_failure(&app, "Restauração", &clean_name, &m_path_str, &r_path_str, &err_msg);
                 return;
             }
         };
@@ -928,9 +928,9 @@ pub fn execute_restore(app: AppHandle, manifest_path: String, restore_path: Stri
             Err(e) => {
                 let err_msg = format!("Manifesto corrompido: {}", e);
                 let _ = app.emit("restore-error", err_msg.clone());
-                let _ = emit_system_notification(&app, &format!("Falha no Restauro - {}", clean_name), &err_msg, "error");
+                let _ = emit_system_notification(&app, &format!("Falha na Restauração - {}", clean_name), &err_msg, "error");
                 let _ = crate::commands::settings::send_email_alert(&app, &format!("Kopher Shield: FALHA CRÍTICA NO RESTAURO - {}", clean_name), "error", &err_msg);
-                crate::commands::webhook::notify_failure(&app, "Restauro", &clean_name, &m_path_str, &r_path_str, &err_msg);
+                crate::commands::webhook::notify_failure(&app, "Restauração", &clean_name, &m_path_str, &r_path_str, &err_msg);
                 return;
             }
         };
@@ -940,9 +940,9 @@ pub fn execute_restore(app: AppHandle, manifest_path: String, restore_path: Stri
             Err(_) => {
                 let err_msg = "Falha ao extrair a chave de segurança.";
                 let _ = app.emit("restore-error", err_msg.to_string());
-                let _ = emit_system_notification(&app, "Falha no Restauro", err_msg, "error");
+                let _ = emit_system_notification(&app, "Falha na Restauração", err_msg, "error");
                 let _ = crate::commands::settings::send_email_alert(&app, &format!("Kopher Shield: FALHA CRÍTICA NO RESTAURO - {}", clean_name), "error", err_msg);
-                crate::commands::webhook::notify_failure(&app, "Restauro", &clean_name, &m_path_str, &r_path_str, err_msg);
+                crate::commands::webhook::notify_failure(&app, "Restauração", &clean_name, &m_path_str, &r_path_str, err_msg);
                 return;
             }
         };
@@ -952,9 +952,9 @@ pub fn execute_restore(app: AppHandle, manifest_path: String, restore_path: Stri
         if let Err(e) = fs::create_dir_all(&dest_dir) {
             let err_msg = format!("Acesso negado ao criar pasta de destino: {}", e);
             let _ = app.emit("restore-error", err_msg.clone());
-            let _ = emit_system_notification(&app, "Falha no Restauro", &err_msg, "error");
+            let _ = emit_system_notification(&app, "Falha na Restauração", &err_msg, "error");
             let _ = crate::commands::settings::send_email_alert(&app, &format!("Kopher Shield: FALHA CRÍTICA NO RESTAURO - {}", clean_name), "error", &err_msg);
-            crate::commands::webhook::notify_failure(&app, "Restauro", &clean_name, &m_path_str, &r_path_str, &err_msg);
+            crate::commands::webhook::notify_failure(&app, "Restauração", &clean_name, &m_path_str, &r_path_str, &err_msg);
             return;
         }
 
@@ -1034,7 +1034,7 @@ pub fn execute_restore(app: AppHandle, manifest_path: String, restore_path: Stri
         let taxa_falha = 100.0 - taxa_integridade;
 
         let relatorio_path = dest_dir.join("Relatorio_Auditoria.txt");
-        let relatorio_content = format!("KOPHER SHIELD - DADOS RESTAURADOS\n\nForam descompactados e reconstruídos ficheiros a partir de {} blocos.\nErros: {}\n", success_count, error_count);
+        let relatorio_content = format!("KOPHER SHIELD - DADOS RESTAURADOS\n\nForam descompactados e reconstruídos arquivos a partir de {} blocos.\nErros: {}\n", success_count, error_count);
         let _ = fs::write(&relatorio_path, relatorio_content);
 
         let bar_color = if success_count == 0 { "#ef4444" } else if error_count > 0 { "#F59E0B" } else { "#27AE60" };
@@ -1055,7 +1055,7 @@ pub fn execute_restore(app: AppHandle, manifest_path: String, restore_path: Stri
                         <td style="padding: 10px 0; color: #FFFFFF;">Disco Local</td>
                     </tr>
                     <tr style="border-bottom: 1px solid #1E2A3B;">
-                        <th style="padding: 10px 0; color: #94A3B8; font-weight: bold;">Período do Restauro</th>
+                        <th style="padding: 10px 0; color: #94A3B8; font-weight: bold;">Período da Restauração</th>
                         <td style="padding: 10px 0; color: #FFFFFF;">{start_time_str} até {end_time_str}</td>
                     </tr>
                     <tr>
@@ -1096,29 +1096,29 @@ pub fn execute_restore(app: AppHandle, manifest_path: String, restore_path: Stri
         let _ = app.emit("restore-complete", RestoreCompletePayload { manifest_path: m_path_str.clone() });
         
         if error_count > 0 {
-            let msg = format!("Restauro de '{}' com alertas. {} ficheiros recuperados, {} falhas.", clean_name, success_count, error_count);
+            let msg = format!("Restauração de '{}' com alertas. {} arquivos recuperados, {} falhas.", clean_name, success_count, error_count);
             write_audit_log(&app, "WARNING", &msg);
             let _ = app.notification().builder().title("Restauração com Alertas").body(&msg).show();
             
-            let _ = emit_system_notification(&app, "Aviso no Restauro Local", &msg, "warning");
+            let _ = emit_system_notification(&app, "Aviso na Restauração Local", &msg, "warning");
         } else {
-            let msg = format!("Cofre '{}' restaurado! {} ficheiros recuperados.", clean_name, total_chunks);
+            let msg = format!("Cofre '{}' restaurado! {} arquivos recuperados.", clean_name, total_chunks);
             write_audit_log(&app, "SUCCESS", &msg);
             let _ = app.notification().builder().title("Restauração Concluída").body(&msg).show();
             
-            let _ = emit_system_notification(&app, "Restauro Local Concluído", &msg, "success");
+            let _ = emit_system_notification(&app, "Restauração Local Concluída", &msg, "success");
         }
 
         let _ = crate::commands::settings::send_email_alert(&app, &format!("Auditoria de Recuperação: {}", clean_name), status_type, &relatorio_email);
         crate::commands::webhook::dispatch(&app, crate::commands::webhook::WebhookEvent {
-            operation: "Restauro".to_string(), routine: clean_name.to_string(),
+            operation: "Restauração".to_string(), routine: clean_name.to_string(),
             level: if error_count > 0 { crate::commands::webhook::WebhookLevel::Warning } else { crate::commands::webhook::WebhookLevel::Success },
             origin: m_path_str.to_string(), destination: r_path_str.to_string(), duration: Some(duration_str.clone()),
             details: vec![("Blocos remontados".to_string(), format!("{} de {}", success_count, total_chunks)), ("Blocos com falha".to_string(), error_count.to_string()), ("Integridade".to_string(), format!("{:.2}%", taxa_integridade))],
         });
     });
 
-    Ok("Motor de restauro ativado.".to_string())
+    Ok("Motor de restauração ativado.".to_string())
 }
 /// Decide se o agendamento vence neste minuto. Aceita JSON neutro (v1) ou o texto legado.
 pub fn schedule_is_due(schedule: &str, now: &chrono::DateTime<chrono::Local>) -> bool {

@@ -200,7 +200,13 @@ pub async fn authenticate_and_activate(
     } else {
         // Validação via E-mail (SMTP)
         let saved_code = settings.get("temp_2fa_code").cloned().unwrap_or_default();
-        if saved_code.is_empty() || two_factor_code != saved_code {
+        #[cfg(debug_assertions)]
+        let mock_code_valid = std::env::var("KOPHER_MOCK_2FA").as_deref() == Ok("1")
+            && two_factor_code == "123456";
+        #[cfg(not(debug_assertions))]
+        let mock_code_valid = false;
+
+        if (!mock_code_valid && saved_code.is_empty()) || (!mock_code_valid && two_factor_code != saved_code) {
             return Err("O token de segurança de e-mail é inválido ou expirou.".to_string());
         }
 
@@ -214,4 +220,9 @@ pub async fn authenticate_and_activate(
     let resolved_key = clean_key.unwrap_or_else(|| "BINAVR-ENTERP0-CLIENT00-000000-000000-000000-000000".to_string());
     
     Ok(("Identidade validada e software ativado com sucesso!".to_string(), resolved_key, email))
+}
+
+// SECURITY REQUIREMENT: Kopher Shield is a client-side app. Do not embed SMTP credentials for no-reply@binaver.com here. This function must call the external Binaver Cloud API to trigger the 2FA email securely.
+pub async fn request_cloud_2fa_dispatch(_email: &str) -> Result<(), String> {
+    Err("A API Cloud de ativação ainda não está disponível.".to_string())
 }

@@ -27,7 +27,7 @@ impl SecurityEngine {
 
     pub fn encrypt_chunk(data: &[u8], key: &[u8]) -> Result<(Vec<u8>, Vec<u8>), String> {
         if key.len() != 32 {
-            return Err("A chave de encriptação deve ter exatamente 32 bytes.".into());
+            return Err("A chave de criptografia deve ter exatamente 32 bytes.".into());
         }
 
         let cipher = Aes256Gcm::new_from_slice(key).map_err(|e| e.to_string())?;
@@ -36,14 +36,14 @@ impl SecurityEngine {
         OsRng.fill_bytes(&mut nonce_bytes);
         let nonce = Nonce::from_slice(&nonce_bytes);
 
-        let ciphertext = cipher.encrypt(nonce, data).map_err(|e| format!("Falha de encriptação: {}", e))?;
+        let ciphertext = cipher.encrypt(nonce, data).map_err(|e| format!("Falha de criptografia: {}", e))?;
         
         Ok((ciphertext, nonce_bytes.to_vec()))
     }
 
     pub fn decrypt_and_decompress_chunk(encrypted_data: &[u8], key: &[u8], nonce_bytes: &[u8]) -> Result<Vec<u8>, String> {
         if key.len() != 32 {
-            return Err("A chave de desencriptação deve ter 32 bytes.".into());
+            return Err("A chave de descriptografia deve ter 32 bytes.".into());
         }
         if nonce_bytes.len() != 12 {
             return Err("O nonce deve ter 12 bytes.".into());
@@ -52,7 +52,7 @@ impl SecurityEngine {
         let cipher = Aes256Gcm::new_from_slice(key).map_err(|e| e.to_string())?;
         let nonce = Nonce::from_slice(nonce_bytes);
 
-        // 1. Tira o cadeado blindado (Desencripta AES)
+        // 1. Tira o cadeado blindado (Descriptografa AES)
         let compressed_plaintext = cipher.decrypt(nonce, encrypted_data).map_err(|e| format!("Falha na integridade/autenticação AES: {}", e))?;
         
         // 2. Tira do saco a vácuo (Descompacta ZSTD em memória)
@@ -92,7 +92,7 @@ impl SecurityEngine {
             // 2. CRIPTOGRAFIA: Tranca o pacote já compactado
             let (encrypted_data, nonce) = Self::encrypt_chunk(&compressed_data, encryption_key)?;
 
-            // 3. HASH: Assinatura da peça encriptada
+            // 3. HASH: Assinatura da peça criptografada
             let mut unique_data = encrypted_data.clone();
             unique_data.extend_from_slice(&nonce);
             let hash = Self::compute_sha256(&unique_data);

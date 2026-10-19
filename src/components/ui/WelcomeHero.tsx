@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Moon, Sun, Monitor, CheckCircle2, ShieldCheck, type LucideIcon } from 'lucide-react';
+import { Moon, Sun, Monitor, CheckCircle2, type LucideIcon } from 'lucide-react';
 import { SUPPORTED_LANGUAGES, normalizeLanguage, type SupportedLanguage } from '../../i18n/languages';
 import { FOCUS_RING } from '../../ui/tokens';
 
@@ -31,13 +31,13 @@ export default function WelcomeHero({ language, theme, onLanguageChange, onTheme
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="text-center flex flex-col items-center gap-3">
-        <div className="p-3 rounded-2xl bg-gradient-to-br from-amber-400/20 to-amber-600/10 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.3)]">
-          <ShieldCheck className="w-6 h-6 text-amber-500 drop-shadow-md" aria-hidden="true" />
+        <div className="w-12 h-12 rounded-2xl bg-slate-950 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.3)] flex items-center justify-center">
+          <img src="/icone-kopher-dark.png" alt="" className="w-8 h-8 object-contain" />
         </div>
-        <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-br from-textMain to-amber-500 bg-clip-text text-transparent">
+        <h2 className="text-3xl font-extrabold tracking-tight text-white">
           {t('welcome.hero.title')}
         </h2>
-        <p className="text-sm sm:text-base text-textMuted max-w-md">{t('welcome.hero.subtitle')}</p>
+        <p className="text-sm font-medium text-slate-400 mt-2">{t('welcome.hero.subtitle')}</p>
       </div>
 
       <fieldset className="flex flex-col gap-3">

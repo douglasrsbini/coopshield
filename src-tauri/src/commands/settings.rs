@@ -69,7 +69,7 @@ fn build_multipart_message(user: &str, dest: &str, cc: Option<&str>, bcc: Option
         let attachment = Attachment::new_inline(String::from("logo_coopshield")).body(logo_bytes, ContentType::parse("image/png").unwrap());
         multipart = multipart.singlepart(attachment);
     }
-    if let Some(binaver_bytes) = get_image_bytes(app_handle, "icone_binaver.png") {
+    if let Some(binaver_bytes) = get_image_bytes(app_handle, "icon_binaver_white.png") {
         let attachment = Attachment::new_inline(String::from("logo_binaver")).body(binaver_bytes, ContentType::parse("image/png").unwrap());
         multipart = multipart.singlepart(attachment);
     }
@@ -141,38 +141,16 @@ pub fn send_email_alert(app_handle: &tauri::AppHandle, subject: &str, status: &s
 }
 
 #[command]
-pub fn request_2fa_token(app_handle: AppHandle, email: String) -> Result<String, String> {
-    let settings = get_all_settings(app_handle.clone())?;
-    let host = settings.get("smtp_host").cloned().unwrap_or_default();
-    let port_str = settings.get("smtp_port").cloned().unwrap_or_default();
-    let user = settings.get("smtp_user").cloned().unwrap_or_default();
-    let pass = settings.get("smtp_pass").cloned().unwrap_or_default();
-    let client_name = settings.get("client_name").cloned().unwrap_or_else(|| "BINAVER".to_string());
+pub fn request_2fa_token(app_handle: AppHandle, _email: String) -> Result<String, String> {
+    #[cfg(debug_assertions)]
+    if std::env::var("KOPHER_MOCK_2FA").as_deref() == Ok("1") {
+        let mut payload = HashMap::new();
+        payload.insert("temp_2fa_code".to_string(), "123456".to_string());
+        update_settings(app_handle, payload)?;
+        return Ok("Mock de API Cloud: token de desenvolvimento criado.".to_string());
+    }
 
-    if host.is_empty() || user.is_empty() { return Err("Servidor SMTP não configurado. Por favor, configure o e-mail corporativo na aba de Alertas.".to_string()); }
-
-    let nanos = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().subsec_nanos();
-    let code = format!("{:06}", (nanos % 900000) + 100000); 
-
-    let mut payload = HashMap::new();
-    payload.insert("temp_2fa_code".to_string(), code.clone());
-    let _ = update_settings(app_handle.clone(), payload);
-
-    let html_details = format!(
-        r#"<div style="text-align: center; margin-bottom: 10px;"><h3 class="title-font" style="color: #FFFFFF; font-size: 18px; font-weight: bold; margin-bottom: 15px;">Token de Segurança 2FA</h3><p style="color: #94a3b8; font-size: 14px; line-height: 1.6; margin-bottom: 25px;">Foi solicitada a ativação do software na sua conta. Utilize o código de verificação abaixo para autorizar o acesso.</p><div style="background-color: #121822; padding: 20px; border-radius: 6px; border: 1px dashed #F59E0B;"><span class="title-font" style="color: #F59E0B; font-weight: bold; font-size: 32px; letter-spacing: 10px;">{}</span></div><p style="color: #ef4444; font-size: 11px; margin-top: 15px;">Aviso: Se você não solicitou este código, ignore este e-mail.</p></div>"#, code
-    );
-    let html_body = build_email_template(&client_name, "#F59E0B", "#050709", "AUTENTICAÇÃO EXIGIDA", &html_details);
-    
-    // O Token vai sempre e apenas para o e-mail digitado no campo da tela, NUNCA copiando a empresa.
-    let email_msg = build_multipart_message(&user, &email, None, None, "Código de Verificação BINAVER", html_body, &app_handle)?;
-
-    let creds = Credentials::new(user, pass);
-    let tls_params = TlsParameters::builder(host.clone()).build().map_err(|e| e.to_string())?;
-    let port: u16 = port_str.parse().unwrap_or(587);
-    let mailer = SmtpTransport::builder_dangerous(&host).port(port).credentials(creds).tls(Tls::Required(tls_params)).build();
-    
-    mailer.send(&email_msg).map_err(|e| format!("Falha de envio SMTP: {}", e))?;
-    Ok("Token enviado com sucesso.".to_string())
+    Err("A API Cloud de ativação ainda não está disponível.".to_string())
 }
 fn build_webhook_payload(url: &str) -> serde_json::Value {
     let msg = "Kopher Shield: Conexão de Webhook estabelecida com sucesso!";

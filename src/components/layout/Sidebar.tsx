@@ -35,7 +35,12 @@ export default function Sidebar({ isCollapsed, onToggle, clientName, clientLogo 
 
   const logo = clientLogo
     ? <img src={clientLogo} alt="" className="w-full h-full object-cover" />
-    : <img src="/logo.png" alt="" className="w-5 h-5 object-contain" />;
+    : (
+      <>
+        <img src="/icon-kopher-dark.png" alt="" className="block dark:hidden w-5 h-5 object-contain" />
+        <img src="/icon-kopher-white.png" alt="" className="hidden dark:block w-5 h-5 object-contain dark:drop-shadow-[0_0_15px_rgba(245,158,11,0.5)]" />
+      </>
+    );
 
   return (
     <aside
@@ -105,12 +110,6 @@ export default function Sidebar({ isCollapsed, onToggle, clientName, clientLogo 
           );
         })}
       </nav>
-
-      {!isCollapsed && clientName && (
-        <div className="px-6 py-2 text-[9px] text-textMuted/40 uppercase font-bold tracking-widest flex items-center justify-center shrink-0">
-          {t('sidebar.poweredBy')}
-        </div>
-      )}
 
       <div className="p-3 border-t border-border/50 shrink-0 bg-surface flex flex-col gap-2">
         <SidebarLanguageMenu isCollapsed={isCollapsed} />

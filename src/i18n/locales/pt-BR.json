@@ -223,7 +223,7 @@
       "backupStartDesc": "Avisa quando uma cópia de segurança for iniciada.",
       "backupEnd": "Conclusão e Relatórios de Backup",
       "backupEndDesc": "Envia o relatório final quando o backup terminar (Sucesso ou Falha).",
-      "restore": "Procedimentos de Restauro",
+      "restore": "Procedimentos de Restauração",
       "restoreDesc": "Alerta a equipe sempre que dados sensíveis forem restaurados.",
       "systemErrors": "Avisos Críticos do Sistema",
       "systemErrorsDesc": "Erros de motor, perda de conexão e falhas no agendamento.",
@@ -361,7 +361,7 @@
       "testing": "Testando nuvem..."
     },
     "confirm": {
-      "deleteMessage": "Tem certeza que deseja eliminar esta conexão de cofre? Os ficheiros na nuvem NÃO serão apagados."
+      "deleteMessage": "Tem certeza que deseja eliminar esta conexão de cofre? Os arquivos na nuvem NÃO serão apagados."
     },
     "modal": {
       "createTitle": "Autenticar cofre cloud",
@@ -558,7 +558,7 @@
     },
     "views": {
       "detailed": "Detalhado",
-      "board": "Diretoria (Mensal)",
+      "board": "Diretório (Mensal)",
       "strategic": "Estratégico (Anual)",
       "week": "Últimos 7 Dias",
       "month": "Este Mês",
@@ -829,7 +829,7 @@
     },
     "empty": {
       "filtered": "Nenhum backup corresponde aos filtros informados.",
-      "initial": "Nenhum ponto de restauro localizado. Selecione a origem acima para carregar os cofres."
+      "initial": "Nenhum ponto de restauração localizado. Selecione a origem acima para carregar os cofres."
     },
     "manifest": {
       "source": "Origem: {{source}}",
@@ -849,10 +849,10 @@
       }
     },
     "progress": {
-      "starting": "Ligando motores de restauro...",
+      "starting": "Ligando motores de restauração...",
       "downloading": "Baixando: {{path}}",
       "extracting": "Descompactando: {{path}}",
-      "completeCloud": "Restauro Cloud concluído!",
+      "completeCloud": "Restauração Cloud concluída!",
       "complete": "Concluído!"
     },
     "modal": {
@@ -866,20 +866,20 @@
       "processing": "Processando lote: {{name}}..."
     },
     "toast": {
-      "restoreFinishedTitle": "Restauro Finalizado",
+      "restoreFinishedTitle": "Restauração Finalizada",
       "restoreFinishedMessage": "O relatório de auditoria foi enviado por e-mail.",
-      "restoreAttentionTitle": "Atenção no Restauro",
+      "restoreAttentionTitle": "Atenção na Restauração",
       "warningTitle": "Aviso",
       "errorTitle": "Erro",
       "localVaultEmpty": "Nenhum cofre Kopher Shield (.kophershield ou legado .coopshield) encontrado nesta pasta.",
       "scanLocalFailed": "Falha ao escanear cofre local: {{error}}",
       "invalidCloudVault": "Selecione um cofre de nuvem válido.",
       "cloudEmpty": "Nenhum backup encontrado neste cofre Cloud.",
-      "cloudFound_one": "{{count}} ponto de restauro encontrado na Nuvem.",
-      "cloudFound_other": "{{count}} pontos de restauro encontrados na Nuvem.",
+      "cloudFound_one": "{{count}} ponto de restauração encontrado na Nuvem.",
+      "cloudFound_other": "{{count}} pontos de restauração encontrados na Nuvem.",
       "cloudConnectFailed": "Falha ao conectar à Nuvem: {{error}}",
       "criticalErrorTitle": "Erro Crítico",
-      "confirmRestoreFailed": "Falha ao acionar restauro: {{error}}",
+      "confirmRestoreFailed": "Falha ao acionar restauração: {{error}}",
       "batchFailureTitle": "Falha no Lote",
       "batchFailedItem": "Erro ao restaurar {{name}}. O sistema avançará para o próximo.",
       "batchFinishedTitle": "Lote Finalizado",

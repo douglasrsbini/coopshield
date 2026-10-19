@@ -17,7 +17,7 @@ pub struct BackupChunk {
 pub struct SecurityEngine;
 
 impl SecurityEngine {
-    // Gera uma chave de encriptação segura de 256 bits
+    // Gera uma chave de criptografia segura de 256 bits
     pub fn generate_key() -> Vec<u8> {
         use aes_gcm::aead::rand_core::RngCore;
         let mut key = vec![0u8; 32];
@@ -28,7 +28,7 @@ impl SecurityEngine {
     // Encripta os dados de um chunk usando AES-256-GCM
     pub fn encrypt_chunk(data: &[u8], key: &[u8]) -> Result<(Vec<u8>, Vec<u8>), String> {
         if key.len() != 32 {
-            return Err("A chave de encriptação deve ter exatamente 32 bytes.".into());
+            return Err("A chave de criptografia deve ter exatamente 32 bytes.".into());
         }
         
         let cipher = Aes256Gcm::new_from_slice(key).map_err(|e| e.to_string())?;
@@ -50,7 +50,7 @@ impl SecurityEngine {
         format!("{:x}", hasher.finalize())
     }
 
-    // Processa um arquivo local: divide em chunks de 1MB, calcula hash e encripta
+    // Processa um arquivo local: divide em chunks de 1MB, calcula hash e criptografa
     pub fn process_file_to_chunks(file_path: &Path, encryption_key: &[u8]) -> Result<Vec<BackupChunk>, String> {
         let mut file = File::open(file_path).map_err(|e| e.to_string())?;
         let mut buffer = vec![0u8; 1024 * 1024]; // Blocos de 1MB
